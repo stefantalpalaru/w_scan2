@@ -109,6 +109,7 @@ struct w_scan_flags flags = {
   0,                // codepage, 0 = UTF-8
   0,                // print pmt
   0,                // emulate
+  0,                // keep duplicate transponders
 };
  
 static unsigned int delsys_min = 0;             // initialization of delsys loop. 0 = delsys legacy.
@@ -923,7 +924,7 @@ static void parse_descriptors(enum table_id t, const unsigned char * buf, int de
 
 /* EN 13818-1 p.43 Table 2-25 - Program association section
  */
-em_static void parse_pat(const unsigned char * buf, uint16_t section_length, uint16_t transport_stream_id, uint32_t flags) {
+em_static void parse_pat(const unsigned char * buf, uint16_t section_length, uint16_t transport_stream_id, uint32_t section_flags) {
   verbose("PAT (xxxx:xxxx:%u)\n", transport_stream_id);  
   hexdump(__FUNCTION__, buf, section_length);
 
@@ -936,7 +937,9 @@ em_static void parse_pat(const unsigned char * buf, uint16_t section_length, uin
          current_tp->network_id,
          transport_stream_id);
      current_tp->transport_stream_id = transport_stream_id;
-     check_duplicate_transponders();
+     if (!flags.keep_duplicate_transponders) {
+        check_duplicate_transponders();
+     }
      if (verbosity > 1) list_transponders();
      }
 
@@ -959,7 +962,7 @@ em_static void parse_pat(const unsigned char * buf, uint16_t section_length, uin
         s = alloc_service(current_tp, service_id);
      s->pmt_pid = program_number;
 
-     if (! (flags & SECTION_FLAG_INITIAL)) {
+     if (! (section_flags & SECTION_FLAG_INITIAL)) {
         if (s->priv == NULL) { //  && s->pmt_pid) {  pmt_pid is by spec: 0x0010 .. 0x1FFE . see EN13818-1 p.19 Table 2-3 - PID table
            s->priv = calloc(1, sizeof(struct section_buf));
            setup_filter(s->priv, demux_devname, s->pmt_pid, TABLE_PMT, -1, 1, 0, SECTION_FLAG_FREE);
@@ -1232,7 +1235,9 @@ em_static void parse_nit(const unsigned char * buf, uint16_t section_length, uin
      info("        %s : updating network_id -> (%u:%u:%u)\n",
           buffer, current_tp->original_network_id, network_id, current_tp->transport_stream_id);
      current_tp->network_id = network_id;
-     check_duplicate_transponders();
+     if (!flags.keep_duplicate_transponders) {
+        check_duplicate_transponders();
+     }
      if (verbosity > 1) list_transponders();
      }
 
@@ -1309,7 +1314,7 @@ em_static void parse_nit(const unsigned char * buf, uint16_t section_length, uin
         // this transponder is already known. Should we update its informations?
         if (tn.other_frequency_flag)
             tn.frequency = t->frequency;
-        if (table_id == TABLE_NIT_ACT) {
+        if (table_id == TABLE_NIT_ACT && !flags.keep_duplicate_transponders) {
            // only nit_actual should update transponders, too much garbage in satellite nit_other.
            if (is_different_transponder_deep_scan(t, &tn, 0) && ((! t->locks_with_params) || is_auto_params(t))) { // || t->source != tn.source) {
               /* some of the informations is still set to AUTO */
@@ -3227,6 +3232,11 @@ static const char * ext_opts = "%s expert help\n"
   "               specify VDR version / channels.conf format\n"
   "               2  = VDR-2.0.x (default)\n"
   "               21 = VDR-2.1.x\n"
+  "       -K, --keep-duplicate-transponders\n"
+  "               normally, only the first transponder copy is kept,\n"
+  "               regardless of the signal strength, so if you are in an area\n"
+  "               with the same transponders being broadcast from different sources,\n"
+  "               you will need this option to search for services in all of them\n"
   ".................Device..................\n"
   "       -a N, --adapter N\n"
   "               use device /dev/dvb/adapterN/ [default: auto detect]\n"
@@ -3370,6 +3380,7 @@ static struct option long_options[] = {
     {"rotor-position"    , required_argument, NULL, 'r'},
     {"scr"               , required_argument, NULL, 'u'},
     {"use-pat"           , required_argument, NULL, 'P'},
+    {"keep-duplicate-transponders", no_argument, NULL, 'K'},
     {NULL                , 0                , NULL,  0 },
 };
 
@@ -3434,7 +3445,7 @@ int main(int argc, char ** argv) {
   
   for (opt=0; opt<argc; opt++) info("%s ", argv[opt]); info("%s", "\n");
 
-  while((opt = getopt_long(argc, argv, "a:c:e:f:hi:l:o:p:qr:s:t:u:vxA:C:D:E:FGHI:LMO:PQ:R:S:T:VXZ", long_options, NULL)) != -1) {
+  while((opt = getopt_long(argc, argv, "a:c:e:f:hi:l:o:p:qr:s:t:u:vxA:C:D:E:FGHI:KLMO:PQ:R:S:T:VXZ", long_options, NULL)) != -1) {
      switch(opt) {
      case 'a': //adapter
              if (strstr(optarg, "/dev/dvb")) {
@@ -3629,6 +3640,9 @@ int main(int argc, char ** argv) {
              break;
      case 'I': //expert providing initial_tuning_data
              initdata=strdup(optarg);
+             break;
+     case 'K': // keep duplicate transponders
+             flags.keep_duplicate_transponders = 1;
              break;
      case 'L': //vlc output
              output_format = OUTPUT_VLC_M3U;
