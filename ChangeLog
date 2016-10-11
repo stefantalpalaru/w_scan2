@@ -1,5 +1,15 @@
 ChangeLog:
 --------------------
+[1.0.0] 2016-10-
+ - project forked
+ - keep duplicate transponders by default because a stronger transponder with
+   the same ID might have a higher frequency and be discarded simply because
+   it's scanned later. Also don't replace the current transponder with an
+   advertised one by default. The latter may have a lower signal strength.
+   More details here:
+   https://stefantalpalaru.wordpress.com/2016/02/04/scan-all-the-things/
+ - the old behaviour can be enabled with -d (--delete-duplicate-transponders)
+
 2014-11-22
  - move '-lrt' from LDFLAGS to AM_LDFLAGS
  - move nested function LeapYear() outside modified_julian_date_to_utc()
