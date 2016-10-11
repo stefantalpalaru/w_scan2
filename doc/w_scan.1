@@ -1,0 +1,320 @@
+.TH "w_scan" 1 "28 March 2011" "" ""
+.SH "NAME"
+w_scan \- a universal ATSC and DVB blind scanner
+.SH "SYNOPSIS"
+.B w_scan
+.B -fa
+.I -c \<COUNTRY_ID\> 
+.B [ options ] 
+.br
+.B w_scan
+.B -fc
+.I -c \<COUNTRY_ID\> 
+.B [ options ] 
+.br
+.B w_scan
+.B -ft
+.I -c \<COUNTRY_ID\> 
+.B [ options ] 
+.br
+.B w_scan
+.B -fs
+.I -s \<SATELLITE_ID\> 
+.B [ options ] 
+.SH "DESCRIPTION"
+.B w_scan
+scans for DVB\-C, DVB\-S/S2, DVB\-T, ISDB-T and ATSC channels. Any other program accessing the DVB hardware (like e.g. VDR) has to be closed in order to avoid conflicts while running w_scan.
+.br
+w_scan provides the channels in different output formats (Default: VDR channels.conf). For other output formats see OPTIONS.
+.SH "OPTIONS"
+The following options are available.
+.TP 
+.B \-f TYPE
+Frontend type,
+.br
+"a" = ATSC,
+.br
+"c" = DVB-C,
+.br
+"s" = DVB-S/S2,
+.br
+"t" = DVB-T (and ISDB-T) [default]
+.br
+Depending on "TYPE", either of the arguments "-s" or "-c" is mandatory. 
+.TP 
+.B \-c COUNTRY_ID
+Mandatory argument for ATSC scans, cable scans and terrestrian scans, see option -f.
+.br
+Specifies the country where you try to scan for channels as uppercase two letter identifier, e.g.
+.br
+DE = Germany,
+.br
+US = United States,
+.br
+FR = France
+.br
+Use "-c?" for a list of all known identifiers.
+.TP 
+.B \-s SATELLITE_ID
+Mandatory argument for satellite scans, see option -f.
+.br
+Specifies the satellite you wish to scan as uppercase identifier, e.g.
+.br
+S19E2 = 19.2° east,
+.br
+S13E0 = 13.0° east,
+.br
+S0W8 = 0.8° west.
+.br
+Use "-s?" for a list of all known identifiers.
+.TP 
+.B \-A N
+specify ATSC scan type
+.br
+1 = terrestrial [default],
+.br
+2 = cable,
+.br
+3 = both, cable and terrestrial.
+.TP 
+.B \-o N
+VDR channels.conf format
+.br
+2 = VDR\-2.0 [default],
+.br
+21 = VDR\-2.1
+.TP 
+.B \-X
+generate zap/czap/xine output instead of VDR channels.conf.
+.TP
+.B \-x
+generate initial tuning data output for (dvb\-)scan instead of VDR channels.conf.
+.TP 
+.B \-k
+generate channels.dvb for kaffeine instead of VDR channels.conf.
+.TP 
+.B \-L
+generate VLC xspf playlist (experimental)
+.TP 
+.B \-M
+mplayer output instead of vdr channels.conf
+.TP 
+.B \-G
+generate output for Gstreamer dvbsrc plugin
+.TP 
+.B \-h
+show help
+.TP 
+.B \-H
+show expert help
+.SH "EXPERT OPTIONS"
+.TP 
+.B \-C CHARSET
+specifies the output charset, i.e. "UTF-8", "ISO-8859-15"
+.br
+use 'iconv --list' to see full list of charsets.
+.TP
+.B \-I FILE
+import dvbscan initial_tuning_data
+.TP 
+.B \-v
+verbose (repeat for more)
+.TP 
+.B \-q
+quiet (repeat for less)
+.TP 
+.B \-R N
+Radio channels
+.br
+0 = don't search radio channels
+.br
+1 = search radio channels [default]
+.TP 
+.B \-T N
+TV channels
+.br
+0 = don't search TV channels,
+.br
+1 = search TV channels [default]
+.TP 
+.B \-O N
+Other services
+.br
+0 = don't search other services,
+.br
+1 = search other services [default]
+.TP 
+.B \-E N
+Conditional access / encrypted channels
+.br
+0 = only Free TV channels,
+.br
+1 = include encrypted channels [default]
+.TP 
+.B \-a N
+use device /dev/dvb/adapterN/ [default: auto detect]
+.br
+(also allowed: -a /dev/dvb/adapterN/frontendM)
+.br
+.I
+NOTE: This option is deprecated and should be usually omitted.
+.TP 
+.B \-F
+Long filter timeout for reading data from hardware. 
+.TP 
+.B \-t N
+Tuning timeout, increasing may help if device tunes slowly or has bad reception.
+.br
+1 = fastest [default],
+.br
+2 = medium,
+.br
+3 = slowest
+.TP 
+.B \-i N
+spectral inversion setting for cable TV
+.br
+0 = off,
+.br
+1 = on,
+.br
+2 = auto [default]
+.TP 
+.B \-Q
+DVB-C modulation [default: choosen by country]
+.br
+.I NOTE: for experienced users only!
+.br
+0 = QAM64,
+.br
+1 = QAM256,
+.br
+2 = QAM128
+.TP
+\fB\-S\fR \fIRATE\fR
+set DVB\-C symbol rate, see table: [default: choosen by country]
+.br
+.I
+NOTE: for experienced users only!!
+.br
+0 = 6\.9000 MSymbol/s
+.
+.br
+1 = 6\.8750 MSymbol/s
+.
+.br
+2 = 6\.9565 MSymbol/s
+.
+.br
+3 = 6\.9560 MSymbol/s
+.
+.br
+4 = 6\.9520 MSymbol/s
+.
+.br
+5 = 6\.9500 MSymbol/s
+.
+.br
+6 = 6\.7900 MSymbol/s
+.
+.br
+7 = 6\.8110 MSymbol/s
+.
+.br
+8 = 6\.2500 MSymbol/s
+.
+.br
+9 = 6\.1110 MSymbol/s
+.
+.br
+10 = 6\.0860 MSymbol/s
+.
+.br
+11 = 5\.9000 MSymbol/s
+.
+.br
+12 = 5\.4830 MSymbol/s
+.
+.br
+13 = 5\.2170 MSymbol/s
+.
+.br
+14 = 5\.1560 MSymbol/s
+.
+.br
+15 = 5\.0000 MSymbol/s
+.
+.br
+16 = 4\.0000 MSymbol/s
+.
+.br
+17 = 3\.4500 MSymbol/s
+.br
+.TP
+.B \-e
+extended DVB-C scan flags.
+.br
+.I NOTE: for experienced users only!
+.br
+Any combination of these flags:
+.br
+1 = use extended symbolrate list,
+.br
+2 = extended QAM scan  
+.TP 
+.B \-l TYPE
+choose LNB type by name (DVB-S/S2 only) [default: UNIVERSAL],
+.br
+"-l?" for list of known LNBs. 
+.TP 
+.B \-D Nc
+use DiSEqC committed switch position N (N = 0 .. 3)
+.TP 
+.B \-D Nu
+use DiSEqC uncommitted switch position N (N = 0 .. 15)
+.TP 
+.B \-p <file>
+use DiSEqC rotor Position file
+.TP 
+.B \-r N
+use Rotor position N (N = 1 .. 255)
+.TP 
+.B \-P
+ATSC scan: do not use ATSC PSIP tables for scan (PAT and PMT only)
+.SH "EXAMPLES"
+.TP
+scan satellite 19.2° east:
+.B w_scan -fs -s S19E2
+.TP
+scan cable (DVB), Germany:
+.B w_scan -fc -c DE
+.TP
+scan aerial (DVB), France:
+.B w_scan -ft -c FR
+.TP
+scan cable (ATSC), United States:
+.B w_scan -fa -A2 -c US
+.TP
+scan aerial (ATSC), United States:
+.B w_scan -fa -A1 -c US
+.TP
+use output format kaffeine:
+.B w_scan [ OTHER OPTIONS ] -k
+.TP
+use output format zap/czap/xine:
+.B w_scan [ OTHER OPTIONS ] -X
+.TP
+use output format dvbscan/scan/scan-s2 initial tuning data.
+.B w_scan [ OTHER OPTIONS ] -x
+.br
+.I  NOTE: w_scan also performs full scans, so there is generally no need for this.
+.SH "REPORTING BUGS"
+see README file from source code package.
+.SH "AUTHOR"
+Written by W.Koehler
+.PP 
+Permission is granted to copy, distribute and/or modify this document under
+the terms of the GNU General Public License, Version 2 any
+later version published by the Free Software Foundation.
+.SH "SEE ALSO"
+.BR vdr (1)

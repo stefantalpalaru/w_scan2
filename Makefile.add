@@ -1,0 +1,14 @@
+__VERSION=$(shell date +%Y%m%d)
+__OLDVER=$(shell cat configure.in | grep AC_INIT | sed -e "s|\[|\\\[|g" -e "s|\]|\\\]|g")
+
+version:
+	@echo "/* AUTOMATICALLY GENERATED - DO NOT EDIT MANUALLY */" > version.h
+	@echo "#ifndef W_SCAN_VERSION_H" >> version.h
+	@echo "#define W_SCAN_VERSION_H" >> version.h
+	@echo "uint version=$(__VERSION);" >> version.h
+	@echo "#endif" >> version.h
+	@echo "" >> version.h
+	@chmod a-x version.h
+	@sed -i -e "s|$(__OLDVER)|AC_INIT(\[$(PACKAGE)\]\, \[$(__VERSION)\])|" configure.in
+	autoconf
+

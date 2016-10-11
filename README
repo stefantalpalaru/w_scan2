@@ -1,0 +1,108 @@
+Hi,
+
+this is a small channel scan tool for vdr which generates ATSC, DVB-C, DVB-S/S2 and DVB-T channels.conf files.
+It's based on old "scan" tool from linuxtv-dvb-apps-1.1.0, the differences are:
+
+- no initial tuning data needed, because scanning without this data is exactly
+  what a scan tool like this should do
+- it detects automatically which DVB/ATSC card to use
+- much more output formats, interfacing to other dtv software.
+
+0. Newest Version
+--------------------
+always at http://wirbel-htpc-forum.de
+
+1. Building w_scan
+--------------------
+Ususally not needed - w_scan is included as binary in this package.
+
+1.a Using the autotools tool chain.
+----------------------------------
+If you really need to compile, just issue the usual
+
+./configure
+make
+make install
+
+NOTE: For compiling need up-to-date(!) dvb headers with DVB API 5.3 support
+are needed. If configure fails complaining about missing or old DVB headers,
+run in your kernel source 'make headers_install' 
+(needs kernel 2.6.29 or higher (!) ).
+At your choice you may also manually update this files; they're located
+in /usr/include/linux/dvb.
+
+1.b Using the cmake tool chain.
+----------------------------------
+You may also use the new cmake tool chain, but be warned - that tool chain is
+new and experimental in w_scan up to now. It's intended to be used as
+
+mkdir build && cd build
+cmake ..
+make
+make install
+
+NOTE: cmake allows as ./configure does, a user defined install prefix.
+      Use 'cmake -DCMAKE_INSTALL_PREFIX=<YOUR_INSTALL_PREFIX> ..'. If you don't
+      overwrite CMAKE_INSTALL_PREFIX, w_scan will be installed with prefix=/usr.
+
+2. Basic usage
+--------------------
+
+NOTE: Newer versions of w_scan need setting '-c' for specifying 
+country (ATSC, DVB-C and DVB-T) or '-s' for satellite (DVB-S).
+
+
+2.a. DVB-C (using Germany as country, option -c)
+./w_scan -fc -c DE >> channels.conf
+
+2.b. DVB-T
+./w_scan -c DE >> channels.conf
+
+2.c. DVB-C and DVB-T
+./w_scan -c DE >> channels.conf && ./w_scan -fc -c DE >> channels.conf
+
+2.d. ATSC (terrestrial, using United States as country)
+./w_scan -fa -c US >> channels.conf
+
+2.e. US Digital Cable (QAM Annex-B)
+./w_scan -A2 -c US >> channels.conf
+
+2.f. ATSC, both terrestrial and digital cable
+./w_scan -A3 -c US >> channels.conf
+
+2.g. DVB-S, here: Astra 19.2 east
+./w_scan -fs -s S19E2
+
+	NOTE: see './w_scan -s?' for list of satellites.
+
+2.h. generate (dvb)scan initial-tuning-data
+./w_scan -c DE -x > initial_tuning_data.txt
+
+2.i. generate kaffeine-0.8.5 channels.dvb
+./w_scan -c DE -k > channels.dvb
+
+2.j. reformat output for UTF8
+./w_scan <OPTIONS> | tcs -f 8859-1 > channels.conf
+
+For more sophisticated scan options see ./w_scan -h.
+
+
+3. Credits
+--------------------
+- "e9hack" Hartmut Birr for onid-patch (2006-09-01)
+- "seaman" giving his his Airstar2 for testing purposes to me
+- "Wicky" for testing with Airstar2/Zarlink MT352 DVB-T
+- "kilroy" for testing with Airstar2/Zarlink MT352 DVB-T and Avermedia
+- "Fabrizio" for testing with Airstar2/Zarlink MT352 DVB-T
+-  Arturo Martinez <martinez@embl.de> for a huge bunch of tests on DVB-S/DVB-S2
+-  Rolf Ahrenberg for doing DVB-T/T2 tests and suggestions to improve w_scan
+
+4. Copyright
+--------------------
+w_scan is GPLv2 Software, see included file COPYRIGHT for details.
+The author can be reached at: w_scan AT gmx-topmail DOT de
+
+have phun,
+wirbel
+
+

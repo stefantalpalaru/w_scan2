@@ -1,0 +1,589 @@
+<!-- ===========================================================================
+ w_scan xml service_list DTD
+ Copyright (c) 2014 Winfried Koehler
+ http://wirbel.htpc-forum.de
+ 
+ This file describes the "w_scan XML file format" used by w_scan.
+
+ This DTD file and the w_scan XML file format described by this DTD may be used
+ and or redistributed in any kind of application as long as:
+
+ 1. this DTD is not modified. Modifications have to be made only by original author.
+
+ 2. your program may read and/or write in w_scan XML file format.
+
+ 3. if your program writes data according to w_scan XML file format,
+    it should check for XML validity against this DTD.
+
+ 4. if your program reads data according to w_scan XML file format,
+    it should check for XML validity against this DTD.
+
+ 5. no fitness for any purpose is guaranteed, nor any responsibility
+    taken over for any usage. If you use it, use this at your own risk.
+
+ 6. extensions to w_scan XML file format may be suggested to original author.
+    No guarantee is made for taking over such suggestions.
+
+ For contact address, see w_scan source code.
+================================================================================ -->
+
+
+
+
+
+<!-- ===========================================================================
+ suggestions:
+  1) expect future versions of this DTD file to be backward compatible.
+  2) dont use <TAB> chars to indent your XML files
+  3) indent using three (3) spaces for readability.
+  4) indent any child of an XML Element.
+  5) if bugs found, please report.
+================================================================================ -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- === generic typedefs ====================================================== -->
+
+<!ENTITY % uint32_t          "CDATA">           <!-- an unsigned 32 bit integer  -->
+<!ENTITY % uint16_t          "CDATA">           <!-- an unsigned 16 bit integer  -->
+<!ENTITY % uint8_t           "CDATA">           <!-- an unsigned 8 bit integer   -->  
+<!ENTITY % hex16_t           "CDATA">           <!-- an unsigned 16 bit integer,
+                                                     in "0x%4X" style, ie. '0x012A'
+                                                     '0x' + 4 digits.            -->
+<!ENTITY % double            "CDATA">           <!-- double floating point number,
+                                                     printed as "%.3f", ie 2.345 -->
+<!ENTITY % boolean           "(false | true)">        
+<!ENTITY % char256           "CDATA">           <!-- a nullterminated string, up
+                                                     to 255 chars + '\0'.
+                                                     ASCII 0..127 only.          -->
+<!ENTITY % char3             "CDATA">           <!-- 3 byte char buffer.
+                                                     ASCII 0..127 only.          -->
+<!-- =========================================================================== -->
+
+
+
+
+
+<!-- ===== An human readable comment, up to 255 char of ASCII 0..127. ==========
+     example: <comment char256="Your comment here."/>
+
+     NOTE: ITEMS OF TYPE char256 ARE NOT FORESEEN FOR TEXT PARSING. But may
+           be displayed as they are.           
+     =========================================================================== -->
+<!ELEMENT comment ANY>
+<!ATTLIST comment char256 %char256; "">
+
+
+
+
+
+<!-- ===== name of an item =====================================================
+     Names may contain up to 255 char of ASCII 0..127.
+     example: <comment char256="YOUR COMMENT HERE."/>
+
+     NOTE: ITEMS OF TYPE char256 ARE NOT FORESEEN FOR TEXT PARSING. But may
+           be displayed as they are.
+     =========================================================================== -->
+<!ELEMENT name EMPTY>
+<!ATTLIST name char256 %char256; "">
+
+<!ELEMENT provider EMPTY>
+<!ATTLIST provider char256 %char256; "">
+
+
+
+
+
+<!-- ===== service_list (root element) =========================================
+     The service list contains one list of transponders and zero or one
+     list of services.
+
+     example:
+        <service_list>
+           <transponders>
+              (..)
+           </transponders>       
+           <services>
+              (..)
+           </services>
+        </service_list>
+     =========================================================================== -->
+<!ELEMENT service_list (transponders,services?)>
+
+
+
+
+
+<!-- ===== transponders ========================================================
+     The transponders list contains one or more items of type transponder.
+
+     example:
+        <transponders>
+           <transponder ONID="1234" NID="1234" TSID="43210">
+              (..)
+           </transponder>
+           <transponder ONID="1234" NID="1234" TSID="43212">
+              (..)
+           </transponder>
+        </transponders> 
+     =========================================================================== -->
+<!ELEMENT transponders (transponder+)>
+
+
+
+
+
+<!-- ===== transponder =========================================================
+     Any item of type transponder is identified by original_network_id,
+     network_id and transport_stream_id. Therefore, those three PIDs are
+     REQUIRED.
+     transponder items may optionally have a comment at beginning or end and
+     have a MANDATORY list of params.
+
+     example:
+        <transponder ONID="1234" NID="1234" TSID="43210">
+           <params delivery_system=(..) center_frequency=(..)>
+             (..)
+           </params>
+        </transponder>
+     =========================================================================== -->
+<!ELEMENT transponder (comment?,params,comment?)>
+<!ATTLIST transponder
+          ONID                  %uint16_t; #REQUIRED
+          NID                   %uint16_t; #REQUIRED
+          TSID                  %uint16_t; #REQUIRED
+          >
+
+
+
+
+
+<!-- ===== services ============================================================
+     The services list contains zero or more items of type service.
+     May be omitted fully.
+
+     example:
+        <services>
+           <service ONID="1234" TSID="43210" SID="102">
+              (..)
+           </service>
+        </services>
+     =========================================================================== -->
+<!ELEMENT services (service*)>
+
+<!ELEMENT frequency_list (tfs_center|transposer)*>
+
+<!ELEMENT tfs_center EMPTY>
+<!ATTLIST tfs_center
+          frequency             %double;   #REQUIRED
+          cell_id               %uint16_t; "0"
+          >
+
+<!ELEMENT transposer EMPTY>
+<!ATTLIST transposer
+          frequency             %double;   #REQUIRED
+          cell_id               %uint16_t; "0"
+          cell_id_extension     %uint8_t;  "0"
+          >
+
+
+<!-- ===== params ==============================================================
+     The params list contains zero or more items of type param.
+
+     Two attributes are MANDATORY to params, delivery_system and
+     center_frequency in unit MHz. center_frequency format specifier is
+     floating point with 3 digits after decimal point: "%.3f",
+     see printf reference. 
+
+     NOTE: If multiple frequencies are in use, set CF to "0.000" here and
+           add the list of other_frequencies to params. Set also the
+           other_frequency_flag (default: false) in params to signal the
+           existence of the other_frequencies list.
+
+     example:
+         <params delivery_system="SYS_DVBC_ANNEX_A" center_frequency="394.000">
+            <param (..) />
+            <param (..) />
+         </params>
+     =========================================================================== -->
+<!ELEMENT params (param)*>
+<!ATTLIST params
+          delsys                (SYS_UNDEFINED    |
+                                 SYS_DVBC_ANNEX_A |
+                                 SYS_DVBC_ANNEX_B |
+                                 SYS_DVBC_ANNEX_C |
+                                 SYS_DVBT         |
+                                 SYS_DVBT2        |
+                                 SYS_ATSC         |
+                                 SYS_DVBS         |
+                                 SYS_DVBS2        |
+                                 SYS_DSS          |
+                                 SYS_TURBO        |
+                                 SYS_DVBH         |
+                                 SYS_ISDBT        |
+                                 SYS_ISDBS        |
+                                 SYS_ISDBC        |
+                                 SYS_ATSCMH       |
+                                 SYS_DTMB         |
+                                 SYS_CMMB         |
+                                 SYS_DAB
+                                 ) #REQUIRED
+          center_frequency      %double; #REQUIRED
+          >
+
+
+
+
+
+<!-- ===== param ===============================================================
+     An entry of params list.
+
+     Any param reflects transponder related NIT data (see en300486),
+     ie. modulation, coderate, polarization, etc.
+     
+     symbolrate, unit: MSymbol/sec ('MHz')
+     bandwidth,  unit: MHz, format specifier is floating point with
+                            3 digits after decimal point: "%.3f",
+                            see printf reference. 
+
+     orbital_position: tens of deg in hex; ie 19.2deg -> 0x0192
+     west_east_flag  : W = 'west', E = 'east'
+
+     terrestrial_delivery_system_descriptor
+     ================================================================
+     hierarchy      : see EN 300 468, Table 46.
+     priority       : if hierarchy differs from HIERARCHY_NONE: true if HP stream.
+     alpha          : if hierarchy differs from HIERARCHY_NONE: see EN 300 468, Table 46.
+     terr_interleave: if hierarchy differs from HIERARCHY_NONE: see EN 300 468, Table 46.
+     coderate_LP    : if hierarchy differs from HIERARCHY_NONE:
+                      coderate low priority stream. ignore if hierarchy = HIERARCHY_NONE.
+
+     mpe_fec  : if true, MPE-FEC as defined in EN 301 192 is used.
+
+     S2_satellite_delivery_system_descriptor:
+     ================================================================
+     scrambling_sequence_selector : use scrambling_sequence_index
+     multiple_input_stream_flag   : single TS or conveyed multiple TS
+     scrambling_sequence_index    : 18bit uint, transmitted as uint32_t
+
+     T2_delivery_system_descriptor:
+     ================================================================
+     extended_info : true, if SISO_MISO, bandwidth, guard_interval
+                           etc are supplied. Optional.
+     SISO_MISO     : true for MISO. (default = false).
+     tfs_flag      : true for TFS.  (default = false).
+
+
+     C2_delivery_system_descriptor:
+     ================================================================
+     C2_System_tuning_frequency      : see center_frequency
+     C2_System_tuning_frequency_type : see EN 300 468
+     active_OFDM_symbol_duration     : see EN 300 468
+
+
+     examples: <param modulation="QAM_256"/>
+               <param symbolrate="6.875"/>
+     =========================================================================== -->
+<!ELEMENT param EMPTY>
+<!ATTLIST param
+          modulation            (QAM_AUTO |
+                                 QPSK     |
+                                 QAM_16   |
+                                 QAM_32   |
+                                 QAM_64   |
+                                 QAM_128  |
+                                 QAM_256  |
+                                 VSB_8    |
+                                 VSB_16   |
+                                 PSK_8    |
+                                 APSK_16  |
+                                 APSK_32  |
+                                 DQPSK    |
+                                 QAM_4_NR
+                                 ) "QAM_AUTO"
+
+          bandwidth             %uint32_t; "8.000"
+
+          coderate              (FEC_AUTO |
+                                 FEC_NONE |
+                                 FEC_2_5  |
+                                 FEC_1_2  |
+                                 FEC_3_5  |
+                                 FEC_2_3  |
+                                 FEC_3_4  |
+                                 FEC_4_5  |
+                                 FEC_5_6  |
+                                 FEC_6_7  |
+                                 FEC_7_8  |
+                                 FEC_8_9  |
+                                 FEC_9_10
+                                 ) "FEC_AUTO"
+
+          coderate_LP           (FEC_AUTO |
+                                 FEC_NONE |
+                                 FEC_2_5  |
+                                 FEC_1_2  |
+                                 FEC_3_5  |
+                                 FEC_2_3  |
+                                 FEC_3_4  |
+                                 FEC_4_5  |
+                                 FEC_5_6  |
+                                 FEC_6_7  |
+                                 FEC_7_8  |
+                                 FEC_8_9  |
+                                 FEC_9_10
+                                 ) "FEC_NONE"
+
+          transmission          (TRANSMISSION_MODE_AUTO |
+                                 TRANSMISSION_MODE_1K   |
+                                 TRANSMISSION_MODE_2K   |
+                                 TRANSMISSION_MODE_4K   |
+                                 TRANSMISSION_MODE_8K   |
+                                 TRANSMISSION_MODE_16K  |
+                                 TRANSMISSION_MODE_32K  |
+                                 TRANSMISSION_MODE_C1   |
+                                 TRANSMISSION_MODE_C3780
+                                ) "TRANSMISSION_MODE_AUTO"
+
+          guard                 (GUARD_INTERVAL_AUTO   |
+                                 GUARD_INTERVAL_1_4    |
+                                 GUARD_INTERVAL_1_8    |
+                                 GUARD_INTERVAL_1_16   |
+                                 GUARD_INTERVAL_1_32   |
+                                 GUARD_INTERVAL_1_128  |
+                                 GUARD_INTERVAL_19_128 |
+                                 GUARD_INTERVAL_19_256 |
+                                 GUARD_INTERVAL_PN420  |
+                                 GUARD_INTERVAL_PN595  |
+                                 GUARD_INTERVAL_PN945
+                                ) "GUARD_INTERVAL_AUTO"
+
+          hierarchy             (HIERARCHY_AUTO |
+                                 HIERARCHY_NONE |
+                                 HIERARCHY_1    |
+                                 HIERARCHY_2    |
+                                 HIERARCHY_4
+                                ) "HIERARCHY_NONE"
+
+          alpha                 (ALPHA_1     |
+                                 ALPHA_2     |
+                                 ALPHA_4     |
+                                 ALPHA_AUTO
+                                ) "ALPHA_AUTO"
+
+          terr_interleaver     (INTERLEAVE_NATIVE   |
+                                 INTERLEAVE_IN_DEPTH |
+                                 INTERLEAVE_AUTO
+                                ) "INTERLEAVE_AUTO"
+
+          priority              %boolean; "true"
+          mpe_fec               %boolean; "false"
+          time_slicing          %boolean; "false"
+
+          plp_id                %uint16_t; "0"
+          system_id             %uint16_t; "0"
+          extended_info         %boolean; "true"
+          SISO_MISO             %boolean; "false"
+          tfs_flag              %boolean; "false"
+          other_frequency_flag  %boolean; "false"
+          other_frequencies     %frequency_list;
+
+
+
+          polarization          (HORIZONTAL     |
+                                 VERTICAL       |
+                                 CIRCULAR_LEFT  |
+                                 CIRCULAR_RIGHT
+                                ) #IMPLIED
+
+          orbital_position      %hex16_t;  "0x0192"
+          west_east_flag        ( W | E )  "E"
+
+          symbolrate            %uint32_t; "6.900"
+
+
+          input_stream_id       %uint8_t;  "0"
+
+
+
+
+
+
+
+          pilot                 (PILOT_ON   |
+                                 PILOT_OFF  |
+                                 PILOT_AUTO
+                                ) "PILOT_AUTO"
+
+          rolloff               (ROLLOFF_35   |
+                                 ROLLOFF_25   |
+                                 ROLLOFF_20   |
+                                 ROLLOFF_AUTO
+                                ) "ROLLOFF_AUTO"
+
+
+
+
+          interleave            (INTERLEAVING_AUTO |
+                                 INTERLEAVING_NONE |
+                                 INTERLEAVING_240  |
+                                 INTERLEAVING_720
+                                ) "INTERLEAVING_NONE"
+
+
+
+          multiple_input_stream_flag   %boolean; "false"
+          scrambling_sequence_selector %boolean; "false"
+          scrambling_sequence_index    %uint32_t; "0"
+
+          data_slice_id        %uint8_t; "0"
+
+          C2_System_tuning_frequency_type (
+                                 DATA_SLICE_TUNING_FREQUENCY          |
+                                 C2_SYSTEM_CENTER_FREQUENCY           |
+                                 INITIAL_TUNING_FOR_STATIC_DATA_SLICE
+                                ) "C2_SYSTEM_CENTER_FREQUENCY"
+
+          active_OFDM_symbol_duration (
+                                 FFT_4K_8MHZ |
+                                 FFT_4K_6MHZ
+                                ) "FFT_4K_8MHZ"
+
+   
+          >
+
+
+
+
+
+<!-- ===== service ==============================================================
+     An entry of services list.
+
+     Any service reflects a combination of one or more TS streams, ie. a
+     scrambled TV service would contain at least an video stream, an audio
+     stream, and the pid of an conditional access (CA) system.
+
+     Any service is identified by three IDs, original_network_id, transport_stream_id
+     and service_id, where ONID and TSID map to a entry of the transponders list and
+     the service_id identifies the service on the selected transponder.
+
+     Therefore, three attributes to any service are MANDATORY: ONID, TSID, SID.
+
+     please note also this cite of en300468 p22 5.2.1 NIT:
+      "The combination of original_network_id and transport_stream_id allow each
+       TS to be uniquely identified throughout the application area of the
+       present document."
+
+     Each service contains in the following items in this sequence:
+        1) optional:  service name, 0..255 char of ASCII 0..127.
+                         ie. <name char256="A TV channels name"/>
+        2) optional:  provider name, 0..255 char of ASCII 0..127.
+                         ie. <provider char256="magic telecom"/>
+        3) optional:  the pcr pid of that channel, for TV channels
+                      usually identical to video pid.
+        4) MANDATORY: the list of streams related to this service.
+        5) optional:  the list of CA_system identifiers of this service.
+                      For scrambled services only. 
+        6) optional:  comment, human readable, not foreseen to be
+                      parsed by programs,
+                      0..255 char of ASCII 0..127.
+
+     NOTE: any char256 should only contain ASCII chars 0 to 127.
+     NOTE: CA_systems is omitted on non-scrambled/free-to-air(FTA) services.
+     =========================================================================== -->
+<!ELEMENT service (name?, provider?, pcr?, streams, CA_systems?, comment?)>
+<!ATTLIST service
+          ONID       %uint16_t; #REQUIRED
+          TSID       %uint16_t; #REQUIRED
+          SID        %uint16_t; #REQUIRED
+          >
+
+
+
+
+
+<!-- ===== streams =============================================================
+     The streams list contains one or more items of type stream.
+
+     Each stream represents service related data: audio, video, ..
+     =========================================================================== -->
+<!ELEMENT streams (stream)+>
+
+
+
+
+
+<!-- ===== stream ==============================================================
+     An entry of streams list.
+
+     Identifies a stream related to a service. If a stream is scrambled, an 
+     CA_systems list is expected. Two attributes are MANDATORY, the stream type
+     identifier 'type' and the TS 'pid', where the stream is carried on.
+ 
+     NOTE: if description or language_code are supplied, ASCII 0..127 only.
+
+     NOTE: 'language_code' is a 3 characters ISO 639-2/B or ISO 639-2/T
+           language code. uppercase and lowercase allowed. No default value.               
+     =========================================================================== -->
+<!ELEMENT stream EMPTY>
+<!ATTLIST stream
+          type        %uint16_t; #REQUIRED
+          pid         %uint16_t; #REQUIRED
+          description %char256; ""
+          language_code %char3; ""
+          >
+
+
+
+
+
+<!-- ===== pcr =================================================================
+     The pid where the pcr_pid for a service is carried on.
+     =========================================================================== -->
+<!ELEMENT pcr EMPTY>
+<!ATTLIST pcr pid %uint16_t; "0">
+
+
+
+
+
+<!-- ===== CA_systems =============================================================
+     The CA_systems (conditional access) list contains one or more items of
+     type CA_system.
+
+     This list is omitted on non-scrambled services.
+     =========================================================================== -->
+<!ELEMENT CA_systems (CA_system)+>
+
+
+
+
+
+<!-- ===== CA_system ==============================================================
+     An entry of CA_systems list.
+
+     Identifies the conditional access system(s) used to access a service.
+     MANDATORY: ca_id.
+
+     NOTE: name is informational only, ASCII 0..127 only, not foreseen for
+           text parsing.              
+     =========================================================================== -->
+<!ELEMENT CA_system EMPTY>
+<!ATTLIST CA_system
+          name       %char256; ""
+          ca_id      %hex16_t; #REQUIRED
+          >

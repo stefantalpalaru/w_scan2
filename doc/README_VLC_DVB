@@ -1,0 +1,100 @@
+I have add m3u output channel to use with libvlc(vdpau) on FreeTuxTV http://code.google.com/p/freetuxtv/
+
+the output (with -L) format is like:
+
+------------------------------
+#EXTVLCOPT:dvb-adapter=0
+#EXTINF:0,Channel name(Provider)
+#EXTVLCOPT:dvb-frequency=11524000
+#EXTVLCOPT:dvb-voltage=18
+#EXTVLCOPT:dvb-satno=0
+#EXTVLCOPT:dvb-srate=30000000
+#EXTVLCOPT:sout-ts-pid-video=601
+#EXTVLCOPT:sout-ts-pid-audio=602
+#EXTVLCOPT:program=102
+dvb://
+------------------------------
+tested using DVB-s only.
+
+## VLC dvb options:
+   cvlc --longhelp --advanced --help-verbose |egrep -i 'dvb|pid'
+
+
+VLC media player 1.1.3 The Luggage (revision exported)
+          This renders the font using "paletized YUV". This option is only needed if you want to encode into DVB subtitles (default disabled)
+ TS muxer (libdvbpsi)
+      --sout-ts-pid-video <integer>
+                                 Video PID
+          Assign a fixed PID to the video stream. The PCR PID will automatically be the video.
+      --sout-ts-pid-audio <integer>
+                                 Audio PID
+          Assign a fixed PID to the audio stream.
+      --sout-ts-pid-spu <integer>
+                                 SPU PID
+          Assign a fixed PID to the SPU.
+      --sout-ts-pid-pmt <integer>
+                                 PMT PID
+          Assign a fixed PID to the PMT
+          Assign a program number to each PMT. This requires "Set PID to ID of ES" to be enabled.
+      --sout-ts-es-id-pid, --no-sout-ts-es-id-pid
+                                 Set PID to ID of ES (default disabled)
+          Sets PID to the ID if the incoming ES. This is for use with --ts-es-id-pid, and allows to have the same PIDs in the input and output streams. (default disabled)
+      --sout-ts-muxpmt <string>  Mux PMT (requires --sout-ts-es-id-pid)
+          Define the pids to add to each pmt. This requires "Set PID to ID of ES" to be enabled.
+      --sout-ts-sdtdesc <string> SDT Descriptors (requires --sout-ts-es-id-pid)
+          Defines the descriptors of each SDT. Thisrequires "Set PID to ID of ES" to be enabled.
+ DVB subtitles decoder
+      --dvbsub-position {0 (Center), 1 (Left), 2 (Right), 4 (Top), 8 (Bottom), 5 (Top-Left), 6 (Top-Right), 9 (Bottom-Left), 10 (Bottom-Right)}
+      --dvbsub-x <integer>       Decoding X coordinate
+      --dvbsub-y <integer>       Decoding Y coordinate
+      --sout-dvbsub-x <integer>  Encoding X coordinate
+      --sout-dvbsub-y <integer>  Encoding Y coordinate
+          Allows a user to specify an extra pmt (pmt_pid=pid:stream_type[,...]).
+      --ts-es-id-pid, --no-ts-es-id-pid
+                                 Set id of ES to PID (default enabled)
+          Set the internal ID of each elementary stream handled by VLC to the same value as the PID in the TS stream, instead of 1, 2, 3, etc. Useful to do '#duplicate{...,
+          select="es=<pid>"}'. (default enabled)
+          Separate teletex/dvbs pages into independent ES. It can be useful to turn off this option when using stream output. (default enabled)
+ DVB input with v4l2 support
+      --dvb-caching <integer>    Caching value in ms
+          Caching value for DVB streams. This value should be set in milliseconds.
+      --dvb-adapter <integer>    Adapter card to tune
+          Adapter cards have a device file in directory named /dev/dvb/adapter[n] with n>=0.
+      --dvb-device <integer>     Device number to use on adapter
+      --dvb-frequency <integer>  Transponder/multiplex frequency
+          In kHz for DVB-S or Hz for DVB-C/T
+      --dvb-inversion <integer>  Inversion mode
+      --dvb-probe, --no-dvb-probe
+                                 Probe DVB card for capabilities (default enabled)
+          Some DVB cards do not like to be probed for their capabilities, you can disable this feature if you experience some trouble. (default enabled)
+      --dvb-budget-mode, --no-dvb-budget-mode
+      --dvb-satno <integer>      Satellite number in the Diseqc system
+      --dvb-voltage <integer>    LNB voltage
+      --dvb-high-voltage, --no-dvb-high-voltage
+      --dvb-tone <integer>       22 kHz tone
+      --dvb-fec <integer>        Transponder FEC
+      --dvb-srate <integer>      Transponder symbol rate in kHz
+      --dvb-lnb-lof1 <integer>   Antenna lnb_lof1 (kHz)
+      --dvb-lnb-lof2 <integer>   Antenna lnb_lof2 (kHz)
+      --dvb-lnb-slof <integer>   Antenna lnb_slof (kHz)
+      --dvb-modulation <integer> Modulation type
+      --dvb-code-rate-hp <integer>
+      --dvb-code-rate-lp <integer>
+      --dvb-bandwidth <integer>  Terrestrial bandwidth
+      --dvb-guard <integer>      Terrestrial guard interval
+      --dvb-transmission <integer>
+      --dvb-hierarchy <integer>  Terrestrial hierarchy mode
+      --dvb-http-host <string>   HTTP Host address
+      --dvb-http-user <string>   HTTP user name
+      --dvb-http-password <string>
+      --dvb-http-acl <string>    HTTP ACL
+      --dvb-http-intf-cert <string>
+      --dvb-http-intf-key <string>
+      --dvb-http-intf-ca <string>
+      --dvb-http-intf-crl <string>
+          Choose the program to select by giving its Service ID. Only use this option if you want to read a multi-program stream (like DVB streams for example).
+          Choose the programs to select by giving a comma-separated list of Service IDs (SIDs). Only use this option if you want to read a multi-program stream (like DVB streams
+
+Thanks.
+
+Zouhair SOUISSI <infonux(at)gmail.com>

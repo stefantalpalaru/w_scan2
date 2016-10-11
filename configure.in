@@ -1,0 +1,104 @@
+#                                               -*- Autoconf -*-
+# Process this file with autoconf to produce a configure script.
+
+AC_PREREQ([2.63])
+AC_INIT([w_scan], [20141122])
+AC_CONFIG_SRCDIR([scan.c])
+AC_CONFIG_HEADERS([config.h])
+AM_INIT_AUTOMAKE
+
+# Checks for programs.
+AC_PROG_CC
+AC_PROG_AWK
+AC_PROG_INSTALL
+AC_PROG_CPP
+
+# define _GNU_SOURCE
+AC_GNU_SOURCE
+
+
+# Checks for libraries.
+
+# Checks for header files.
+AC_CHECK_HEADERS([fcntl.h stdint.h stdlib.h string.h strings.h sys/ioctl.h unistd.h])
+
+# Checks for typedefs, structures, and compiler characteristics.
+AC_C_INLINE
+AC_TYPE_UINT16_T
+AC_TYPE_UINT32_T
+AC_TYPE_UINT8_T
+
+# Checks for library functions.
+AC_FUNC_ERROR_AT_LINE
+AC_FUNC_MALLOC
+AC_CHECK_FUNCS([memset strcasecmp strdup strtoul])
+
+
+dnl add the external library to the list of libraries which will be used for our test program
+#    LIBS="-llibtotest $LIBS"
+
+dnl check for the presence of 'dvb/frontend.h'
+AC_MSG_CHECKING([for linux/dvb/frontend.h presence])
+    AC_LINK_IFELSE([
+                    AC_LANG_PROGRAM([#include <linux/dvb/frontend.h>],
+                                    [fe_caps_t fakeinstance;])
+                    ],
+                    [DVB_HEADER=1], [DVB_HEADER=0])
+
+    if test "$DVB_HEADER" = "1"; then
+        AC_MSG_RESULT([yes])
+    else
+        AC_MSG_RESULT([no])
+	echo "*******************************************************"
+	echo "*** ERROR: $PACKAGE requires linux DVB headers,"
+        echo "*** (usually /usr/include/linux/dvb)."
+	echo "*** EXITING!"
+	echo "*******************************************************"
+        exit 1
+    fi
+
+
+dnl check for symbol 'dvb/frontend.h'
+AC_MSG_CHECKING([for linux/dvb/frontend.h usability (FE_CAN_2G_MODULATION)])
+    AC_LINK_IFELSE([
+                    AC_LANG_PROGRAM([#include <linux/dvb/frontend.h>],
+                                    [fe_caps_t fakeinstance = FE_CAN_2G_MODULATION;])
+                    ],
+                    [HAS_DVB_API5=1], [HAS_DVB_API5=0])
+
+    if test "$HAS_DVB_API5" = "1"; then
+        AC_MSG_RESULT([yes])
+    else
+        AC_MSG_RESULT([no])
+	echo "*******************************************************"
+	echo "*** ERROR: $PACKAGE requires latest linux dvb headers."
+	echo "*** missing symbol 'FE_CAN_2G_MODULATION' in <linux/dvb/frontend.h>"
+	echo "*** Please update your linux dvb headers,"
+        echo "*** (usually /usr/include/linux/dvb)."
+	echo "*** EXITING!"
+	echo "*******************************************************"
+        exit 1
+    fi
+
+dnl check for the version of 'dvb/frontend.h'
+AC_MSG_CHECKING([for linux/dvb/frontend.h usability (DVB-T2, DVB API >= v5.3)])
+    AC_LINK_IFELSE([
+                    AC_LANG_PROGRAM([#include <linux/dvb/frontend.h>],
+                                    [fe_delivery_system_t fakeinstance = SYS_DVBT2;])
+                    ],
+                    [HAS_DVB_API5=1], [HAS_DVB_API5=0])
+
+    if test "$HAS_DVB_API5" = "1"; then
+        AC_MSG_RESULT([yes])
+    else
+        AC_MSG_RESULT([no])
+	echo "*******************************************************"
+	echo "*** ERROR: $PACKAGE requires linux DVB API v5.3 or higher."
+	echo "*** Please update your linux dvb headers,"
+        echo "*** (usually /usr/include/linux/dvb)."
+	echo "*** EXITING!"
+	echo "*******************************************************"
+        exit 1
+    fi
+AC_CONFIG_FILES([Makefile])
+AC_OUTPUT

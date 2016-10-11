@@ -1,0 +1,39 @@
+<?xml version="1.0" ?>
+<!DOCTYPE service_list SYSTEM "http://wirbel.htpc-forum.de/w_scan/dtd/service_list.dtd">
+
+<!-- if testing, use XML validator which uses DTD. This is what i use:
+    http://www.validome.org/xml/validate/
+ -->
+
+<service_list>
+   <transponders>
+      <transponder ONID="8438" NID="13100" TSID="13057">
+         <params delsys="SYS_DVBT2" center_frequency="177500000">
+            <param modulation="QAM_AUTO"/>
+            <param bandwidth="8000000"/>
+            <param coderate="FEC_AUTO"/>
+            <param transmission="TRANSMISSION_MODE_32K"/>
+            <param guard="GUARD_INTERVAL_19_256"/>
+            <param hierarchy="HIERARCHY_NONE"/>
+            <param plp_id="0"/>
+         </params>
+      </transponder>
+   </transponders>
+
+   <services>
+      <service ONID="8438" TSID="13057" SID="102">
+         <name char256="Nelonen Pro 2 HD"/>
+         <provider char256="DNA"/>
+         <pcr pid="213"/>
+         <streams>
+            <stream type="27" pid="213" description="AVC Video stream, ITU-T Rec. H.264 | ISO/IEC 14496-10"/>
+            <stream type="4" pid="330" description="AUDIO" language_code="fin"/>
+         </streams>
+         <CA_systems>
+            <CA_system name="Conax" ca_id="0x0B00"/>
+            <CA_system name="Conax" ca_id="0x0B02"/>
+         </CA_systems>
+         <comment char256="Nelonen Pro 2 HD is twice on 177.5MHz"/>
+      </service>
+   </services>
+</service_list>
