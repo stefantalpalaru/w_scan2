@@ -62,7 +62,7 @@ struct w_scan_flags {
    uint16_t    codepage;
    uint8_t     print_pmt;
    uint8_t     emulate;
-   uint8_t     keep_duplicate_transponders;;
+   uint8_t     delete_duplicate_transponders;
 };
 
 

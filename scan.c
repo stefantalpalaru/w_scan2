@@ -109,7 +109,7 @@ struct w_scan_flags flags = {
   0,                // codepage, 0 = UTF-8
   0,                // print pmt
   0,                // emulate
-  0,                // keep duplicate transponders
+  0,                // delete duplicate transponders
 };
  
 static unsigned int delsys_min = 0;             // initialization of delsys loop. 0 = delsys legacy.
@@ -937,7 +937,7 @@ em_static void parse_pat(const unsigned char * buf, uint16_t section_length, uin
          current_tp->network_id,
          transport_stream_id);
      current_tp->transport_stream_id = transport_stream_id;
-     if (!flags.keep_duplicate_transponders) {
+     if (flags.delete_duplicate_transponders) {
         check_duplicate_transponders();
      }
      if (verbosity > 1) list_transponders();
@@ -1235,7 +1235,7 @@ em_static void parse_nit(const unsigned char * buf, uint16_t section_length, uin
      info("        %s : updating network_id -> (%u:%u:%u)\n",
           buffer, current_tp->original_network_id, network_id, current_tp->transport_stream_id);
      current_tp->network_id = network_id;
-     if (!flags.keep_duplicate_transponders) {
+     if (flags.delete_duplicate_transponders) {
         check_duplicate_transponders();
      }
      if (verbosity > 1) list_transponders();
@@ -1314,7 +1314,7 @@ em_static void parse_nit(const unsigned char * buf, uint16_t section_length, uin
         // this transponder is already known. Should we update its informations?
         if (tn.other_frequency_flag)
             tn.frequency = t->frequency;
-        if (table_id == TABLE_NIT_ACT && !flags.keep_duplicate_transponders) {
+        if (table_id == TABLE_NIT_ACT && flags.delete_duplicate_transponders) {
            // only nit_actual should update transponders, too much garbage in satellite nit_other.
            if (is_different_transponder_deep_scan(t, &tn, 0) && ((! t->locks_with_params) || is_auto_params(t))) { // || t->source != tn.source) {
               /* some of the informations is still set to AUTO */
@@ -3232,11 +3232,11 @@ static const char * ext_opts = "%s expert help\n"
   "               specify VDR version / channels.conf format\n"
   "               2  = VDR-2.0.x (default)\n"
   "               21 = VDR-2.1.x\n"
-  "       -K, --keep-duplicate-transponders\n"
-  "               normally, only the first transponder copy is kept,\n"
+  "       -d, --delete-duplicate-transponders\n"
+  "               with this option, only the first transponder copy is kept,\n"
   "               regardless of the signal strength, so if you are in an area\n"
   "               with the same transponders being broadcast from different sources,\n"
-  "               you will need this option to search for services in all of them\n"
+  "               this will prevent you from searching for services in all of them\n"
   ".................Device..................\n"
   "       -a N, --adapter N\n"
   "               use device /dev/dvb/adapterN/ [default: auto detect]\n"
@@ -3380,7 +3380,7 @@ static struct option long_options[] = {
     {"rotor-position"    , required_argument, NULL, 'r'},
     {"scr"               , required_argument, NULL, 'u'},
     {"use-pat"           , required_argument, NULL, 'P'},
-    {"keep-duplicate-transponders", no_argument, NULL, 'K'},
+    {"delete-duplicate-transponders", no_argument, NULL, 'd'},
     {NULL                , 0                , NULL,  0 },
 };
 
@@ -3445,7 +3445,7 @@ int main(int argc, char ** argv) {
   
   for (opt=0; opt<argc; opt++) info("%s ", argv[opt]); info("%s", "\n");
 
-  while((opt = getopt_long(argc, argv, "a:c:e:f:hi:l:o:p:qr:s:t:u:vxA:C:D:E:FGHI:KLMO:PQ:R:S:T:VXZ", long_options, NULL)) != -1) {
+  while((opt = getopt_long(argc, argv, "a:c:de:f:hi:l:o:p:qr:s:t:u:vxA:C:D:E:FGHI:LMO:PQ:R:S:T:VXZ", long_options, NULL)) != -1) {
      switch(opt) {
      case 'a': //adapter
              if (strstr(optarg, "/dev/dvb")) {
@@ -3641,8 +3641,8 @@ int main(int argc, char ** argv) {
      case 'I': //expert providing initial_tuning_data
              initdata=strdup(optarg);
              break;
-     case 'K': // keep duplicate transponders
-             flags.keep_duplicate_transponders = 1;
+     case 'd': // delete duplicate transponders
+             flags.delete_duplicate_transponders = 1;
              break;
      case 'L': //vlc output
              output_format = OUTPUT_VLC_M3U;

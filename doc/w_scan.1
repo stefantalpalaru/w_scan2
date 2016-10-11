@@ -151,13 +151,13 @@ Conditional access / encrypted channels
 .br
 1 = include encrypted channels [default]
 .TP 
-.B \-K
-Keep duplicate transponders
+.B \-d
+Delete duplicate transponders
 .br
-normally, only the first transponder copy is kept,
+with this option, only the first transponder copy is kept,
 regardless of the signal strength, so if you are in an area
 with the same transponders being broadcast from different sources,
-you will need this option to search for services in all of them
+this will prevent you from searching for services in all of them
 .TP 
 .B \-a N
 use device /dev/dvb/adapterN/ [default: auto detect]
