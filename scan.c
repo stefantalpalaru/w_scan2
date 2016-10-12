@@ -35,7 +35,7 @@
  * Copyright: Johannes Stezenbach <js@convergence.de> and others, GPLv2 and LGPL
  * (linuxtv-dvb-apps-1.1.0/utils/scan)
  *
- * Differencies:
+ * Differences:
  * - command line options
  * - detects dvb card automatically
  * - no need for initial tuning data
