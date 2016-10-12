@@ -9,6 +9,7 @@ ChangeLog:
    More details here:
    https://stefantalpalaru.wordpress.com/2016/02/04/scan-all-the-things/
  - the old behaviour can be enabled with -d (--delete-duplicate-transponders)
+ - all files are now UTF-8 and have Unix line terminators
 
 2014-11-22
  - move '-lrt' from LDFLAGS to AM_LDFLAGS
