@@ -228,7 +228,7 @@ static float hex_to_float(const int bin_val) {
 }
 
 /******************************************************************************
- * returns the angle (0.0° .. 359.9°)
+ * returns the angle (0.0Â° .. 359.9Â°)
  * for a given satellite from sat_list[]
  *
  ******************************************************************************/
@@ -325,7 +325,7 @@ extern int rotate_rotor (int frontend_fd, int * from, int to, uint8_t voltage_18
                 if (*from != to) {
                         if (*from < 0) {
                                 /* starting from unknown position, therefore 
-                                 * assuming worst case: 180°
+                                 * assuming worst case: 180Â°
                                  * diseqc-2.2 rotor should stop earlier
                                  */
                                 rotation_angle = 180;

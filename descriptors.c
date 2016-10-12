@@ -735,8 +735,8 @@ void parse_C2_delivery_system_descriptor (const unsigned char *buf,
      default:t->C2_tuning_frequency_type = DATA_SLICE_TUNING_FREQUENCY;                              // This is the default option for C2 systems
      }
   switch((*bp & 0x38) >> 3) {                                                                        // active_OFDM_symbol_duration  3 uimsbf
-     case 0: t->active_OFDM_symbol_duration = FFT_4K_8MHZ; break;                                    // 448µsec    (4k FFT mode for 8MHz CATV systems)
-     case 1: t->active_OFDM_symbol_duration = FFT_4K_6MHZ; break;                                    // 597,33µsec (4k FFT mode for 6MHz CATV systems)
+     case 0: t->active_OFDM_symbol_duration = FFT_4K_8MHZ; break;                                    // 448Âµsec    (4k FFT mode for 8MHz CATV systems)
+     case 1: t->active_OFDM_symbol_duration = FFT_4K_6MHZ; break;                                    // 597,33Âµsec (4k FFT mode for 6MHz CATV systems)
    //case 2 ... 7: reserved_for_future_use                                                           //
      default:t->active_OFDM_symbol_duration = FFT_4K_8MHZ;                                           // defaulting to here to 8MHz CATV systems, as nothing better found so far.
      }
@@ -1296,7 +1296,7 @@ void parse_network_change_notify_descriptor(const unsigned char *buf, network_ch
         bp++; descriptor_length--; loop_length--;
         change->message_id = *bp;                                           //           message_id                 8 uimsbf
         bp++; descriptor_length--; loop_length--;
-        if (change->invariant_ts.present == 1) {                            //           if (invariant_ts_present == ‘1’) {
+        if (change->invariant_ts.present == 1) {                            //           if (invariant_ts_present == â€˜1â€™) {
            change->invariant_ts.tsid = get_u16(bp);                         //              invariant_ts_tsid       16 uimsbf
            bp+=2; descriptor_length-=2; loop_length-=2;
            change->invariant_ts.onid = get_u16(bp);                         //              invariant_ts_onid       16 uimsbf
