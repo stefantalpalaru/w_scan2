@@ -540,8 +540,10 @@ const char * guard_interval_name(int guard_interval) {
      case GUARD_INTERVAL_19_128 : return "GUARD_INTERVAL_19_128";
      case GUARD_INTERVAL_19_256 : return "GUARD_INTERVAL_19_256";
      case GUARD_INTERVAL_PN420  : return "GUARD_INTERVAL_PN420";
-     case GUARD_INTERVAL_PN595 : return "GUARD_INTERVAL_PN595";
-     case GUARD_INTERVAL_PN945 : return "GUARD_INTERVAL_PN945";
+     case GUARD_INTERVAL_PN595
+ : return "GUARD_INTERVAL_PN595";
+     case GUARD_INTERVAL_PN945
+ : return "GUARD_INTERVAL_PN945";
      default                    : return "GUARD_INTERVAL_AUTO";
      }
 }
