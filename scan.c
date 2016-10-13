@@ -2,6 +2,7 @@
  * Simple MPEG/DVB parser to achieve network/service information without initial tuning data
  *
  * Copyright (C) 2006 - 2014 Winfried Koehler 
+ * Copyright © 2016 Ștefan Talpalaru <stefantalpalaru@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,7 +21,7 @@
  *
  * The author can be reached at: w_scan AT gmx-topmail DOT de
  *
- * The project's page is http://wirbel.htpc-forum.de/w_scan/index2.html
+ * The project's page is https://github.com/stefantalpalaru/w_scan2
  *
  *  referred standards:
  *    ISO/IEC 13818-1

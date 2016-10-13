@@ -20,7 +20,7 @@
  *
  * The author can be reached at: w_scan AT gmx-topmail DOT de
  *
- * The project's page is http://wirbel.htpc-forum.de/w_scan/idx2.html
+ * The project's page is https://github.com/stefantalpalaru/w_scan2
  */
 
 /* 20120525 --wk */
@@ -166,7 +166,7 @@ void vlc_xspf_prolog(FILE * f, uint16_t adapter, uint16_t frontend, struct w_sca
   fprintf_tab0(">\n");
   fprintf_tab1("<title>DVB Playlist</title>\n");
   fprintf (f,"%s<creator>w_scan-%i</creator>\n", T1, version);        
-  fprintf_tab1("<info>http://wirbel.htpc-forum.de</info>\n");
+  fprintf_tab1("<info>https://github.com/stefantalpalaru/w_scan2</info>\n");
   fprintf_tab1("<trackList>\n");
 
   idx = 1;

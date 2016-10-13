@@ -20,7 +20,7 @@
  *
  * The author can be reached at: w_scan AT gmx-topmail DOT de
  *
- * The project's page is http://wirbel.htpc-forum.de/w_scan/index2.html
+ * The project's page is https://github.com/stefantalpalaru/w_scan2
  *
  * added 20090303 -wk-
  */
