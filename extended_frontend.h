@@ -22,7 +22,7 @@
 
 
 /* this file is shared between w_scan2 and the VDR plugin wirbelscan.
- * For details on both of them see http://wirbel.htpc-forum.de
+ * For details on the latter see http://wirbel.htpc-forum.de
  */
 
 
