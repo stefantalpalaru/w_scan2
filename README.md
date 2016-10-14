@@ -114,8 +114,8 @@ For more sophisticated scan options see ```./w_scan2 -h``` and ```./w_scan2 -H``
 - "kilroy" for testing with Airstar2/Zarlink MT352 DVB-T and Avermedia
 - "Fabrizio" for testing with Airstar2/Zarlink MT352 DVB-T
 - Arturo Martinez <martinez@embl.de> for a huge bunch of tests on DVB-S/DVB-S2
-- Rolf Ahrenberg for doing DVB-T/T2 tests and suggestions to improve w\_scan
-- Ștefan Talpalaru <stefantalpalaru@yahoo.com> - the w\_scan2 fork
+- Rolf Ahrenberg for doing DVB-T/T2 tests and suggestions to improve *w\_scan*
+- Ștefan Talpalaru <stefantalpalaru@yahoo.com> - the *w\_scan2* fork
 
 ## license
 
