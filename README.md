@@ -32,6 +32,15 @@ It's based on the old "scan" tool from linuxtv-dvb-apps-1.1.0. The differences a
 make
 ```
 
+## distro support
+
+### Gentoo
+
+```sh
+layman -a stefantalpalaru
+emerge w_scan2
+```
+
 ## basic usage
 
 NOTE: Newer versions of **w\_scan2** need the '-c' option for specifying the
