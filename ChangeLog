@@ -1,6 +1,6 @@
 ChangeLog:
 --------------------
-[1.0.0] 2016-10-
+[1.0.0] 2016-10-14
  - project forked from http://wirbel.htpc-forum.de/w_scan/index2.html and renamed w_scan2
  - keep duplicate transponders by default because a stronger transponder with
    the same ID might have a higher frequency and be discarded simply because
