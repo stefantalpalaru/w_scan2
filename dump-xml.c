@@ -172,7 +172,7 @@ void xml_dump(FILE * dest, pList transponders) {
   int indent = 0;
 
   fprintf(dest, "<?xml version=\"1.0\" ?>\n");
-  fprintf(dest, "<!DOCTYPE service_list SYSTEM \"http://wirbel.htpc-forum.de/w_scan/dtd/service_list.dtd\">\n");
+  fprintf(dest, "<!DOCTYPE service_list SYSTEM \"https://raw.githubusercontent.com/stefantalpalaru/w_scan2/master/doc/service_list.dtd\">\n");
   fprintf(dest, "\n");
   fprintf(dest, "<!-- NOTE:\n");
   fprintf(dest, "     if reading or writing w_scan2 XML file format:\n");

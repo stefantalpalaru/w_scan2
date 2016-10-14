@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<!DOCTYPE service_list SYSTEM "http://wirbel.htpc-forum.de/w_scan/dtd/service_list.dtd">
+<!DOCTYPE service_list SYSTEM "https://raw.githubusercontent.com/stefantalpalaru/w_scan2/master/doc/service_list.dtd">
 
 <!-- if testing, use XML validator which uses DTD. This is what i use:
     http://www.validome.org/xml/validate/
