@@ -43,7 +43,7 @@ emerge w_scan2
 
 ## basic usage
 
-NOTE: Newer versions of **w\_scan2** need the '-c' option for specifying the
+NOTE: Newer versions of *w\_scan2* need the '-c' option for specifying the
 country (ATSC, DVB-C and DVB-T) or '-s' for satellite (DVB-S).
 
 
