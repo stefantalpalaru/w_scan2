@@ -10,7 +10,7 @@ It's based on the old "scan" tool from linuxtv-dvb-apps-1.1.0. The differences a
 
 **w\_scan2** is a fork of the original **w\_scan** from http://wirbel.htpc-forum.de/w_scan/index2.html
 
-### main changes from **w\_scan** to **w\_scan2**
+#### main changes from **w\_scan** to **w\_scan2**
 
 - keep duplicate transponders by default because a stronger transponder with
   the same ID might have a higher frequency and be discarded simply because
@@ -34,7 +34,7 @@ make
 
 ## distro support
 
-### Gentoo
+#### Gentoo
 
 ```sh
 layman -a stefantalpalaru
@@ -47,43 +47,43 @@ NOTE: Newer versions of **w\_scan2** need the '-c' option for specifying the
 country (ATSC, DVB-C and DVB-T) or '-s' for satellite (DVB-S).
 
 
-### DVB-C (using Germany as country, option -c)
+#### DVB-C (using Germany as country, option -c)
 
 ```sh
 ./w_scan2 -fc -c DE >> channels.conf
 ```
 
-### DVB-T
+#### DVB-T
 
 ```sh
 ./w_scan2 -c DE >> channels.conf
 ```
 
-### DVB-C and DVB-T
+#### DVB-C and DVB-T
 
 ```sh
 ./w_scan2 -c DE >> channels.conf && ./w_scan2 -fc -c DE >> channels.conf
 ```
 
-### ATSC (terrestrial, using United States as country)
+#### ATSC (terrestrial, using United States as country)
 
 ```sh
 ./w_scan2 -fa -c US >> channels.conf
 ```
 
-### US Digital Cable (QAM Annex-B)
+#### US Digital Cable (QAM Annex-B)
 
 ```sh
 ./w_scan2 -A2 -c US >> channels.conf
 ```
 
-### ATSC, both terrestrial and digital cable
+#### ATSC, both terrestrial and digital cable
 
 ```sh
 ./w_scan2 -A3 -c US >> channels.conf
 ```
 
-### DVB-S, here: Astra 19.2 east
+#### DVB-S, here: Astra 19.2 east
 
 ```sh
 ./w_scan2 -fs -s S19E2
@@ -91,13 +91,13 @@ country (ATSC, DVB-C and DVB-T) or '-s' for satellite (DVB-S).
 
 NOTE: see ```./w_scan2 -s?``` for list of satellites.
 
-### generate (dvb)scan initial-tuning-data
+#### generate (dvb)scan initial-tuning-data
 
 ```sh
 ./w_scan2 -c DE -x > initial_tuning_data.txt
 ```
 
-### generate kaffeine-0.8.5 channels.dvb
+#### generate kaffeine-0.8.5 channels.dvb
 
 ```sh
 ./w_scan2 -c DE -k > channels.dvb
