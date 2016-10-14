@@ -1,25 +1,11 @@
-#                                               -*- Autoconf -*-
-# Process this file with autoconf to produce a configure script.
+AC_INIT([w_scan2], [1.0.0], [stefantalpalaru@yahoo.com], [w_scan2], [https://github.com/stefantalpalaru/w_scan2])
+AM_INIT_AUTOMAKE([foreign subdir-objects])
 
-AC_PREREQ([2.63])
-AC_INIT([w_scan], [20141122])
-AC_CONFIG_SRCDIR([scan.c])
-AC_CONFIG_HEADERS([config.h])
-AM_INIT_AUTOMAKE
-
-# Checks for programs.
 AC_PROG_CC
-AC_PROG_AWK
-AC_PROG_INSTALL
-AC_PROG_CPP
 
 # define _GNU_SOURCE
 AC_GNU_SOURCE
 
-
-# Checks for libraries.
-
-# Checks for header files.
 AC_CHECK_HEADERS([fcntl.h stdint.h stdlib.h string.h strings.h sys/ioctl.h unistd.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
@@ -30,12 +16,7 @@ AC_TYPE_UINT8_T
 
 # Checks for library functions.
 AC_FUNC_ERROR_AT_LINE
-AC_FUNC_MALLOC
 AC_CHECK_FUNCS([memset strcasecmp strdup strtoul])
-
-
-dnl add the external library to the list of libraries which will be used for our test program
-#    LIBS="-llibtotest $LIBS"
 
 dnl check for the presence of 'dvb/frontend.h'
 AC_MSG_CHECKING([for linux/dvb/frontend.h presence])
@@ -100,5 +81,5 @@ AC_MSG_CHECKING([for linux/dvb/frontend.h usability (DVB-T2, DVB API >= v5.3)])
 	echo "*******************************************************"
         exit 1
     fi
-AC_CONFIG_FILES([Makefile])
-AC_OUTPUT
+
+AC_OUTPUT([Makefile])

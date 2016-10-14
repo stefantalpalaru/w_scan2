@@ -17,10 +17,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  * Or, point your browser to http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- *
- * The author can be reached at: w_scan AT gmx-topmail DOT de
- *
- * The project's page is https://github.com/stefantalpalaru/w_scan2
  */
 
 #ifndef __SI_TYPES_H
@@ -160,15 +156,15 @@ struct transponder {
   fe_transmit_mode_t         transmission                :7; /*                               0..8  -> 4 -> 7 (127) 22    */
   fe_west_east_flag_t        west_east_flag              :1; /* east, west                    0..1  -> 1 -> 1 (1)   22    */
   fe_hierarchy_t             hierarchy                   :4; /*                               0..4  -> 3 -> 4 (15)  23    */
-  unsigned                   time_slicing                :2; /* only defined in w_scan.       0..2  -> 2 -> 2 (3)   23    */
+  unsigned                   time_slicing                :2; /* only defined in w_scan2.       0..2  -> 2 -> 2 (3)   23    */
   unsigned                   scrambling_sequence_index   :18;/* not yet in use.                                     23..25*/
   unsigned                   scrambling_sequence_selector:1; /* on/off                        0..1  -> 1            26    */
   unsigned                   multiple_input_stream_flag  :1; /* on/off                        0..1  -> 1            26    */
   fe_frequency_type_t        C2_tuning_frequency_type    :2; /* 0..2                          0..2  -> 2 -> 2 (3)   26    */
   fe_ofdm_symbol_duration_t  active_OFDM_symbol_duration :2; /*                                                     26    */
-  fe_alpha_t                 alpha                       :2; /* only defined in w_scan                              26    */
-  fe_interleave_t            terr_interleaver            :2; /* only defined in w_scan                              27    */
-  unsigned                   priority                    :1; /* only defined in w_scan                              27    */
+  fe_alpha_t                 alpha                       :2; /* only defined in w_scan2                              26    */
+  fe_interleave_t            terr_interleaver            :2; /* only defined in w_scan2                              27    */
+  unsigned                   priority                    :1; /* only defined in w_scan2                              27    */
   unsigned                   mpe_fec                     :1; /*                                                     27    */
   unsigned                   extended_info               :1; /*                                                     27    */
   unsigned                   SISO_MISO                   :1; /* 1 = multiple input single output                    27    */

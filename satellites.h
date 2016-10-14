@@ -17,16 +17,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  * Or, point your browser to http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- *
- * The author can be reached at: w_scan AT gmx-topmail DOT de
- *
- * The project's page is https://github.com/stefantalpalaru/w_scan2
  */
 
 
 
-/* this file is shared between w_scan and the VDR plugin wirbelscan.
- * For details on both of them see http://wirbel.htpc-forum.de
+/* this file is shared between w_scan2 and the VDR plugin wirbelscan.
+ * For details on the latter see http://wirbel.htpc-forum.de
  */
 
 #ifndef __SATELLITES_H__

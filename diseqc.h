@@ -1,4 +1,4 @@
-/* This file was taken from scan-s2, and changed to use with w_scan.
+/* This file was taken from scan-s2, and changed to use with w_scan2.
  */
 
 #ifndef __DISEQC_H__

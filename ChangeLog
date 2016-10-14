@@ -1,15 +1,16 @@
 ChangeLog:
 --------------------
 [1.0.0] 2016-10-
- - project forked
+ - project forked from http://wirbel.htpc-forum.de/w_scan/index2.html and renamed w_scan2
  - keep duplicate transponders by default because a stronger transponder with
    the same ID might have a higher frequency and be discarded simply because
    it's scanned later. Also don't replace the current transponder with an
    advertised one by default. The latter may have a lower signal strength.
    More details here:
-   https://stefantalpalaru.wordpress.com/2016/02/04/scan-all-the-things/
- - the old behaviour can be enabled with -d (--delete-duplicate-transponders)
+   https://stefantalpalaru.wordpress.com/2016/02/04/scan-all-the-things/ .
+   The old behaviour can be enabled with -d (--delete-duplicate-transponders).
  - all files are now ASCII or UTF-8 and have Unix line terminators
+ - refactored the autotools files
 
 2014-11-22
  - move '-lrt' from LDFLAGS to AM_LDFLAGS

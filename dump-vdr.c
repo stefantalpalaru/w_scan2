@@ -17,10 +17,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  * Or, point your browser to http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- *
- * The author can be reached at: w_scan AT gmx-topmail DOT de
- *
- * The project's page is https://github.com/stefantalpalaru/w_scan2
  */
 
 /* 20110702 --wk */
@@ -106,7 +102,7 @@ static struct cTr translations[] = {
 #define TR_COUNT(x) (sizeof(x)/sizeof(struct cTr))
 
 /******************************************************************************
- * translate short names used by w_scan into VDR satellite identifiers. 
+ * translate short names used by w_scan2 into VDR satellite identifiers. 
  *
  *****************************************************************************/
 
@@ -119,7 +115,7 @@ return satname; //fallback.
 }
 
 /******************************************************************************
- * translate VDR satellite identifiers into short names used by w_scan. 
+ * translate VDR satellite identifiers into short names used by w_scan2. 
  *
  *****************************************************************************/
 

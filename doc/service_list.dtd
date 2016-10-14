@@ -1,30 +1,29 @@
 <!-- ===========================================================================
- w_scan xml service_list DTD
+ w_scan2 xml service_list DTD
  Copyright (c) 2014 Winfried Koehler
- http://wirbel.htpc-forum.de
  
- This file describes the "w_scan XML file format" used by w_scan.
+ This file describes the "w_scan2 XML file format" used by w_scan2.
 
- This DTD file and the w_scan XML file format described by this DTD may be used
+ This DTD file and the w_scan2 XML file format described by this DTD may be used
  and or redistributed in any kind of application as long as:
 
  1. this DTD is not modified. Modifications have to be made only by original author.
 
- 2. your program may read and/or write in w_scan XML file format.
+ 2. your program may read and/or write in w_scan2 XML file format.
 
- 3. if your program writes data according to w_scan XML file format,
+ 3. if your program writes data according to w_scan2 XML file format,
     it should check for XML validity against this DTD.
 
- 4. if your program reads data according to w_scan XML file format,
+ 4. if your program reads data according to w_scan2 XML file format,
     it should check for XML validity against this DTD.
 
  5. no fitness for any purpose is guaranteed, nor any responsibility
     taken over for any usage. If you use it, use this at your own risk.
 
- 6. extensions to w_scan XML file format may be suggested to original author.
+ 6. extensions to w_scan2 XML file format may be suggested to original author.
     No guarantee is made for taking over such suggestions.
 
- For contact address, see w_scan source code.
+ For contact address, see w_scan2 source code.
 ================================================================================ -->
 
 

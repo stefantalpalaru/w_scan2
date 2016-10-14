@@ -17,17 +17,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  * Or, point your browser to http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- *
- * The author can be reached at: w_scan AT gmx-topmail DOT de
- *
- * The project's page is https://github.com/stefantalpalaru/w_scan2
- * v 20110402
  */
 
 
 /**********************************************************************************************************************
  * char conversation is based on a patch from Mauro Carvalho Chehab for (dvb)scan and adapted for
- * w_scan (used v1 of patch).
+ * w_scan2 (used v1 of patch).
  * see http://www.mail-archive.com/linux-media@vger.kernel.org/msg29914.html
  *********************************************************************************************************************/
 

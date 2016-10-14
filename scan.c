@@ -19,10 +19,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  * Or, point your browser to http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
- * The author can be reached at: w_scan AT gmx-topmail DOT de
- *
- * The project's page is https://github.com/stefantalpalaru/w_scan2
- *
  *  referred standards:
  *    ISO/IEC 13818-1
  *    ETSI EN 300 468 v1.14.1
@@ -58,7 +54,6 @@
 #include <linux/dvb/dmx.h>
 #include <linux/dvb/version.h>
 
-#include "version.h"
 #include "scan.h"
 #include "dump-vdr.h"
 #include "dump-xine.h"
@@ -91,7 +86,7 @@
 static char demux_devname[80];
 
 struct w_scan_flags flags = {
-  0,                // readback value w_scan version {YYYYMMDD}
+  PACKAGE_VERSION,                // readback value w_scan2 version
   SCAN_TERRESTRIAL, // scan type
   ATSC_VSB,         // default for ATSC scan
   0,                // need 2nd generation frontend
@@ -121,7 +116,7 @@ static unsigned int dvbc_symbolrate_min = 0;    // initialization of symbolrate 
 static unsigned int dvbc_symbolrate_max = 1;    // initialization of symbolrate loop. 6875
 static unsigned int freq_offset_min = 0;        // initialization of freq offset loop. 0 == offset (0), 1 == offset(+), 2 == offset(-), 3 == offset1(+), 4 == offset2(+)
 static unsigned int freq_offset_max = 4;        // initialization of freq offset loop.
-static int this_channellist = DVBT_DE;          // w_scan uses by default DVB-t
+static int this_channellist = DVBT_DE;          // w_scan2 uses by default DVB-t
 static unsigned int ATSC_type = ATSC_VSB;       // 20090227: flag type vars shouldnt be signed. 
 static unsigned int no_ATSC_PSIP = 0;           // 20090227: initialization was missing, signed -> unsigned                
 static unsigned int serv_select = 3;            // 20080106: radio and tv as default (no service/other). 20090227: flag type vars shouldnt be signed. 
@@ -1460,7 +1455,7 @@ em_static void parse_psip_vct(const unsigned char * buf, uint16_t section_length
         ch.program_number = --pseudo_id;
 
      /* 0x40 << 8 | {0xC8,0xC9} is not 100% correct here,
-      * but for w_scans purpose its easier to handle. ;-)
+      * but for w_scan2's purpose its easier to handle. ;-)
       * generally speaking it should be {0xC800,0xC900}.
       *
       * ch.carrier_frequency defaults to '0' && non-zero is deprecated,
@@ -2500,7 +2495,7 @@ static int initial_tune(int frontend_fd, int tuning_data) {
 
   if (tuning_data <= 0) {
   
-  /* ---- w_scan blindscan loop ----
+  /* ---- w_scan2 blindscan loop ----
    *  DVB-T       : changed 20090101 -wk
    *  DVB-C       : changed 20090101 -wk
    *  DVB-S(2)    : changed 20090422 -wk
@@ -2957,7 +2952,7 @@ int device_is_preferred(int caps, const char * frontend_name, uint16_t scantype)
      /* Pinnacle PCTV 290e, known to have probs on cable. */
      preferred = 0; // not preferred
   else if (caps & FE_CAN_2G_MODULATION)
-     /* w_scan preferres devices which are DVB-{S,C,T}2 */
+     /* w_scan2 preferres devices which are DVB-{S,C,T}2 */
      preferred = 2; // preferred
   return preferred;        
 }
@@ -3201,7 +3196,7 @@ static const char * usage = "\n"
   "       -x, --output-initial\n"
   "               generate initial tuning data for (dvb-)scan\n"
   "       -Z, --output-xml\n"
-  "               generate w_scan XML tuning data\n"
+  "               generate w_scan2 XML tuning data\n"
   "       -H, --extended-help\n"
   "               view extended help (experts only)\n";
 
@@ -3390,7 +3385,7 @@ void bad_usage(char * pname) {
 }
 
 void ext_help(void) {
-  fprintf(stderr, ext_opts, "w_scan");
+  fprintf(stderr, ext_opts, PACKAGE_NAME);
 }
 
 #define MOD_USE_STANDARD  0x0
@@ -3441,7 +3436,6 @@ int main(int argc, char ** argv) {
   this_lnb.high_val *= 1000;
   this_lnb.switch_val *= 1000;
 
-  flags.version = version;
   run_time_init();
   
   for (opt=0; opt<argc; opt++) info("%s ", argv[opt]); info("%s", "\n");
@@ -3491,7 +3485,7 @@ int main(int argc, char ** argv) {
                 }
              break;
      case 'h': //basic help
-             bad_usage("w_scan");
+             bad_usage(PACKAGE_NAME);
              cleanup();
              return 0;
              break;
@@ -3683,7 +3677,7 @@ int main(int argc, char ** argv) {
      case 'X': //xine output
              output_format = OUTPUT_XINE;
              break;
-     case 'Z': //w_scan xml output
+     case 'Z': //w_scan2 xml output
              output_format = OUTPUT_XML;
              break;
      default: //undefined
@@ -3693,11 +3687,11 @@ int main(int argc, char ** argv) {
      }
   }
   if (retVersion) {
-     info("%d", version);
+     info("%s", PACKAGE_VERSION);
      cleanup();
      return 0;
      }
-  info("w_scan version %d (compiled for DVB API %d.%d)\n", version, DVB_API_VERSION, DVB_API_VERSION_MINOR);
+  info("%s version %s (compiled for DVB API %d.%d)\n", PACKAGE_NAME, PACKAGE_VERSION, DVB_API_VERSION, DVB_API_VERSION_MINOR);
   if (NULL == initdata) {
       if ((NULL == country) && (scantype != SCAN_SATELLITE)) {
          country = strdup(country_to_short_name(get_user_country()));
@@ -3826,13 +3820,13 @@ int main(int argc, char ** argv) {
         // vlc format will be output always as utf-8.
         if (codepage)
            free(codepage);
-        codepage = strdup("ISO-8859-1");
+        codepage = strdup("UTF-8");
         break;
      case OUTPUT_XML:
-        info("output format w_scan XML tuning data\n");
+        info("output format w_scan2 XML tuning data\n");
         if (codepage)
            free(codepage);
-        codepage = strdup("ISO-8859-1");
+        codepage = strdup("UTF-8");
         break;
      default:
         cleanup();

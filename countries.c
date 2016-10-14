@@ -17,12 +17,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  * Or, point your browser to http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- *
- * The author can be reached at: w_scan AT gmx-topmail DOT de
- *
- * The project's page is https://github.com/stefantalpalaru/w_scan2
- * country.c/h, added 20090101
- * last update 20110329
  */
 
 #include "countries.h"
@@ -43,7 +37,7 @@ namespace COUNTRY {
 
 /**************************************************************************************************
  * FREQUENCY CALCULATION SCHEME:
- * each frequency used by w_scan is calculated as follows:
+ * each frequency used by w_scan2 is calculated as follows:
  * 
  * frequency(channellist, channel, frequency_offset_index) = 
  *      base_offset(channel, channellist) +
@@ -816,7 +810,7 @@ unsigned int i;
 for (i = 0; i < COUNTRY_COUNT(country_list); i++)
    if (! strcasecmp(id,country_list[i].short_name))
       return country_list[i].id;
-return DE; // w_scan defaults to DVB-t de_DE
+return DE; // w_scan2 defaults to DVB-t de_DE
 }
 
 
@@ -828,7 +822,7 @@ unsigned int i;
 for (i = 0; i < COUNTRY_COUNT(country_list); i++)
    if (idx == country_list[i].id)
       return country_list[i].short_name;
-return "DE"; // w_scan defaults to DVB-t de_DE
+return "DE"; // w_scan2 defaults to DVB-t de_DE
 }
 
 /* convert index number
@@ -841,7 +835,7 @@ for (i = 0; i < COUNTRY_COUNT(country_list); i++)
       return country_list[i].full_name;
 warning("COUNTRY CODE NOT DEFINED. PLEASE RE-CHECK WETHER YOU TYPED CORRECTLY.\n");
 usleep(5000000);
-return "GERMANY"; // w_scan defaults to DVB-t de_DE
+return "GERMANY"; // w_scan2 defaults to DVB-t de_DE
 }
 
 void print_countries(void) {

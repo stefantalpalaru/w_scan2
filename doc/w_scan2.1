@@ -1,31 +1,31 @@
-.TH "w_scan" 1 "28 March 2011" "" ""
+.TH "w_scan2" 1 "28 March 2011" "" ""
 .SH "NAME"
-w_scan \- a universal ATSC and DVB blind scanner
+w_scan2 \- a universal ATSC and DVB blind scanner
 .SH "SYNOPSIS"
-.B w_scan
+.B w_scan2
 .B -fa
 .I -c \<COUNTRY_ID\> 
 .B [ options ] 
 .br
-.B w_scan
+.B w_scan2
 .B -fc
 .I -c \<COUNTRY_ID\> 
 .B [ options ] 
 .br
-.B w_scan
+.B w_scan2
 .B -ft
 .I -c \<COUNTRY_ID\> 
 .B [ options ] 
 .br
-.B w_scan
+.B w_scan2
 .B -fs
 .I -s \<SATELLITE_ID\> 
 .B [ options ] 
 .SH "DESCRIPTION"
-.B w_scan
-scans for DVB\-C, DVB\-S/S2, DVB\-T, ISDB-T and ATSC channels. Any other program accessing the DVB hardware (like e.g. VDR) has to be closed in order to avoid conflicts while running w_scan.
+.B w_scan2
+scans for DVB\-C, DVB\-S/S2, DVB\-T, ISDB-T and ATSC channels. Any other program accessing the DVB hardware (like e.g. VDR) has to be closed in order to avoid conflicts while running w_scan2.
 .br
-w_scan provides the channels in different output formats (Default: VDR channels.conf). For other output formats see OPTIONS.
+w_scan2 provides the channels in different output formats (Default: VDR channels.conf). For other output formats see OPTIONS.
 .SH "OPTIONS"
 The following options are available.
 .TP 
@@ -292,30 +292,30 @@ ATSC scan: do not use ATSC PSIP tables for scan (PAT and PMT only)
 .SH "EXAMPLES"
 .TP
 scan satellite 19.2° east:
-.B w_scan -fs -s S19E2
+.B w_scan2 -fs -s S19E2
 .TP
 scan cable (DVB), Germany:
-.B w_scan -fc -c DE
+.B w_scan2 -fc -c DE
 .TP
 scan aerial (DVB), France:
-.B w_scan -ft -c FR
+.B w_scan2 -ft -c FR
 .TP
 scan cable (ATSC), United States:
-.B w_scan -fa -A2 -c US
+.B w_scan2 -fa -A2 -c US
 .TP
 scan aerial (ATSC), United States:
-.B w_scan -fa -A1 -c US
+.B w_scan2 -fa -A1 -c US
 .TP
 use output format kaffeine:
-.B w_scan [ OTHER OPTIONS ] -k
+.B w_scan2 [ OTHER OPTIONS ] -k
 .TP
 use output format zap/czap/xine:
-.B w_scan [ OTHER OPTIONS ] -X
+.B w_scan2 [ OTHER OPTIONS ] -X
 .TP
 use output format dvbscan/scan/scan-s2 initial tuning data.
-.B w_scan [ OTHER OPTIONS ] -x
+.B w_scan2 [ OTHER OPTIONS ] -x
 .br
-.I  NOTE: w_scan also performs full scans, so there is generally no need for this.
+.I  NOTE: w_scan2 also performs full scans, so there is generally no need for this.
 .SH "REPORTING BUGS"
 see README file from source code package.
 .SH "AUTHOR"

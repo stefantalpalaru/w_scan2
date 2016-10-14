@@ -17,10 +17,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  * Or, point your browser to http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- *
- * The author can be reached at: w_scan AT gmx-topmail DOT de
- *
- * The project's page is https://github.com/stefantalpalaru/w_scan2
  */
 
 #include <strings.h>
@@ -363,7 +359,7 @@ struct init_item sat_rolloff_list[] = {
         {"25"  , ROLLOFF_25},
         {"20"  , ROLLOFF_20},
         {"AUTO", ROLLOFF_AUTO},
-}; // NOTE: "AUTO" == 0,35 in w_scan !
+}; // NOTE: "AUTO" == 0,35 in w_scan2 !
 
 struct init_item sat_mod_list[] = {
         {"QPSK"  , QPSK   },
@@ -371,7 +367,7 @@ struct init_item sat_mod_list[] = {
         {"16APSK", APSK_16},
         {"32APSK", APSK_32},
         {"AUTO"  , QPSK   },
-}; // NOTE: "AUTO" == QPSK in w_scan !
+}; // NOTE: "AUTO" == QPSK in w_scan2 !
 
 /* convert text to identifiers */
 
@@ -477,7 +473,7 @@ struct init_item scantype_list[] = {
         {"CABLE",          SCAN_CABLE },
         {"TERRESTRIAL",    SCAN_TERRESTRIAL},
         {"SATELLITE",      SCAN_SATELLITE},
-}; // NOTE: "AUTO" == SCAN_TERRESTRIAL in w_scan !
+}; // NOTE: "AUTO" == SCAN_TERRESTRIAL in w_scan2 !
 
 /* convert text to identifiers */
 

@@ -17,10 +17,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  * Or, point your browser to http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- *
- * The author can be reached at: w_scan AT gmx-topmail DOT de
- *
- * The project's page is https://github.com/stefantalpalaru/w_scan2
  */
 
 #ifndef __SCAN_H__
@@ -43,7 +39,7 @@
  *****************************************************************************/
 
 struct w_scan_flags {
-   uint32_t    version;
+   char*       version;
    scantype_t  scantype;
    uint8_t     atsc_type;
    uint8_t     need_2g_fe;

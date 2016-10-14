@@ -17,10 +17,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  * Or, point your browser to http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- *
- * The author can be reached at: w_scan AT gmx-topmail DOT de
- *
- * The project's page is https://github.com/stefantalpalaru/w_scan2
  */
 
 /* 20120525 --wk */
@@ -149,8 +145,6 @@ int vlc_rolloff (int rolloff) {
      }                         
 }
 
-extern uint version;
-
 void vlc_xspf_prolog(FILE * f, uint16_t adapter, uint16_t frontend, struct w_scan_flags * flags, struct lnb_types_st * lnbp) {
   fprintf_tab0("<?");
   fprintf_pair("xml version", "1.0");
@@ -165,7 +159,7 @@ void vlc_xspf_prolog(FILE * f, uint16_t adapter, uint16_t frontend, struct w_sca
   fprintf_pair("version", "1");
   fprintf_tab0(">\n");
   fprintf_tab1("<title>DVB Playlist</title>\n");
-  fprintf (f,"%s<creator>w_scan-%i</creator>\n", T1, version);        
+  fprintf (f,"%s<creator>%s-%s</creator>\n", T1, PACKAGE_NAME, PACKAGE_VERSION);
   fprintf_tab1("<info>https://github.com/stefantalpalaru/w_scan2</info>\n");
   fprintf_tab1("<trackList>\n");
 
