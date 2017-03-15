@@ -384,6 +384,15 @@ static struct transponder * find_transponder_by_freq(struct transponder * tn) {
         }
      }
 
+  // handle the case of current_tp not being in scanned_transponders or in new_transponders
+  if (!((flags.scantype == SCAN_SATELLITE) && (current_tp->polarization != tn->polarization))) {
+      if (is_nearly_same_frequency(current_tp->frequency, tn->frequency, tn->type)) {
+          verbose("          -> found current_tp'  %s\n", buffer);
+          free(buffer);
+          return current_tp;
+      }
+  }
+
   free(buffer);
   verbose("          -> not found.\n");
   return NULL;
@@ -2890,7 +2899,7 @@ static void scan_tp_dvb(void) {
   int result = 0;
 
   // first run: read PAT, but dont read PMT (~0.5sec)
-  //   - to enshure that current_tp->transport_stream_id is set.
+  //   - to ensure that current_tp->transport_stream_id is set.
   //   - to update network_PID (default: 0x10).
   current_tp->network_PID = PID_NIT_ST;
   setup_filter(&s[0], demux_devname, PID_PAT, TABLE_PAT, -1, 1, 0, SECTION_FLAG_INITIAL);
