@@ -2,7 +2,7 @@
  * Simple MPEG/DVB parser to achieve network/service information without initial tuning data
  *
  * Copyright (C) 2006 - 2014 Winfried Koehler 
- * Copyright © 2016 Ștefan Talpalaru <stefantalpalaru@yahoo.com>
+ * Copyright © 2016-2017 Ștefan Talpalaru <stefantalpalaru@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -349,6 +349,89 @@ int is_different_transponder_deep_scan(struct transponder * a, struct transponde
      }
 }
 
+static void copy_transponder(struct transponder * dest, struct transponder * source) {
+  struct service * s, * sd;
+  struct frequency_item * p, * p1;
+
+  copy_fe_params(dest, source);
+
+  dest->network_PID          = source->network_PID;
+  dest->network_id           = source->network_id;
+  dest->original_network_id  = source->original_network_id;
+  dest->transport_stream_id  = source->transport_stream_id;
+
+  if (dest->network_name) {
+     free(dest->network_name);
+     dest->network_name = NULL;
+     }
+  if (source->network_name != NULL) {
+     dest->network_name = (char *) calloc(strlen(source->network_name) + 1, 1);
+     memcpy(dest->network_name, source->network_name, strlen(source->network_name));
+     }
+
+  dest->frequencies = &(dest->_frequencies);  
+  for(p = (dest->frequencies)->first; p; p = p->next)
+     ClearList(p->transposers);
+  ClearList(dest->frequencies); 
+
+  for(p = (source->frequencies)->first; p; p = p->next) {
+     struct frequency_item * p2, * p3;
+     p1 = calloc(1, sizeof(*p1));
+     p1->transposers = &(p1->_transposers);
+     NewList(p1->transposers, "transposers");
+     p1->frequency = p->frequency;
+     p1->cell_id   = p->cell_id;
+     for(p2 = (p->transposers)->first; p2; p2 = p2->next) {
+        p3 = calloc(1, sizeof(*p3));
+        p3->transposers = &(p3->_transposers);
+        NewList(p3->transposers, "dont_use");
+        p3->frequency = p2->frequency;
+        p3->cell_id   = p2->cell_id;
+        AddItem(p1->transposers, p3);        
+        }
+     AddItem(dest->frequencies, p1);
+     }
+
+  dest->services = &(dest->_services);
+  ClearList(dest->services);
+
+  // be sure that we take all services from source to dest.
+  for(s = (source->services)->first; s; s = s->next) {
+     sd = calloc(1, sizeof(*sd));
+     memcpy(sd, s, sizeof(*sd));
+     sd->priv = NULL;
+     sd->prev = NULL;
+     sd->next = NULL;
+     sd->index = 0;
+     AddItem(dest->services, sd);
+     }
+
+  if (source->network_name != NULL) {
+     if (dest->network_name != NULL)
+        free(dest->network_name);
+     dest->network_name = (char *) malloc(strlen(source->network_name) + 1);
+     memcpy(dest->network_name, source->network_name, strlen(source->network_name));
+     dest->network_name[strlen(source->network_name)] = '\0';
+     }
+  else
+     dest->network_name = NULL;
+
+  if (source->network_change.num_networks > 0) {
+     int i;
+     dest->network_change.num_networks = source->network_change.num_networks;
+     dest->network_change.network = calloc(source->network_change.num_networks, sizeof(changed_network_t));
+     for(i = 0; i < source->network_change.num_networks; i++) {
+        dest->network_change.network[i] = source->network_change.network[i];
+        dest->network_change.network[i].loop =
+               calloc(source->network_change.network[i].num_changes,sizeof(network_change_loop_t));
+        memcpy(&dest->network_change.network[i].loop, &source->network_change.network[i].loop,
+               source->network_change.network[i].num_changes * sizeof(network_change_loop_t));
+        }
+     }
+  else
+     dest->network_change.num_networks = 0;
+}
+
 // TODO: remove this workaround.
 static struct transponder * find_transponder_by_freq(struct transponder * tn) {
   struct transponder * t;
@@ -388,6 +471,9 @@ static struct transponder * find_transponder_by_freq(struct transponder * tn) {
   if (!((flags.scantype == SCAN_SATELLITE) && (current_tp->polarization != tn->polarization))) {
       if (is_nearly_same_frequency(current_tp->frequency, tn->frequency, tn->type)) {
           verbose("          -> found current_tp'  %s\n", buffer);
+          t = calloc(1, sizeof(*t));
+          copy_transponder(t, tn);
+          AddItem(scanned_transponders, t);
           free(buffer);
           return current_tp;
       }
@@ -620,89 +706,6 @@ void check_duplicate_transponders() {
      }
 }
 
-
-static void copy_transponder(struct transponder * dest, struct transponder * source) {
-  struct service * s, * sd;
-  struct frequency_item * p, * p1;
-
-  copy_fe_params(dest, source);
-
-  dest->network_PID          = source->network_PID;
-  dest->network_id           = source->network_id;
-  dest->original_network_id  = source->original_network_id;
-  dest->transport_stream_id  = source->transport_stream_id;
-
-  if (dest->network_name) {
-     free(dest->network_name);
-     dest->network_name = NULL;
-     }
-  if (source->network_name != NULL) {
-     dest->network_name = (char *) calloc(strlen(source->network_name) + 1, 1);
-     memcpy(dest->network_name, source->network_name, strlen(source->network_name));
-     }
-
-  dest->frequencies = &(dest->_frequencies);  
-  for(p = (dest->frequencies)->first; p; p = p->next)
-     ClearList(p->transposers);
-  ClearList(dest->frequencies); 
-
-  for(p = (source->frequencies)->first; p; p = p->next) {
-     struct frequency_item * p2, * p3;
-     p1 = calloc(1, sizeof(*p1));
-     p1->transposers = &(p1->_transposers);
-     NewList(p1->transposers, "transposers");
-     p1->frequency = p->frequency;
-     p1->cell_id   = p->cell_id;
-     for(p2 = (p->transposers)->first; p2; p2 = p2->next) {
-        p3 = calloc(1, sizeof(*p3));
-        p3->transposers = &(p3->_transposers);
-        NewList(p3->transposers, "dont_use");
-        p3->frequency = p2->frequency;
-        p3->cell_id   = p2->cell_id;
-        AddItem(p1->transposers, p3);        
-        }
-     AddItem(dest->frequencies, p1);
-     }
-
-  dest->services = &(dest->_services);
-  ClearList(dest->services);
-
-  // be shure that we take all services from source to dest.
-  for(s = (source->services)->first; s; s = s->next) {
-     sd = calloc(1, sizeof(*sd));
-     memcpy(sd, s, sizeof(*sd));
-     sd->priv = NULL;
-     sd->prev = NULL;
-     sd->next = NULL;
-     sd->index = 0;
-     AddItem(dest->services, sd);
-     }
-
-  if (source->network_name != NULL) {
-     if (dest->network_name != NULL)
-        free(dest->network_name);
-     dest->network_name = (char *) malloc(strlen(source->network_name) + 1);
-     memcpy(dest->network_name, source->network_name, strlen(source->network_name));
-     dest->network_name[strlen(source->network_name)] = '\0';
-     }
-  else
-     dest->network_name = NULL;
-
-  if (source->network_change.num_networks > 0) {
-     int i;
-     dest->network_change.num_networks = source->network_change.num_networks;
-     dest->network_change.network = calloc(source->network_change.num_networks, sizeof(changed_network_t));
-     for(i = 0; i < source->network_change.num_networks; i++) {
-        dest->network_change.network[i] = source->network_change.network[i];
-        dest->network_change.network[i].loop =
-               calloc(source->network_change.network[i].num_changes,sizeof(network_change_loop_t));
-        memcpy(&dest->network_change.network[i].loop, &source->network_change.network[i].loop,
-               source->network_change.network[i].num_changes * sizeof(network_change_loop_t));
-        }
-     }
-  else
-     dest->network_change.num_networks = 0;
-}
 
 /* service_ids are guaranteed to be unique within one TP
  * (acc. DVB standards unique within one network, but in real life...)
