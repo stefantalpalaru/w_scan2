@@ -23,11 +23,11 @@ w_scan2_SOURCES	= atsc_psip_section.c atsc_psip_section.h \
 				  extended_frontend.h \
 				  si_types.h
 
-dist_man_MANS	= doc/w_scan2.1
-EXTRA_DIST	= doc \
-			  .ycm_extra_conf.py \
-			  autogen.sh \
-			  README.md
+dist_man_MANS = doc/w_scan2.1
+EXTRA_DIST = doc \
+			 .ycm_extra_conf.py \
+			 autogen.sh \
+			 README.md
 AM_LDFLAGS = -lrt
 AM_CFLAGS = -Wall -Wextra -Wno-comment -Wswitch-default -Wno-unused-parameter
 
