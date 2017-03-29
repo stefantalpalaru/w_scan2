@@ -1,6 +1,10 @@
 ChangeLog:
 --------------------
-[1.0.1]
+[1.0.1] 2017-03-29
+ - fix a corner case where a pair of transponders kept adding each other to
+   the scanning loop, without ending up in any list we use for avoiding them
+   in the future. The end result was an endless loop. Thanks
+   https://github.com/mfyorp for reporting the bug and testing the fix.
 
 [1.0.0] 2016-10-14
  - project forked from http://wirbel.htpc-forum.de/w_scan/index2.html and renamed w_scan2
