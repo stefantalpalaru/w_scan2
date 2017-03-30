@@ -28,11 +28,9 @@
 #include "extended_frontend.h"
 #include "scan.h"
 
-
-extern void mplayer_dump_service_parameter_set (FILE * f,
-                                struct service * s,
-                                struct transponder * t,
-                                struct w_scan_flags * flags);
+extern void mplayer_dump_service_parameter_set(FILE * f,
+					       struct service *s,
+					       struct transponder *t,
+					       struct w_scan_flags *flags);
 
 #endif
-

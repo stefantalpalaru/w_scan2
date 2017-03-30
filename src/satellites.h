@@ -19,8 +19,6 @@
  * Or, point your browser to http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
 
-
-
 /* this file is shared between w_scan2 and the VDR plugin wirbelscan.
  * For details on the latter see http://wirbel.htpc-forum.de
  */
@@ -32,12 +30,11 @@
 #include <stdint.h>
 #include <unistd.h>
 
-
-int choose_satellite(const char * satellite, int * channellist);
-int txt_to_satellite (const char * id);
+int choose_satellite(const char *satellite, int *channellist);
+int txt_to_satellite(const char *id);
 int sat_count();
-const char * satellite_to_short_name(int idx);
-const char * satellite_to_full_name(int idx);
+const char *satellite_to_short_name(int idx);
+const char *satellite_to_full_name(int idx);
 int rotor_position_to_sat_list_index(int rotor_position);
 void print_satellites(void);
 //int get_frontend_param(uint16_t satellite, uint16_t table_index,
@@ -48,31 +45,29 @@ void print_satellites(void);
  *
  *****************************************************************************/
 struct __sat_transponder {
-        fe_delivery_system_t           modulation_system;
-        uint32_t                       intermediate_frequency;
-        fe_polarization_t              polarization;
-        uint32_t                       symbol_rate;
-        fe_code_rate_t                 fec_inner;
-        fe_rolloff_t                   rolloff;
-        fe_modulation_t                modulation_type;
+	fe_delivery_system_t modulation_system;
+	uint32_t intermediate_frequency;
+	fe_polarization_t polarization;
+	uint32_t symbol_rate;
+	fe_code_rate_t fec_inner;
+	fe_rolloff_t rolloff;
+	fe_modulation_t modulation_type;
 };
 #define SAT_TRANSPONDER_COUNT(x) (sizeof(x)/sizeof(struct __sat_transponder))
 
-
 struct cSat {
-        const char                     * short_name;
-        const int                      id;
-        const char                     * full_name;
-        const struct __sat_transponder * items;
-        const int                      item_count;
-        const fe_west_east_flag_t      west_east_flag;
-        const uint16_t                 orbital_position;
-        int                            rotor_position;     // Note: *not* const
-        const char                     * source_id;        // VDR sources.conf
+	const char *short_name;
+	const int id;
+	const char *full_name;
+	const struct __sat_transponder *items;
+	const int item_count;
+	const fe_west_east_flag_t west_east_flag;
+	const uint16_t orbital_position;
+	int rotor_position;	// Note: *not* const
+	const char *source_id;	// VDR sources.conf
 };
 #define SAT_COUNT(x) (sizeof(x)/sizeof(struct cSat))
 
 extern struct cSat sat_list[];
-
 
 #endif

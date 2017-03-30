@@ -29,12 +29,12 @@
 #include "si_types.h"
 #include "scan.h"
 
-void xine_dump_dvb_parameters (FILE * f, struct transponder * t, struct w_scan_flags * flags);
+void xine_dump_dvb_parameters(FILE * f, struct transponder *t,
+			      struct w_scan_flags *flags);
 
-void xine_dump_service_parameter_set (FILE * f,
-                                struct service * s,
-                                struct transponder * t,
-                                struct w_scan_flags * flags);
+void xine_dump_service_parameter_set(FILE * f,
+				     struct service *s,
+				     struct transponder *t,
+				     struct w_scan_flags *flags);
 
 #endif
-

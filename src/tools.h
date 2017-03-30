@@ -23,15 +23,15 @@
 #define _TOOLS_H
 
 #include <stdint.h>
-#include <time.h>     // link with -lrt
+#include <time.h>		// link with -lrt
 
 /*******************************************************************************
 /* common typedefs && logging.
  ******************************************************************************/
 #ifndef bool
-  typedef int bool;
-  #define false 0
-  #define true  !(false)
+typedef int bool;
+#define false 0
+#define true  !(false)
 #endif
 
 #define min(a,b)  (b<a?b:a)
@@ -65,68 +65,68 @@ extern int verbosity;
 /* time functions.
  ******************************************************************************/
 
-double elapsed (struct timespec * from, struct timespec * to);
-void   get_time(struct timespec * dest);
-void   set_timeout(uint16_t msec, struct timespec * dest);
-int    timeout_expired(struct timespec * src);
+double elapsed(struct timespec *from, struct timespec *to);
+void get_time(struct timespec *dest);
+void set_timeout(uint16_t msec, struct timespec *dest);
+int timeout_expired(struct timespec *src);
 
 /*******************************************************************************
 /* debug helpers.
  ******************************************************************************/
-void  run_time_init();
-const char * run_time();
-void  hexdump(const char * intro, const unsigned char * buf, int len);
+void run_time_init();
+const char *run_time();
+void hexdump(const char *intro, const unsigned char *buf, int len);
 
-const char * inversion_name(int inversion);
-const char * coderate_name(int coderate);
-const char * modulation_name(int modulation);
-const char * transmission_mode_name(int transmission_mode);
-const char * guard_interval_name(int guard_interval);
-const char * hierarchy_name(int hierarchy);
-const char * interleaving_name(int interleaving);
-const char * delivery_system_name(int delsys);
-const char * bool_name(bool t);
+const char *inversion_name(int inversion);
+const char *coderate_name(int coderate);
+const char *modulation_name(int modulation);
+const char *transmission_mode_name(int transmission_mode);
+const char *guard_interval_name(int guard_interval);
+const char *hierarchy_name(int hierarchy);
+const char *interleaving_name(int interleaving);
+const char *delivery_system_name(int delsys);
+const char *bool_name(bool t);
 uint32_t freq_scale(uint32_t freq, double scale);
 
-const char * alpha_name(int alpha);   /* somehow missing. */
-const char * interleaver_name(int i); /* somehow missing. */
+const char *alpha_name(int alpha);	/* somehow missing. */
+const char *interleaver_name(int i);	/* somehow missing. */
 
 /*******************************************************************************
 /* double linked list.
  ******************************************************************************/
 
-typedef int  (*cmp_func) (void * a, void * b);
-typedef bool (*fnd_func) (void * a);
+typedef int (*cmp_func) (void *a, void *b);
+typedef bool(*fnd_func) (void *a);
 
 typedef struct {
-   void * first;
-   void * last;
-   uint32_t count;
-   char * name;
-   bool lock;
-   } cList, * pList;
+	void *first;
+	void *last;
+	uint32_t count;
+	char *name;
+	bool lock;
+} cList, *pList;
 
 typedef struct {
-   void * prev;
-   void * next;
-   uint32_t index;
-   } cItem, * pItem;
+	void *prev;
+	void *next;
+	uint32_t index;
+} cItem, *pItem;
 
-void   NewList(pList list, const char * name);
-void   ClearList(pList list);
-void   SortList(pList list, cmp_func compare);
-void   AddItem(pList list, void * item);
-void   DeleteItem(pList list, void * item);
-void   SwapItem(pList list, pItem a, pItem b);
-void   UnlinkItem(pList list, void * item, bool freemem);
-void   InsertItem(pList list, void * item, uint32_t index);
-void * GetItem(pList list, uint32_t index);
-bool   IsMember(pList list, void * item);
+void NewList(pList list, const char *name);
+void ClearList(pList list);
+void SortList(pList list, cmp_func compare);
+void AddItem(pList list, void *item);
+void DeleteItem(pList list, void *item);
+void SwapItem(pList list, pItem a, pItem b);
+void UnlinkItem(pList list, void *item, bool freemem);
+void InsertItem(pList list, void *item, uint32_t index);
+void *GetItem(pList list, uint32_t index);
+bool IsMember(pList list, void *item);
 
 /*******************************************************************************
 /* fuzzy bit error recovery.
  ******************************************************************************/
 
-bool fuzzy_section(void * s);
+bool fuzzy_section(void *s);
 
 #endif

@@ -1,6 +1,9 @@
 ChangeLog:
 --------------------
 [1.0.2]
+ - move the source files in a "src" subdirectory
+ - apply some of the Linux kernel coding style indentation using the Lindent
+   script from the kernel tree
 
 [1.0.1] 2017-03-29
  - fix a corner case where a pair of transponders kept adding each other to

@@ -30,19 +30,17 @@
 #include "scan.h"
 #include "lnb.h"
 
+void vlc_xspf_prolog(FILE * f,
+		     uint16_t adapter,
+		     uint16_t frontend,
+		     struct w_scan_flags *flags, struct lnb_types_st *lnbp);
 
-void vlc_xspf_prolog (FILE * f,
-                                uint16_t adapter,
-                                uint16_t frontend,
-                                struct w_scan_flags * flags,
-                                struct lnb_types_st * lnbp);
+void vlc_dump_service_parameter_set_as_xspf(FILE * f,
+					    struct service *s,
+					    struct transponder *t,
+					    struct w_scan_flags *flags,
+					    struct lnb_types_st *lnbp);
 
-void vlc_dump_service_parameter_set_as_xspf (FILE * f,
-                                struct service * s,
-                                struct transponder * t,
-                                struct w_scan_flags * flags,
-                                struct lnb_types_st *lnbp);
-
-void vlc_xspf_epilog (FILE * f);
+void vlc_xspf_epilog(FILE * f);
 
 #endif

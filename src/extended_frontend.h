@@ -19,12 +19,9 @@
  * Or, point your browser to http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  */
 
-
-
 /* this file is shared between w_scan2 and the VDR plugin wirbelscan.
  * For details on the latter see http://wirbel.htpc-forum.de
  */
-
 
 #ifndef _EXTENDED_DVBFRONTEND_H_
 #define _EXTENDED_DVBFRONTEND_H_
@@ -39,67 +36,67 @@
  *
  *****************************************************************************/
 
-#ifndef fe_polarization // 300468 v181  6.2.13.2 Satellite delivery system descriptor
+#ifndef fe_polarization		// 300468 v181  6.2.13.2 Satellite delivery system descriptor
 typedef enum fe_polarization {
-        POLARIZATION_HORIZONTAL,
-        POLARIZATION_VERTICAL,
-        POLARIZATION_CIRCULAR_LEFT,
-        POLARIZATION_CIRCULAR_RIGHT,
+	POLARIZATION_HORIZONTAL,
+	POLARIZATION_VERTICAL,
+	POLARIZATION_CIRCULAR_LEFT,
+	POLARIZATION_CIRCULAR_RIGHT,
 } fe_polarization_t;
 #endif
 
-#ifndef fe_west_east_flag       // 300468 v181  6.2.13.2 Satellite delivery system descriptor
+#ifndef fe_west_east_flag	// 300468 v181  6.2.13.2 Satellite delivery system descriptor
 typedef enum fe_west_east_flag {
-        EAST_FLAG,
-        WEST_FLAG,
+	EAST_FLAG,
+	WEST_FLAG,
 } fe_west_east_flag_t;
 #endif
 
-#ifndef fe_interleave   // 300468 v181  6.2.13.4 Terrestrial delivery system descriptor
+#ifndef fe_interleave		// 300468 v181  6.2.13.4 Terrestrial delivery system descriptor
 typedef enum fe_interleaver {
-        INTERLEAVE_NATIVE,
-        INTERLEAVE_IN_DEPTH,
-        INTERLEAVE_AUTO,
+	INTERLEAVE_NATIVE,
+	INTERLEAVE_IN_DEPTH,
+	INTERLEAVE_AUTO,
 } fe_interleave_t;
 #endif
 
-#ifndef fe_alpha        // 300468 v181  6.2.13.4 Terrestrial delivery system descriptor
+#ifndef fe_alpha		// 300468 v181  6.2.13.4 Terrestrial delivery system descriptor
 typedef enum fe_alpha {
-        ALPHA_1,
-        ALPHA_2,
-        ALPHA_4,
-        ALPHA_AUTO,
+	ALPHA_1,
+	ALPHA_2,
+	ALPHA_4,
+	ALPHA_AUTO,
 } fe_alpha_t;
 #endif
 
 typedef enum fe_siso_miso {
-        SISO,
-        MISO,
-        SISO_MISO_RESERVED1,
-        SISO_MISO_RESERVED2,
+	SISO,
+	MISO,
+	SISO_MISO_RESERVED1,
+	SISO_MISO_RESERVED2,
 } fe_siso_miso_t;
 
-#ifndef SYS_DVBC2                              //// \BEGIN   FIX_ME: _REALLY_ DIRTY HACK. JUST FOR TESTING THIS CODE. REMOVE LATER!!!!!
-#define SYS_DVBC2 (63U)  /* max value in use: 18U */
+#ifndef SYS_DVBC2		//// \BEGIN   FIX_ME: _REALLY_ DIRTY HACK. JUST FOR TESTING THIS CODE. REMOVE LATER!!!!!
+#define SYS_DVBC2 (63U)		/* max value in use: 18U */
 #ifndef QAM_512
-#define QAM_512   (61U)  /* max value in use: 13U */
+#define QAM_512   (61U)		/* max value in use: 13U */
 #endif
 #ifndef QAM_1024
-#define QAM_1024  (62U)  /* max value in use: 13U */
+#define QAM_1024  (62U)		/* max value in use: 13U */
 #endif
 #ifndef QAM_4096
-#define QAM_4096  (63U)  /* max value in use: 13U */
+#define QAM_4096  (63U)		/* max value in use: 13U */
 #endif
 #ifndef GUARD_INTERVAL_1_64
-#define GUARD_INTERVAL_1_64 (127U) /* max value in use: 10U */
+#define GUARD_INTERVAL_1_64 (127U)	/* max value in use: 10U */
 #endif
-#endif                                         //// \END     REMOVE UP TO HERE!!!
+#endif //// \END     REMOVE UP TO HERE!!!
 
-#ifndef SYS_TURBO  // remove later.
-#define SYS_TURBO (SYS_DVBT2 + 1) /* correct in any case. */
+#ifndef SYS_TURBO		// remove later.
+#define SYS_TURBO (SYS_DVBT2 + 1)	/* correct in any case. */
 #endif
 
-#ifndef DTV_ENUM_DELSYS // remove later.
+#ifndef DTV_ENUM_DELSYS		// remove later.
 #define DTV_ENUM_DELSYS 44
 #endif
 
@@ -108,14 +105,14 @@ typedef enum fe_siso_miso {
 #endif
 
 typedef enum {
-        DATA_SLICE_TUNING_FREQUENCY,
-        C2_SYSTEM_CENTER_FREQUENCY,
-        INITIAL_TUNING_FOR_STATIC_DATA_SLICE,
+	DATA_SLICE_TUNING_FREQUENCY,
+	C2_SYSTEM_CENTER_FREQUENCY,
+	INITIAL_TUNING_FOR_STATIC_DATA_SLICE,
 } fe_frequency_type_t;
 
 typedef enum {
-        FFT_4K_8MHZ,
-        FFT_4K_6MHZ,
+	FFT_4K_8MHZ,
+	FFT_4K_6MHZ,
 } fe_ofdm_symbol_duration_t;
 
 /* don't use FE_OFDM, FE_QAM, FE_QPSK, FE_ATSC any longer.
@@ -128,11 +125,11 @@ typedef enum {
  * 20120107 wirbel
  */
 typedef enum {
-        SCAN_UNDEFINED,
-        SCAN_SATELLITE,
-        SCAN_CABLE,
-        SCAN_TERRESTRIAL,
-        SCAN_TERRCABLE_ATSC,   /* I dislike this mixture of terr and cable. fix later, as it leads to problems now. */
+	SCAN_UNDEFINED,
+	SCAN_SATELLITE,
+	SCAN_CABLE,
+	SCAN_TERRESTRIAL,
+	SCAN_TERRCABLE_ATSC,	/* I dislike this mixture of terr and cable. fix later, as it leads to problems now. */
 } scantype_t;
 
 #endif
