@@ -62,7 +62,7 @@ struct w_scan_flags {
 struct service *find_service(struct transponder *t, uint16_t service_id);
 struct service *alloc_service(struct transponder *t, uint16_t service_id);
 
-struct transponder *alloc_transponder(uint32_t frequency, uint8_t type,
+struct transponder *alloc_transponder(uint32_t frequency, unsigned delsys,
 				      uint8_t polarization);
 
 /* write transponder data to dest. no memory allocating,

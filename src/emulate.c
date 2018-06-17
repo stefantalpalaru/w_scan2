@@ -64,6 +64,8 @@ struct {
   *   - not to be exposed outside this file.
   */
 static struct {
+	unsigned w_scan_version;
+	uint32_t w_scan_flags;
 	fe_delivery_system_t delsys;
 	uint32_t frequency;
 	uint32_t bandwidth_hz;
@@ -87,6 +89,11 @@ static struct {
 	uint32_t lnb_low;
 	uint32_t lnb_high;
 } em_device;
+
+#define EM_OLD_DELSYSLIST (((uint32_t)1) << 1)
+#define EM_OLD_APIDISP    (((uint32_t)1) << 2)
+#define EM_HEXDUMP_BUG    (((uint32_t)1) << 3)
+#define EM_OLD_SI_HEADER  (((uint32_t)1) << 4)
 
 /*
  * forward declarations.
@@ -923,6 +930,7 @@ static int parse_logfile(const char *log)
 	sidata_t *sidata = NULL;
 	bool delsys_list = false;
 	em_device.scantype = SCAN_UNDEFINED;
+	em_device.w_scan_version = em_device.w_scan_flags = 0;	// logging w_scan's version.
 
 	if (!log || !*log) {
 		free(line);
@@ -941,6 +949,34 @@ static int parse_logfile(const char *log)
 	while (fgets(line, 256, logfile) != NULL) {
 		bool is_tp = false;
 		line_no++;
+
+		// --- get logging w_scan's version -------------------------------------------------------------------------------
+		if (!em_device.w_scan_version) {
+			sscanf(line,
+			       "w_scan version %u (compiled for DVB API 5.xx)",
+			       &em_device.w_scan_version);
+			EM_INFO("detected w_scan version %u\n",
+				em_device.w_scan_version);
+			if (em_device.w_scan_version
+			    && (em_device.w_scan_version < 20140614)) {
+				EM_INFO("using flag EM_OLD_DELSYSLIST\n");
+				em_device.w_scan_flags |= EM_OLD_DELSYSLIST;
+			}
+			if (em_device.w_scan_version
+			    && (em_device.w_scan_version < 20140529)) {
+				EM_INFO("using flag EM_OLD_SI_HEADER\n");
+				em_device.w_scan_flags |= EM_OLD_SI_HEADER;
+			}
+			if (em_device.w_scan_version
+			    && (em_device.w_scan_version < 20140423)) {
+				EM_INFO("using flag EM_OLD_APIDISP\n");
+				em_device.w_scan_flags |= EM_OLD_APIDISP;
+				EM_INFO("using flag EM_OLD_APIDISP\n");
+				em_device.w_scan_flags |= EM_HEXDUMP_BUG;
+			}
+			continue;
+		}
+		// --- end logging w_scan's version -------------------------------------------------------------------------------
 
 		// --- get scan type ----------------------------------------------------------------------------------------------
 		if (em_device.scantype == SCAN_UNDEFINED) {
@@ -985,8 +1021,13 @@ static int parse_logfile(const char *log)
 
 			// used DVB API
 			if (strstr(line, "Using DVB API ")) {
-				sscanf(line, "Using DVB API %u.%u",
-				       &em_api.major, &em_api.minor);
+				if (em_device.w_scan_flags & EM_OLD_APIDISP) {
+					sscanf(line, "Using DVB API %x.%x",
+					       &em_api.major, &em_api.minor);
+				} else {
+					sscanf(line, "Using DVB API %u.%u",
+					       &em_api.major, &em_api.minor);
+				}
 				continue;
 			}
 			// capabilities: frontend name
@@ -1131,6 +1172,68 @@ static int parse_logfile(const char *log)
 				     line);
 		}
 
+		if (em_device.w_scan_flags & EM_OLD_DELSYSLIST) {
+			EM_INFO("%d: lookup oldstyle delsys hex array\n",
+				line_no);
+			if (strstr(line, "=====================") == NULL) {
+				info("skip line %d: '%s'\n", line_no, line);
+			} else {
+				int len = 0;
+				unsigned tmp, args[16];
+				//EM_INFO("lookup oldstyle delsys hex array: started\n");
+
+				while (fgets(line, 256, logfile) != NULL) {
+					EM_INFO("checking line '%s'", line);
+					line_no++;
+					if (strstr
+					    (line,
+					     "	======================"))
+						continue;
+					if (!len) {
+						sscanf(line, "	len = %d",
+						       &len);
+						continue;
+					}
+					if (len) {
+						int i;
+						int nitems = sscanf(line,
+								    "	0x%X: %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X :",
+								    &tmp,
+								    &args[0],
+								    &args[1],
+								    &args[2],
+								    &args[3],
+								    &args[4],
+								    &args[5],
+								    &args[6],
+								    &args[7],
+								    &args[8],
+								    &args[9],
+								    &args[10],
+								    &args[11],
+								    &args[12],
+								    &args[13],
+								    &args[14],
+								    &args[15]);
+						EM_INFO("nitems = %d\n",
+							nitems);
+						if (!nitems)
+							continue;
+						for (i = 0; i < len; i++)
+							em_device.delsystems
+							    [em_device.ndelsystems++]
+							    =
+							    (fe_delivery_system_t)
+							    args[i];
+						//for(i=0; i<em_device.ndelsystems; i++)
+						//   info("delsys %d\n", em_device.delsystems[i]);
+						break;
+					}
+				}
+				em_device.w_scan_flags &= ~EM_OLD_DELSYSLIST;
+			}
+			continue;
+		}
 		if ((p = strstr(line, "   check ")) != NULL) {
 			delsys_list = true;
 			continue;
@@ -1155,8 +1258,8 @@ static int parse_logfile(const char *log)
 			for (i = 0; i < sizeof(dname) / sizeof(dname[0]); i++) {
 				//EM_INFO("'%s' = '%s'?\n",p,dname[i]);
 				if (strncmp(p, dname[i], strlen(p)) == 0) {
-					em_device.
-					    delsystems[em_device.ndelsystems++]
+					em_device.delsystems[em_device.
+							     ndelsystems++]
 					    = (fe_delivery_system_t) i;
 					delsys = true;
 					break;
@@ -1177,6 +1280,13 @@ static int parse_logfile(const char *log)
 			is_tp = true;	// '        signal ok:        <FOOBAR>'
 		if (strncmp(line, "tune to: ", 9) == 0)
 			is_tp = true;	// 'tune to: <FOOBAR>'
+		if (strncmp(line, "signal ok:", 10) == 0) {
+			if (fgets(line, 256, logfile) != NULL) {
+				*line = ':';
+			}
+			line_no++;
+			is_tp = true;
+		}
 		if (is_tp) {
 			char *p = strchr(line, ':');
 			p++;
@@ -1226,6 +1336,81 @@ static int parse_logfile(const char *log)
 			parse_intro(table_id, p, &pmt_pid, &service_id);
 			pid = pmt_pid;
 			continue;
+		}
+
+		if ((em_device.w_scan_flags & EM_OLD_SI_HEADER)
+		    && !strncmp(line, "parse_section", 13)) {
+			unsigned args[9];
+			int nargs, tmp;
+//                            parse_section:1376: pid 0x10 tid 0x40 table_id_ext 0x0056, 2/3 (version 16)
+//                            parse_section:1376: pid 17 (0x11), tid 66 (0x42), table_id_ext 30 (0x001e), section_number 0, last_section_number 0, version 3\n" 
+			nargs = sscanf(line, "parse_section:%d: pid %x tid %x table_id_ext %x, %i/%i (version %i)",	//",
+				       &tmp, &args[0], &args[1], &args[2], &args[3], &args[4], &args[5]);	//);
+			if (nargs != 7)
+				nargs =
+				    sscanf(line,
+					   "parse_section:%d: pid %d (%x), tid %d (%x), table_id_ext %d (%x), section_number %i, last_section_number %i, version %i\n",
+					   &tmp, &args[0], &args[1], &args[2],
+					   &args[3], &args[4], &args[5],
+					   &args[6], &args[7], &args[8]);
+			//if (nargs) info("found %d args---------\n", nargs);
+			if ((nargs == 7) || (nargs == 10)) {
+				EM_INFO("found table. nargs = %d\n", nargs);
+				table_id =
+				    (nargs == 7) ? (int)args[1] : (nargs ==
+								   10) ? (int)
+				    args[2] : table_id;
+				switch (table_id) {
+				case TABLE_PAT:
+					transport_stream_id =
+					    (nargs ==
+					     7) ? (int)args[2] : (nargs ==
+								  10) ? (int)
+					    args[4] : transport_stream_id;
+					break;
+				case TABLE_NIT_ACT:
+				case TABLE_NIT_OTH:
+					network_id =
+					    (nargs ==
+					     7) ? (int)args[2] : (nargs ==
+								  10) ? (int)
+					    args[4] : network_id;
+					break;
+				case TABLE_SDT_ACT:
+				case TABLE_SDT_OTH:
+					transport_stream_id =
+					    (nargs ==
+					     7) ? (int)args[2] : (nargs ==
+								  10) ? (int)
+					    args[4] : transport_stream_id;
+					break;
+				case TABLE_PMT:
+					pmt_pid = ((nargs == 7)
+						   || (nargs ==
+						       10)) ? (int)args[0] :
+					    pmt_pid;
+					service_id =
+					    (nargs ==
+					     7) ? (int)args[2] : (nargs ==
+								  10) ? (int)
+					    args[4] : service_id;
+					break;
+				default:
+					info("invalid table id %d\n", table_id);
+				}
+				if (fgets(line, 256, logfile) != NULL) {
+					EM_INFO("next: %s\n", line);
+				}
+				line_no++;	//"NIT (act" 
+				if (fgets(line, 256, logfile) != NULL) {
+					EM_INFO("next: %s\n", line);
+				}
+				line_no++;	//"       ===================== parse_"
+				if (fgets(line, 256, logfile) != NULL) {
+					EM_INFO("next: %s\n", line);
+				}
+				line_no++;	//"       len = "
+			}
 		}
 
 		if (strstr
@@ -1365,21 +1550,37 @@ static int parse_logfile(const char *log)
 						sidata->buf[sidata->len++] =
 						    args[i];
 					if (len < 1) {
-						//int v = verbosity;
-						//verbosity = 5;
-						//hexdump(table_name(sidata->table_id, &sidata->buf[0], sidata->len);
-						//verbosity = v;
-						//char b[256];
-						//print_transponder(b, &sidata->t);
-						//EM_INFO("add: %6d %-10s pid=%-3d, table_id_ext=%-5d, ONID=%-5d, NID=%-5d, TSID=%-5d, SID=%-5d (%s)\n", \
-						//     freq_scale(em_device.frequency, 1e-3),                                                       \
-						//     table_name(sidata->table_id),                                                                \
-						//     sidata->pid,                                                                                 \
-						//     sidata->table_id_ext,                                                                        \
-						//     sidata->original_network_id,                                                                 \
-						//     sidata->network_id,                                                                          \
-						//     sidata->transport_stream_id,                                                                 \
-						//     sidata->service_id, b);
+						//info("line %d\n", line_no);
+						//switch(table_id) {
+						//   case TABLE_PAT:
+						//      info("PAT (xxxx:xxxx:%u)\n", transport_stream_id);
+						//      break;
+						//   case TABLE_NIT_ACT:
+						//   case TABLE_NIT_OTH:
+						//      info("%s: (xxxx:%u:xxxx)\n", table_id == 0x40?"NIT(act)":"NIT(oth)", network_id);
+						//      break;
+						//   case TABLE_SDT_ACT:
+						//   case TABLE_SDT_OTH:
+						//      info("SDT(%s TS, transport_stream_id %d (0x%04x) )\n", table_id == 0x42 ? "actual":"other",
+						//          transport_stream_id, transport_stream_id);
+						//      break;
+						//   case TABLE_PMT:
+						//      info("PMT %d (0x%04x) for service %d (0x%04x)\n", pid, pid, service_id, service_id);
+						//      break;
+						//   default:
+						//      info("??? unknown table_id %d\n", table_id);
+						//   }
+						if (em_device.
+						    w_scan_flags &
+						    EM_HEXDUMP_BUG) {
+							// each sections hexdump misses two bytes, because of bug in older versions. :(
+							// those are really lost in logfile && not recoverable.
+							sidata->buf[sidata->
+								    len++] = 0;
+							sidata->buf[sidata->
+								    len++] = 0;
+						}
+						//hexdump("sidata", &sidata->buf[0], sidata->len);
 						AddItem(em_sidata, sidata);
 						sidata = NULL;
 					}

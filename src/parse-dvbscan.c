@@ -173,19 +173,19 @@ int dvbscan_parse_tuningdata(const char *tuningdata, struct w_scan_flags *flags)
 			continue;
 		switch (toupper(token[0])) {
 		case 'A':
-			tn = alloc_transponder(0, SCAN_TERRCABLE_ATSC, 0);
+			tn = alloc_transponder(0, SYS_ATSC, 0);
 			tn->type = SCAN_TERRCABLE_ATSC;
 			break;
 		case 'C':
-			tn = alloc_transponder(0, SCAN_CABLE, 0);
+			tn = alloc_transponder(0, SYS_DVBC_ANNEX_AC, 0);
 			tn->type = SCAN_CABLE;
 			break;
 		case 'S':
-			tn = alloc_transponder(0, SCAN_SATELLITE, 0);
+			tn = alloc_transponder(0, SYS_DVBS, 0);
 			tn->type = SCAN_SATELLITE;
 			break;
 		case 'T':
-			tn = alloc_transponder(0, SCAN_TERRESTRIAL, 0);
+			tn = alloc_transponder(0, SYS_DVBT, 0);
 			tn->type = SCAN_TERRESTRIAL;
 			break;
 		case '#':

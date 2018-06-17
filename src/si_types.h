@@ -113,19 +113,28 @@ struct service {
 } service_t, *p_service_t;
 
 /*******************************************************************************
-/* transponder type.
+ * transponder type.
  ******************************************************************************/
 
-struct frequency_item {
+struct transposer {
+	uint8_t cell_id_extension;
+	uint32_t transposer_frequency;
+};
+
+struct cell {
   /*----------------------------*/
 	void *prev;
 	void *next;
 	uint32_t index;
   /*----------------------------*/
-	pList transposers;
-	cList _transposers;
 	uint16_t cell_id;
-	uint32_t frequency;
+
+	// if TFS: up to 6 RF freqs.
+	int num_center_frequencies;
+	uint32_t center_frequencies[6];
+
+	int num_transposers;
+	struct transposer transposers[16];
 };
 
 struct transponder {
@@ -135,8 +144,8 @@ struct transponder {
 	uint32_t index;
 	pList services;
 	cList _services;
-	pList frequencies;	/* DVB-T/T2 */
-	cList _frequencies;
+	pList cells;		/* DVB-T/T2 */
+	cList _cells;
   /*----------------------------- starting from here copied by 'copy_fe_params' ------------------------------------------*/
 	/* NOTE: 'frequency' needs to be first item - dont touch!                                                               */
 	uint32_t frequency;	/* unit Hz, except satellite: kHz                      1..4  */

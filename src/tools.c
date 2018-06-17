@@ -75,7 +75,7 @@ int alphabetically(void *a, void *b, int ascending)
 #endif
 
 // initializes a list before first use
-void NewList(pList list, const char *name)
+void NewList(pList const list, const char *name)
 {
 	dbg("%s %d: list:'%s'\n", __FUNCTION__, __LINE__, name);
 	list->first = NULL;
@@ -107,7 +107,6 @@ void ClearList(pList list)
 	pItem p = list->last;
 
 	while (p != NULL) {
-		list->count--;
 		list->last = p->prev;
 		free(p);
 		p = list->last;
@@ -116,6 +115,7 @@ void ClearList(pList list)
 		}
 	}
 	list->first = NULL;
+	list->count = 0;
 	list->lock = false;
 	report(list);
 }
@@ -676,6 +676,154 @@ const char *delivery_system_name(int delsys)
 		return "SYS_DVBC_ANNEX_C";
 	default:
 		return "SYS_UNDEFINED";
+	}
+}
+
+const char *property_name(int property)
+{
+	switch (property) {
+	case DTV_UNDEFINED:
+		return "DTV_UNDEFINED";
+	case DTV_TUNE:
+		return "DTV_TUNE";
+	case DTV_CLEAR:
+		return "DTV_CLEAR";
+	case DTV_FREQUENCY:
+		return "DTV_FREQUENCY";
+	case DTV_MODULATION:
+		return "DTV_MODULATION";
+	case DTV_BANDWIDTH_HZ:
+		return "DTV_BANDWIDTH_HZ";
+	case DTV_INVERSION:
+		return "DTV_INVERSION";
+	case DTV_DISEQC_MASTER:
+		return "DTV_DISEQC_MASTER";
+	case DTV_SYMBOL_RATE:
+		return "DTV_SYMBOL_RATE";
+	case DTV_INNER_FEC:
+		return "DTV_INNER_FEC";
+	case DTV_VOLTAGE:
+		return "DTV_VOLTAGE";
+	case DTV_TONE:
+		return "DTV_TONE";
+	case DTV_PILOT:
+		return "DTV_PILOT";
+	case DTV_ROLLOFF:
+		return "DTV_ROLLOFF";
+	case DTV_DISEQC_SLAVE_REPLY:
+		return "DTV_DISEQC_SLAVE_REPLY";
+	case DTV_FE_CAPABILITY_COUNT:
+		return "DTV_FE_CAPABILITY_COUNT";
+	case DTV_FE_CAPABILITY:
+		return "DTV_FE_CAPABILITY";
+	case DTV_DELIVERY_SYSTEM:
+		return "DTV_DELIVERY_SYSTEM";
+	case DTV_ISDBT_PARTIAL_RECEPTION:
+		return "DTV_ISDBT_PARTIAL_RECEPTION";
+	case DTV_ISDBT_SOUND_BROADCASTING:
+		return "DTV_ISDBT_SOUND_BROADCASTING";
+	case DTV_ISDBT_SB_SUBCHANNEL_ID:
+		return "DTV_ISDBT_SB_SUBCHANNEL_ID";
+	case DTV_ISDBT_SB_SEGMENT_IDX:
+		return "DTV_ISDBT_SB_SEGMENT_IDX";
+	case DTV_ISDBT_SB_SEGMENT_COUNT:
+		return "DTV_ISDBT_SB_SEGMENT_COUNT";
+	case DTV_ISDBT_LAYERA_FEC:
+		return "DTV_ISDBT_LAYERA_FEC";
+	case DTV_ISDBT_LAYERA_MODULATION:
+		return "DTV_ISDBT_LAYERA_MODULATION";
+	case DTV_ISDBT_LAYERA_SEGMENT_COUNT:
+		return "DTV_ISDBT_LAYERA_SEGMENT_COUNT";
+	case DTV_ISDBT_LAYERA_TIME_INTERLEAVING:
+		return "DTV_ISDBT_LAYERA_TIME_INTERLEAVING";
+	case DTV_ISDBT_LAYERB_FEC:
+		return "DTV_ISDBT_LAYERB_FEC";
+	case DTV_ISDBT_LAYERB_MODULATION:
+		return "DTV_ISDBT_LAYERB_MODULATION";
+	case DTV_ISDBT_LAYERB_SEGMENT_COUNT:
+		return "DTV_ISDBT_LAYERB_SEGMENT_COUNT";
+	case DTV_ISDBT_LAYERB_TIME_INTERLEAVING:
+		return "DTV_ISDBT_LAYERB_TIME_INTERLEAVING";
+	case DTV_ISDBT_LAYERC_FEC:
+		return "DTV_ISDBT_LAYERC_FEC";
+	case DTV_ISDBT_LAYERC_MODULATION:
+		return "DTV_ISDBT_LAYERC_MODULATION";
+	case DTV_ISDBT_LAYERC_SEGMENT_COUNT:
+		return "DTV_ISDBT_LAYERC_SEGMENT_COUNT";
+	case DTV_ISDBT_LAYERC_TIME_INTERLEAVING:
+		return "DTV_ISDBT_LAYERC_TIME_INTERLEAVING";
+	case DTV_API_VERSION:
+		return "DTV_API_VERSION";
+	case DTV_CODE_RATE_HP:
+		return "DTV_CODE_RATE_HP";
+	case DTV_CODE_RATE_LP:
+		return "DTV_CODE_RATE_LP";
+	case DTV_GUARD_INTERVAL:
+		return "DTV_GUARD_INTERVAL";
+	case DTV_TRANSMISSION_MODE:
+		return "DTV_TRANSMISSION_MODE";
+	case DTV_HIERARCHY:
+		return "DTV_HIERARCHY";
+	case DTV_ISDBT_LAYER_ENABLED:
+		return "DTV_ISDBT_LAYER_ENABLED";
+	case DTV_STREAM_ID:
+		return "DTV_STREAM_ID";
+	case DTV_DVBT2_PLP_ID_LEGACY:
+		return "DTV_DVBT2_PLP_ID_LEGACY";
+	case DTV_ENUM_DELSYS:
+		return "DTV_ENUM_DELSYS";
+	case DTV_ATSCMH_FIC_VER:
+		return "DTV_ATSCMH_FIC_VER";
+	case DTV_ATSCMH_PARADE_ID:
+		return "DTV_ATSCMH_PARADE_ID";
+	case DTV_ATSCMH_NOG:
+		return "DTV_ATSCMH_NOG";
+	case DTV_ATSCMH_TNOG:
+		return "DTV_ATSCMH_TNOG";
+	case DTV_ATSCMH_SGN:
+		return "DTV_ATSCMH_SGN";
+	case DTV_ATSCMH_PRC:
+		return "DTV_ATSCMH_PRC";
+	case DTV_ATSCMH_RS_FRAME_MODE:
+		return "DTV_ATSCMH_RS_FRAME_MODE";
+	case DTV_ATSCMH_RS_FRAME_ENSEMBLE:
+		return "DTV_ATSCMH_RS_FRAME_ENSEMBLE";
+	case DTV_ATSCMH_RS_CODE_MODE_PRI:
+		return "DTV_ATSCMH_RS_CODE_MODE_PRI";
+	case DTV_ATSCMH_RS_CODE_MODE_SEC:
+		return "DTV_ATSCMH_RS_CODE_MODE_SEC";
+	case DTV_ATSCMH_SCCC_BLOCK_MODE:
+		return "DTV_ATSCMH_SCCC_BLOCK_MODE";
+	case DTV_ATSCMH_SCCC_CODE_MODE_A:
+		return "DTV_ATSCMH_SCCC_CODE_MODE_A";
+	case DTV_ATSCMH_SCCC_CODE_MODE_B:
+		return "DTV_ATSCMH_SCCC_CODE_MODE_B";
+	case DTV_ATSCMH_SCCC_CODE_MODE_C:
+		return "DTV_ATSCMH_SCCC_CODE_MODE_C";
+	case DTV_ATSCMH_SCCC_CODE_MODE_D:
+		return "DTV_ATSCMH_SCCC_CODE_MODE_D";
+	case DTV_INTERLEAVING:
+		return "DTV_INTERLEAVING";
+	case DTV_LNA:
+		return "DTV_LNA";
+	case DTV_STAT_SIGNAL_STRENGTH:
+		return "DTV_STAT_SIGNAL_STRENGTH";
+	case DTV_STAT_CNR:
+		return "DTV_STAT_CNR";
+	case DTV_STAT_PRE_ERROR_BIT_COUNT:
+		return "DTV_STAT_PRE_ERROR_BIT_COUNT";
+	case DTV_STAT_PRE_TOTAL_BIT_COUNT:
+		return "DTV_STAT_PRE_TOTAL_BIT_COUNT";
+	case DTV_STAT_POST_ERROR_BIT_COUNT:
+		return "DTV_STAT_POST_ERROR_BIT_COUNT";
+	case DTV_STAT_POST_TOTAL_BIT_COUNT:
+		return "DTV_STAT_POST_TOTAL_BIT_COUNT";
+	case DTV_STAT_ERROR_BLOCK_COUNT:
+		return "DTV_STAT_ERROR_BLOCK_COUNT";
+	case DTV_STAT_TOTAL_BLOCK_COUNT:
+		return "DTV_STAT_TOTAL_BLOCK_COUNT";
+	default:
+		return "(unknown dtv property)";
 	}
 }
 

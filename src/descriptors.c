@@ -885,8 +885,9 @@ void parse_terrestrial_delivery_system_descriptor(const unsigned char *buf,
 						  inversion)
 {
 	uint32_t center_frequency;
-	struct frequency_item *p, *p1;
+	struct cell *p;
 	bool known;
+	int i;
 
 	hd(buf);
 	if (t == NULL)
@@ -898,6 +899,8 @@ void parse_terrestrial_delivery_system_descriptor(const unsigned char *buf,
 	t->inversion = inversion;
 
 	center_frequency = 10 * get_u32(buf + 2);	// center_frequency 32 bslbf, 10Hz steps
+	if ((center_frequency < 50000000) || (center_frequency > 1000000000))
+		center_frequency = 0;
 	switch (buf[6] >> 5) {	// bandwidth 3 bslbf
 	case 0:
 		t->bandwidth = 8000000;
@@ -1042,14 +1045,17 @@ void parse_terrestrial_delivery_system_descriptor(const unsigned char *buf,
 			t->frequency = center_frequency;
 		else {
 			known = false;
-			for (p = (t->frequencies)->first; p; p = p->next) {
-				if (p->frequency == center_frequency) {
-					known = true;
-					break;
-				}
-				for (p1 = (p->transposers)->first; p1;
-				     p1 = p1->next) {
-					if (p1->frequency == center_frequency) {
+			for (p = (t->cells)->first; p; p = p->next) {
+				for (i = 0; i < p->num_center_frequencies; i++)
+					if (p->center_frequencies[i] ==
+					    center_frequency) {
+						known = true;
+						break;
+					}
+				for (i = 0; i < p->num_transposers; i++) {
+					if (p->
+					    transposers[i].transposer_frequency
+					    == center_frequency) {
 						known = true;
 						break;
 					}
@@ -1057,10 +1063,9 @@ void parse_terrestrial_delivery_system_descriptor(const unsigned char *buf,
 			}
 			if (!known) {
 				p = calloc(1, sizeof(*p));
-				p->transposers = &(p->_transposers);
-				NewList(p->transposers, "transposers");
-				p->frequency = center_frequency;
-				AddItem(t->frequencies, p);
+				p->num_center_frequencies = 1;
+				p->center_frequencies[0] = center_frequency;
+				AddItem(t->cells, p);
 			}
 		}		// end other_frequency_flag
 	}			// end if center_frequency > 0
@@ -1071,36 +1076,51 @@ void parse_terrestrial_delivery_system_descriptor(const unsigned char *buf,
 		t->other_frequency_flag = 1;
 	}
 
-	verbose
-	    ("          F%u B%u %s C%d D%d G%d T%d other_frequency=%d (%u)\n",
-	     freq_scale(t->frequency, 1e-3), freq_scale(t->bandwidth, 1e-6),
-	     (t->modulation == QPSK) ? "QPSK" : (t->modulation ==
-						 QAM_16) ? "M16" : "M64",
-	     (t->coderate == FEC_1_2) ? 12 : (t->coderate ==
-					      FEC_2_3) ? 23 : (t->coderate ==
-							       FEC_3_4) ? 34
-	     : (t->coderate == FEC_5_6) ? 56 : (t->coderate ==
-						FEC_7_8) ? 78 : 999,
-	     (t->coderate_LP == FEC_1_2) ? 12 : (t->coderate_LP ==
-						 FEC_2_3) ? 23 : (t->coderate_LP
-								  ==
-								  FEC_3_4) ? 34
-	     : (t->coderate_LP == FEC_5_6) ? 56 : (t->coderate_LP ==
-						   FEC_7_8) ? 78 : 999,
-	     (t->guard == GUARD_INTERVAL_1_32) ? 32 : (t->guard ==
-						       GUARD_INTERVAL_1_16) ? 16
-	     : (t->guard == GUARD_INTERVAL_1_8) ? 8 : 4,
-	     (t->transmission == TRANSMISSION_MODE_2K) ? 2 : (t->transmission ==
-							      TRANSMISSION_MODE_8K)
-	     ? 8 : 4, t->other_frequency_flag,
-	     t->other_frequency_flag ? center_frequency : 0);
+	if (verbosity >= 4) {
+		verbose
+		    ("          F%u B%u %s C%d D%d G%d T%d other_frequency=%d (%u)\n",
+		     freq_scale(t->frequency, 1e-3), freq_scale(t->bandwidth,
+								1e-6),
+		     (t->modulation == QPSK) ? "QPSK" : (t->modulation ==
+							 QAM_16) ? "M16" :
+		     "M64",
+		     (t->coderate == FEC_1_2) ? 12 : (t->coderate ==
+						      FEC_2_3) ? 23
+		     : (t->coderate == FEC_3_4)
+		     ? 34 : (t->coderate == FEC_5_6) ? 56 : (t->coderate ==
+							     FEC_7_8) ? 78 :
+		     999,
+		     (t->coderate_LP == FEC_1_2) ? 12 : (t->coderate_LP ==
+							 FEC_2_3) ? 23
+		     : (t->coderate_LP == FEC_3_4)
+		     ? 34 : (t->coderate_LP ==
+			     FEC_5_6) ? 56 : (t->coderate_LP ==
+					      FEC_7_8) ? 78 : 999,
+		     (t->guard == GUARD_INTERVAL_1_32) ? 32 : (t->guard ==
+							       GUARD_INTERVAL_1_16)
+		     ? 16 : (t->guard == GUARD_INTERVAL_1_8) ? 8 : 4,
+		     (t->transmission ==
+		      TRANSMISSION_MODE_2K) ? 2 : (t->transmission ==
+						   TRANSMISSION_MODE_8K) ? 8 :
+		     4, t->other_frequency_flag,
+		     t->other_frequency_flag ? center_frequency : 0);
 
-	verbose("          %u frequencies\n", (t->frequencies)->count);
-	for (p = (t->frequencies)->first; p; p = p->next) {
-		verbose("             %u\n", p->frequency);
-		for (p1 = (p->transposers)->first; p1; p1 = p1->next) {
-			verbose("                transposer %u\n",
-				p1->frequency);
+		verbose("          %u cells\n", (t->cells)->count);
+		i = 0;
+		for (p = (t->cells)->first; p; p = p->next, ++i) {
+			int n;
+			for (n = 0; n < p->num_center_frequencies; n++)
+				verbose
+				    ("             cell %u: center_frequency %7.3f\n",
+				     p->cell_id,
+				     p->center_frequencies[n] / 1000000.0);
+			for (n = 0; n < p->num_transposers; n++) {
+				verbose
+				    ("                transposer %u transposer_frequency %7.3f\n",
+				     p->transposers[n].cell_id_extension,
+				     p->transposers[n].transposer_frequency /
+				     1000000.0);
+			}
 		}
 	}
 }				//end parse_terrestrial_delivery_system_descriptor
@@ -1108,18 +1128,18 @@ void parse_terrestrial_delivery_system_descriptor(const unsigned char *buf,
 void parse_frequency_list_descriptor(const unsigned char *buf,
 				     struct transponder *t)
 {
-	uint8_t i, coding_type = (buf[2] & 0x03);
+	uint8_t i, j, coding_type = (buf[2] & 0x03);
 	uint8_t num_frequencies = (buf[1] - 1) / 4;
 	uint32_t f;
 	bool known;
-	struct frequency_item *p, *p1;
+	struct cell *p;
 
 	if (t == NULL)
 		return;
 	hd(buf);
 	buf += 3;
 
-	for (i = 0; i < num_frequencies; i++) {
+	for (i = 0; i < num_frequencies; ++i) {
 		switch (coding_type) {
 		case 1:
 			f = 10 * bcd32_to_cpu(buf[0], buf[1], buf[2], buf[3]);
@@ -1140,13 +1160,14 @@ void parse_frequency_list_descriptor(const unsigned char *buf,
 			continue;
 
 		known = false;
-		for (p = (t->frequencies)->first; p; p = p->next) {
-			if (p->frequency == f) {
-				known = true;
-				break;
-			}
-			for (p1 = (p->transposers)->first; p1; p1 = p1->next) {
-				if (p1->frequency == f) {
+		for (p = (t->cells)->first; p; p = p->next) {
+			for (j = 0; j < p->num_center_frequencies; j++)
+				if (p->center_frequencies[j] == f) {
+					known = true;
+					break;
+				}
+			for (j = 0; j < p->num_transposers; j++) {
+				if (p->transposers[j].transposer_frequency == f) {
 					known = true;
 					break;
 				}
@@ -1154,19 +1175,26 @@ void parse_frequency_list_descriptor(const unsigned char *buf,
 		}
 		if (!known) {
 			p = calloc(1, sizeof(*p));
-			p->transposers = &(p->_transposers);
-			NewList(p->transposers, "transposers");
-			p->frequency = f;
-			AddItem(t->frequencies, p);
+			p->num_center_frequencies = 1;
+			p->center_frequencies[0] = f;
+			AddItem(t->cells, p);
 		}
 	}			// end freq loop
 
-	verbose("          %-.2u frequencies\n", (t->frequencies)->count);
-	for (p = (t->frequencies)->first; p; p = p->next) {
-		verbose("             %u\n", p->frequency);
-		for (p1 = (p->transposers)->first; p1; p1 = p1->next) {
-			verbose("                transposer %u\n",
-				p1->frequency);
+	if (verbosity >= 4) {
+		verbose("          %u cells\n", (t->cells)->count);
+		i = 0;
+		for (p = (t->cells)->first; p; p = p->next, ++i) {
+			int n;
+			for (n = 0; n < p->num_center_frequencies; n++)
+				verbose
+				    ("             cell%d: center_frequency%u\n",
+				     i, p->center_frequencies[n]);
+			for (n = 0; n < p->num_transposers; n++) {
+				verbose
+				    ("                transposer%d transposer_frequency%u\n",
+				     n, p->transposers[n].transposer_frequency);
+			}
 		}
 	}
 }
@@ -1182,13 +1210,10 @@ void parse_T2_delivery_system_descriptor(const unsigned char *buf,
 {
 	unsigned char *bp;
 	__u8 descriptor_length;
-	__u8 cell_id_extension;
 	__u8 frequency_loop_length = 0;
 	__u8 subcell_info_loop_length = 0;
-	__u16 cell_id;
-	__u32 center_frequency = 0, transposer_frequency;
-	bool known = false;
-	struct frequency_item *p, *p1;
+	__u32 center_frequency = 0;
+	struct cell *p;
 
 	if (t == NULL)
 		return;
@@ -1198,6 +1223,12 @@ void parse_T2_delivery_system_descriptor(const unsigned char *buf,
 	t->source = 0x04;
 	t->delsys = SYS_DVBT2;
 	t->modulation = QAM_AUTO;
+	t->hierarchy = HIERARCHY_NONE;
+	t->coderate = FEC_AUTO;
+	t->coderate_LP = FEC_NONE;
+	t->SISO_MISO = 0;	// NOTE: DTV_BANDWIDTH == '0' is BANDWIDTH_AUTO
+	t->guard = GUARD_INTERVAL_AUTO;
+	t->transmission = TRANSMISSION_MODE_AUTO;
 	t->inversion = inversion;
 	// descriptor_tag               8 uimsbf
 	descriptor_length = buf[1];	// descriptor_length            8 uimsbf
@@ -1234,7 +1265,7 @@ void parse_T2_delivery_system_descriptor(const unsigned char *buf,
 			t->bandwidth = 1712000;
 			break;
 		default:
-			t->bandwidth = 8000000;	//       0110 to 1111 reserved for future use
+			t->bandwidth = 0;	//       0110 to 1111 reserved for future use -> '0' is BANDWIDTH_AUTO
 		}
 		//reserved_future_use = buf[6] & 0x3);                                                          // reserved_future_use 2 bslbf
 		switch ((buf[7] >> 5) & 0x7) {	// guard_interval 3 bslbf
@@ -1289,172 +1320,106 @@ void parse_T2_delivery_system_descriptor(const unsigned char *buf,
 		descriptor_length -= 6;	// so far, we read 6 bytes.
 		bp = (unsigned char *)&buf[8];
 
-		while (descriptor_length > 0) {	// for (i=0;i<N,i++) {
-			cell_id = get_u16(bp);
-			bp += 2;
-			descriptor_length -= 2;	//      cell_id 16 uimsbf  
-			if (t->tfs_flag) {	//      if (tfs_flag == 1) {
-				// if tfs_flag (Time-Frequency Slicing) is set, we use 2..6 frequencies in parallel,      //
-				// the TS is time interleaved && jumping from freq to freq. No idea, how this should      //
-				// fit in future into linux dvb.                                                          //
-				frequency_loop_length = *bp;
-				bp++;
-				descriptor_length--;	//          frequency_loop_length 8 uimsbf // 2 to 6 center freqs belonging to TFS arrangement
-				while (frequency_loop_length > 3) {	//          for (j=0;j<N;j++){
-					bool known = false;
-					struct frequency_item *p;
-					center_frequency = 10 * get_u32(bp);	//              centre_frequency 32 uimsbf     
-					bp += 4;
-					descriptor_length -= 4;
-					frequency_loop_length -= 4;	//
+		ClearList(t->cells);
 
-					for (p = (t->frequencies)->first; p;
-					     p = p->next) {
-						if (p->frequency ==
-						    center_frequency) {
-							p->cell_id = cell_id;
-							known = true;
-							break;
-						}
-					}
-					if (!known) {
-						p = calloc(1, sizeof(*p));
-						p->transposers =
-						    &(p->_transposers);
-						NewList(p->transposers,
-							"transposers");
-						p->cell_id = cell_id;
-						p->frequency = center_frequency;
-						AddItem(t->frequencies, p);
-					}
-				}	//              }
+		while (descriptor_length > 0) {	// for (i=0;i<N,i++) {
+			struct cell *cell =
+			    (struct cell *)calloc(1, sizeof(struct cell));
+			cell->cell_id = get_u16(bp);
+			bp += 2;
+			descriptor_length -= 2;	//      cell_id 16 uimsbf
+			if (t->tfs_flag > 0) {	//      if (tfs_flag == 1) {
+				int frequency_loop_length = *bp++;
+				descriptor_length--;	//          frequency_loop_length 8 uimsbf // 2 to 6 center freqs belonging to TFS arrangement
+				while (frequency_loop_length > 0) {	//          for (j=0;j<N;j++){
+					center_frequency = 10 * get_u32(bp);
+					bp += 4;
+					descriptor_length -= 4;	//              centre_frequency 32 uimsbf
+					frequency_loop_length -= 4;
+					cell->center_frequencies
+					    [cell->num_center_frequencies++]
+					    = center_frequency;
+				}	// frequency_loop                                                                    //              }  
 			}	// end tfs flag                                                                         //          }
 			else {	//      else { // no tfs_flag, just one center freq. the usual case.
-				center_frequency = 10 * get_u32(bp);	//          centre_frequency 32 uimsbf
+				center_frequency = 10 * get_u32(bp);
 				bp += 4;
-				descriptor_length -= 4;	//     
+				descriptor_length -= 4;	//         centre_frequency 32 uimsbf
+				frequency_loop_length -= 4;	//
+				if ((center_frequency < 50000000)
+				    || (center_frequency > 1000000000))
+					center_frequency = 0;
+				cell->center_frequencies[cell->num_center_frequencies++] = center_frequency;	//
+			}	//         }
+			subcell_info_loop_length = *bp++;
+			descriptor_length--;	//      subcell_info_loop_length 8 uimsbf
 
-				if (center_frequency > 0) {	// now: add center freq. 
-					if (!t->other_frequency_flag)
-						t->frequency = center_frequency;
-					else {	// more than one center_freqs or transposers.
-						known = false;
-						for (p =
-						     (t->frequencies)->first; p;
-						     p = p->next) {
-							if (p->frequency ==
-							    center_frequency) {
-								p->cell_id =
-								    cell_id;
-								known = true;
-								break;
-							}
-							for (p1 =
-							     (p->transposers)->
-							     first; p1;
-							     p1 = p1->next) {
-								if (p1->
-								    frequency ==
-								    center_frequency)
-								{
-									p->cell_id = cell_id;
-									known =
-									    true;
-									break;
-								}
-							}
-						}
-						if (!known) {
-							p = calloc(1,
-								   sizeof(*p));
-							p->transposers =
-							    &(p->_transposers);
-							NewList(p->transposers,
-								"transposers");
-							p->cell_id = cell_id;
-							p->frequency =
-							    center_frequency;
-							AddItem(t->frequencies,
-								p);
-						}
-					}
-				}
-			}	//          }
-			subcell_info_loop_length = *bp;
-			bp++;
-			descriptor_length -= 1;	//      subcell_info_loop_length 8 uimsbf
-
-			for (p = (t->frequencies)->first; p; p = p->next) {
-				if (cell_id == p->cell_id)
-					break;
+			while (subcell_info_loop_length > 0) {	//      for (k=0;k<N;k++){
+				if (cell->num_transposers > 15)
+					break;	//
+				cell->transposers[cell->num_transposers].cell_id_extension = *bp++;	//         cell_id_extension 8 uimsbf
+				cell->transposers[cell->num_transposers].transposer_frequency = 10 * get_u32(bp);	//         transposer_frequency 32 uimsbf
+				bp += 4;
+				descriptor_length -= 5;	//
+				cell->num_transposers++;
+				subcell_info_loop_length -= 5;
 			}
-
-			while (subcell_info_loop_length > 4) {	//      for (k=0;k<N;k++){
-				cell_id_extension = *bp;	//           cell_id_extension 8 uimsbf
-				transposer_frequency = 10 * get_u32(bp + 1);	//           transposer_frequency 32 uimsbf
-				bp += 5;
-				descriptor_length -= 5;
-				subcell_info_loop_length -= 5;	//
-				if (p == NULL) {
-					p = calloc(1, sizeof(*p));
-					p->transposers = &(p->_transposers);
-					NewList(p->transposers, "transposers");
-					p->cell_id = cell_id;
-					p->frequency = center_frequency;
-					AddItem(t->frequencies, p);
-				}
-				known = false;
-				for (p1 = (p->transposers)->first; p1;
-				     p1 = p1->next) {
-					if (p1->frequency ==
-					    transposer_frequency) {
-						p1->cell_id = cell_id_extension;
-						known = true;
-						break;
-					}
-				}
-				if (!known) {
-					p1 = calloc(1, sizeof(*p1));
-					p1->transposers = &(p1->_transposers);
-					NewList(p1->transposers, "transposers");
-					p1->cell_id = cell_id_extension;
-					p1->frequency = transposer_frequency;
-					AddItem(p->transposers, p1);
-				}
-			}	// end subcell info loop                                                                //           }
-		}		// end while(descriptor_length > 0)                                                        //      }
-	}
+			AddItem(t->cells, cell);
+		}		// while desriptor_length
+	}			//extended info
 	if ((t->frequency == 0) && (t->other_frequency_flag == 0)) {
 		verbose
 		    ("%s: center_freq = 0 && other_frequency_flag = 0 -> set other_frequency_flag = 1\n",
 		     __FUNCTION__);
 		t->other_frequency_flag = 1;
 	}
-	verbose
-	    ("%s f%u system_id%u plp_id%u SISO/MISO=%s B%.1f G%d T%d other_frequency%d TFS%d\n",
-	     __FUNCTION__, freq_scale(t->frequency, 1e-3), t->system_id,
-	     t->plp_id, t->SISO_MISO ? "MISO" : "SISO", (t->bandwidth * 1e-6),
-	     (t->guard == GUARD_INTERVAL_1_32) ? 32 : (t->guard ==
-						       GUARD_INTERVAL_1_16) ? 16
-	     : (t->guard == GUARD_INTERVAL_1_8) ? 8 : (t->guard ==
-						       GUARD_INTERVAL_1_4) ? 4
-	     : (t->guard == GUARD_INTERVAL_1_128) ? 128 : (t->guard ==
-							   GUARD_INTERVAL_19_128)
-	     ? 19128 : 19256,
-	     (t->transmission == TRANSMISSION_MODE_2K) ? 2 : (t->transmission ==
-							      TRANSMISSION_MODE_8K)
-	     ? 8 : (t->transmission ==
-		    TRANSMISSION_MODE_4K) ? 4 : (t->transmission ==
-						 TRANSMISSION_MODE_1K) ? 1
-	     : (t->transmission == TRANSMISSION_MODE_16K) ? 16 : 32,
-	     t->other_frequency_flag, t->tfs_flag);
 
-	verbose("          %-.2u frequencies:\n", (t->frequencies)->count);
-	for (p = (t->frequencies)->first; p; p = p->next) {
-		verbose("             %u\n", p->frequency);
-		for (p1 = (p->transposers)->first; p1; p1 = p1->next) {
-			verbose("                transposer %u\n",
-				p1->frequency);
+	if (t->cells->count > 0) {
+		center_frequency =
+		    ((struct cell *)t->cells->first)->center_frequencies[0];
+		if (center_frequency > 0)
+			t->frequency = center_frequency;
+	}
+
+	if (verbosity >= 4) {
+		verbose
+		    ("%s:%d f%u system_id%u plp_id%u SISO/MISO=%s B%.1f G%d T%d other_frequency%d TFS%d\n",
+		     __FUNCTION__, __LINE__, freq_scale(t->frequency, 1e-3),
+		     t->system_id, t->plp_id, t->SISO_MISO ? "MISO" : "SISO",
+		     (t->bandwidth * 1e-6),
+		     (t->guard == GUARD_INTERVAL_1_32) ? 32 : (t->guard ==
+							       GUARD_INTERVAL_1_16)
+		     ? 16 : (t->guard == GUARD_INTERVAL_1_8) ? 8 : (t->guard ==
+								    GUARD_INTERVAL_1_4)
+		     ? 4 : (t->guard ==
+			    GUARD_INTERVAL_1_128) ? 128 : (t->guard ==
+							   GUARD_INTERVAL_19_128)
+		     ? 19128 : 19256,
+		     (t->transmission ==
+		      TRANSMISSION_MODE_2K) ? 2 : (t->transmission ==
+						   TRANSMISSION_MODE_8K) ? 8
+		     : (t->transmission ==
+			TRANSMISSION_MODE_4K) ? 4 : (t->transmission ==
+						     TRANSMISSION_MODE_1K) ? 1
+		     : (t->transmission == TRANSMISSION_MODE_16K) ? 16 : 32,
+		     t->other_frequency_flag, t->tfs_flag);
+
+		verbose("          %u cells:\n", (t->cells)->count);
+		int i = 0;
+		for (p = (t->cells)->first; p; p = p->next, ++i) {
+			int n;
+			for (n = 0; n < p->num_center_frequencies; n++)
+				verbose
+				    ("             cell %u: center_frequency %7.3f\n",
+				     p->cell_id,
+				     p->center_frequencies[n] / 1000000.0);
+			for (n = 0; n < p->num_transposers; n++) {
+				verbose
+				    ("                cell_id_extension %u: transposer_frequency %7.3f\n",
+				     p->transposers[n].cell_id_extension,
+				     p->transposers[n].transposer_frequency /
+				     1000000.0);
+			}
 		}
 	}
 }
@@ -1466,18 +1431,22 @@ void parse_logical_channel_descriptor(const unsigned char *buf,
 		return;
 	hd(buf);
 
-//uint8_t descriptor_tag    = buf[0];                              // descriptor_tag           8 uimsbf
 	uint8_t descriptor_length = buf[1];	// descriptor_length        8 uimsbf
-	struct service *s;	//
-	uint16_t service_id;	//
-	int p = 2;		//
-	//
-	//
-	while (descriptor_length > 0) {	//
+	struct service *s;
+	uint16_t service_id;
+	int p = 2;
+
+	if (descriptor_length % 4) {
+		verbose
+		    ("        %s %d: non-LCN data on descriptor 0x83 ?\n",
+		     __FUNCTION__, __LINE__);
+		return;
+	}
+	while (descriptor_length > 3) {	//
 		service_id = (buf[p] << 8) | buf[p + 1];	// service_id              16 uimsbf
 		s = find_service(t, service_id);	//
 		if (s == NULL)	//
-			s = alloc_service(t, service_id);	//
+			return;	//
 		//
 		s->visible_service = (buf[p + 2] & 0x80) > 0;	// visible_service_flag     1 bslbf, reserved NorDig: 1bslbf: Australia: 5 bslbf
 		s->logical_channel_number = (buf[p + 2] & 0x3F) << 8 | buf[p + 3];	// logical_channel_number   NorDig: 14uimbsf; Australia: 10 uimsbf
@@ -1527,8 +1496,8 @@ struct tm modified_julian_date_to_utc(__u32 MJD)
 	return utc;
 }
 
-void parse_network_change_notify_descriptor(const unsigned char *buf,
-					    network_change_t * nc)
+void parse_network_change_notify_descriptor(const unsigned char
+					    *buf, network_change_t * nc)
 {
 	unsigned char *bp;
 	int descriptor_length;
@@ -1627,8 +1596,8 @@ void parse_network_change_notify_descriptor(const unsigned char *buf,
 }
 
 /* ATSC PSIP VCT */
-void parse_atsc_service_location_descriptor(struct service *s,
-					    const unsigned char *buf)
+void parse_atsc_service_location_descriptor(struct service *s, const unsigned char
+					    *buf)
 {
 	struct ATSC_service_location_descriptor d =
 	    read_ATSC_service_location_descriptor(buf);
@@ -1642,8 +1611,8 @@ void parse_atsc_service_location_descriptor(struct service *s,
 		switch (e.stream_type) {
 		case iso_iec_13818_1_11172_2_video_stream:
 			s->video_pid = e.elementary_PID;
-			moreverbose("  VIDEO     : PID 0x%04x\n",
-				    e.elementary_PID);
+			moreverbose
+			    ("  VIDEO     : PID 0x%04x\n", e.elementary_PID);
 			break;
 		case atsc_a_52b_ac3:
 			if (s->audio_num < AUDIO_CHAN_MAX) {
@@ -1651,14 +1620,15 @@ void parse_atsc_service_location_descriptor(struct service *s,
 				s->audio_lang[s->audio_num][0] =
 				    (e.ISO_639_language_code >> 16) & 0xff;
 				s->audio_lang[s->audio_num][1] =
-				    (e.ISO_639_language_code >> 8) & 0xff;
+				    (e.ISO_639_language_code >> 8)
+				    & 0xff;
 				s->audio_lang[s->audio_num][2] =
 				    e.ISO_639_language_code & 0xff;
 				s->audio_num++;
 			}
-			moreverbose("\tAUDIO\t: PID 0x%04x lang: %s\n",
-				    e.elementary_PID,
-				    s->audio_lang[s->audio_num - 1]);
+			moreverbose
+			    ("\tAUDIO\t: PID 0x%04x lang: %s\n",
+			     e.elementary_PID, s->audio_lang[s->audio_num - 1]);
 
 			break;
 		default:
@@ -1669,8 +1639,9 @@ void parse_atsc_service_location_descriptor(struct service *s,
 	}
 }
 
-void parse_atsc_extended_channel_name_descriptor(struct service *s,
-						 const unsigned char *buf)
+void parse_atsc_extended_channel_name_descriptor(struct service
+						 *s, const unsigned
+						 char *buf)
 {
 	unsigned char *b = (unsigned char *)buf + 2;
 	int i, j;
@@ -1684,7 +1655,8 @@ void parse_atsc_extended_channel_name_descriptor(struct service *s,
 		b += 4;		/* skip lang code */
 		for (j = 0; j < num_seg; j++) {
 			int compression_type =
-			    b[0], /* mode = b[1], */ num_bytes = b[2];
+			    b[0], /* mode = b[1], */ num_bytes =
+			    b[2];
 
 			switch (compression_type) {
 			case uncompressed_string:
@@ -1863,7 +1835,8 @@ typedef enum fe_code_rate_ext {
 	FEC_2_9,
 } fe_code_rate_ext_t;
 
-void parse_SH_delivery_system_descriptor(const unsigned char *buf,
+void parse_SH_delivery_system_descriptor(const unsigned char
+					 *buf,
 					 struct transponder *t,
 					 fe_spectral_inversion_t inversion)
 {
@@ -1915,7 +1888,8 @@ void parse_SH_delivery_system_descriptor(const unsigned char *buf,
 	descriptor_length -= 2;
 	bp = (unsigned char *)&buf[4];
 	modulation_loop =
-	    (modulation_loop_t *) calloc(1 + descriptor_length / 4,
+	    (modulation_loop_t *) calloc(1 +
+					 descriptor_length / 4,
 					 sizeof(modulation_loop_t));
 	while (descriptor_length > 0) {	//  for (i=0; i<N; i++){
 		modulation_loop[n_modulations].modulation_type = (*bp >> 7) & 0x1;	//      modulation_type 1 bslbf
@@ -1927,16 +1901,16 @@ void parse_SH_delivery_system_descriptor(const unsigned char *buf,
 			modulation_loop[n_modulations].polarization = (*bp >> 6) & 0x2;	//         Polarization 2 bslbf
 			switch ((*bp >> 4) & 0x2) {	//         roll_off 2 bslbf
 			case 0:
-				modulation_loop[n_modulations].roll_off =
-				    ROLLOFF_35;
+				modulation_loop[n_modulations].roll_off
+				    = ROLLOFF_35;
 				break;	//
 			case 1:
-				modulation_loop[n_modulations].roll_off =
-				    ROLLOFF_25;
+				modulation_loop[n_modulations].roll_off
+				    = ROLLOFF_25;
 				break;	//
 			case 2:
-				modulation_loop[n_modulations].roll_off =
-				    ROLLOFF_15;
+				modulation_loop[n_modulations].roll_off
+				    = ROLLOFF_15;
 				break;	//
 				//case 3: reserved for future use                                                           //
 			default:
@@ -1944,16 +1918,16 @@ void parse_SH_delivery_system_descriptor(const unsigned char *buf,
 			}	//
 			switch ((*bp >> 2) & 0x2) {	//         modulation_mode 2 bslbf
 			case 0:
-				modulation_loop[n_modulations].modulation_mode =
-				    QPSK;
+				modulation_loop
+				    [n_modulations].modulation_mode = QPSK;
 				break;	//
 			case 1:
-				modulation_loop[n_modulations].modulation_mode =
-				    PSK_8;
+				modulation_loop
+				    [n_modulations].modulation_mode = PSK_8;
 				break;	//
 			case 2:
-				modulation_loop[n_modulations].modulation_mode =
-				    APSK_16;
+				modulation_loop
+				    [n_modulations].modulation_mode = APSK_16;
 				break;	//
 				//case 3: reserved for future use                                                           //
 			default:
@@ -1961,52 +1935,52 @@ void parse_SH_delivery_system_descriptor(const unsigned char *buf,
 			}	//
 			switch (((*bp & 0x2) << 2) | ((bp[1] >> 6) & 0x2)) {	//         code_rate 4 bslbf
 			case 0:
-				modulation_loop[n_modulations].code_rate =
-				    FEC_1_5;
+				modulation_loop[n_modulations].code_rate
+				    = FEC_1_5;
 				break;	//                     // 1/5 standard
 			case 1:
-				modulation_loop[n_modulations].code_rate =
-				    FEC_2_9;
+				modulation_loop[n_modulations].code_rate
+				    = FEC_2_9;
 				break;	//                     // 2/9 standard
 			case 2:
-				modulation_loop[n_modulations].code_rate =
-				    FEC_1_4;
+				modulation_loop[n_modulations].code_rate
+				    = FEC_1_4;
 				break;	//                     // 1/4 standard
 			case 3:
-				modulation_loop[n_modulations].code_rate =
-				    FEC_2_7;
+				modulation_loop[n_modulations].code_rate
+				    = FEC_2_7;
 				break;	//                     // 2/7 standard
 			case 4:
-				modulation_loop[n_modulations].code_rate =
-				    FEC_1_3;
+				modulation_loop[n_modulations].code_rate
+				    = FEC_1_3;
 				break;	//                     // 1/3 standard 
 			case 5:
-				modulation_loop[n_modulations].code_rate =
-				    FEC_1_3_C;
+				modulation_loop[n_modulations].code_rate
+				    = FEC_1_3_C;
 				break;	//                     // 1/3 complementary
 			case 6:
-				modulation_loop[n_modulations].code_rate =
-				    FEC_2_5;
+				modulation_loop[n_modulations].code_rate
+				    = FEC_2_5;
 				break;	//                     // 2/5 standard
 			case 7:
-				modulation_loop[n_modulations].code_rate =
-				    FEC_2_5_C;
+				modulation_loop[n_modulations].code_rate
+				    = FEC_2_5_C;
 				break;	//                     // 2/5 complementary 
 			case 8:
-				modulation_loop[n_modulations].code_rate =
-				    FEC_1_2;
+				modulation_loop[n_modulations].code_rate
+				    = FEC_1_2;
 				break;	//                     // 1/2 standard 
 			case 9:
-				modulation_loop[n_modulations].code_rate =
-				    FEC_1_3_C;
+				modulation_loop[n_modulations].code_rate
+				    = FEC_1_3_C;
 				break;	//                     // 1/3 complementary
 			case 10:
-				modulation_loop[n_modulations].code_rate =
-				    FEC_2_3;
+				modulation_loop[n_modulations].code_rate
+				    = FEC_2_3;
 				break;	//                     // 2/3 standard
 			case 11:
-				modulation_loop[n_modulations].code_rate =
-				    FEC_2_3_C;
+				modulation_loop[n_modulations].code_rate
+				    = FEC_2_3_C;
 				break;	//                     // 2/3 complementary
 				//case 12 ... 15: reserved for future use                                                   //
 			default:
@@ -2021,18 +1995,18 @@ void parse_SH_delivery_system_descriptor(const unsigned char *buf,
 				switch (modulation_loop[n_modulations].roll_off) {	//
 				case ROLLOFF_15:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_34_5;
+					    [n_modulations].symbol_rate
+					    = TDM_34_5;
 					break;
 				case ROLLOFF_25:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_32_5;
+					    [n_modulations].symbol_rate
+					    = TDM_32_5;
 					break;
 				default:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_29_5;
+					    [n_modulations].symbol_rate
+					    = TDM_29_5;
 					break;
 				}	//
 				break;	//
@@ -2042,18 +2016,18 @@ void parse_SH_delivery_system_descriptor(const unsigned char *buf,
 				switch (modulation_loop[n_modulations].roll_off) {	//
 				case ROLLOFF_15:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_62_9;
+					    [n_modulations].symbol_rate
+					    = TDM_62_9;
 					break;
 				case ROLLOFF_25:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_56_9;
+					    [n_modulations].symbol_rate
+					    = TDM_56_9;
 					break;
 				default:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_52_9;
+					    [n_modulations].symbol_rate
+					    = TDM_52_9;
 					break;
 				}	//
 				break;	//
@@ -2063,18 +2037,18 @@ void parse_SH_delivery_system_descriptor(const unsigned char *buf,
 				switch (modulation_loop[n_modulations].roll_off) {	//
 				case ROLLOFF_15:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_116_17;
+					    [n_modulations].symbol_rate
+					    = TDM_116_17;
 					break;
 				case ROLLOFF_25:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_108_17;
+					    [n_modulations].symbol_rate
+					    = TDM_108_17;
 					break;
 				default:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_100_17;
+					    [n_modulations].symbol_rate
+					    = TDM_100_17;
 					break;
 				}	//
 				break;	//
@@ -2084,18 +2058,18 @@ void parse_SH_delivery_system_descriptor(const unsigned char *buf,
 				switch (modulation_loop[n_modulations].roll_off) {	//
 				case ROLLOFF_15:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_224_33;
+					    [n_modulations].symbol_rate
+					    = TDM_224_33;
 					break;
 				case ROLLOFF_25:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_208_33;
+					    [n_modulations].symbol_rate
+					    = TDM_208_33;
 					break;
 				default:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_64_11;
+					    [n_modulations].symbol_rate
+					    = TDM_64_11;
 					break;
 				}	//
 				break;	//        
@@ -2105,18 +2079,18 @@ void parse_SH_delivery_system_descriptor(const unsigned char *buf,
 				switch (modulation_loop[n_modulations].roll_off) {	//
 				case ROLLOFF_15:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_119_20;
+					    [n_modulations].symbol_rate
+					    = TDM_119_20;
 					break;
 				case ROLLOFF_25:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_28_5;
+					    [n_modulations].symbol_rate
+					    = TDM_28_5;
 					break;
 				default:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_203_40;
+					    [n_modulations].symbol_rate
+					    = TDM_203_40;
 					break;
 				}	//
 				break;	//
@@ -2126,18 +2100,18 @@ void parse_SH_delivery_system_descriptor(const unsigned char *buf,
 				switch (modulation_loop[n_modulations].roll_off) {	//
 				case ROLLOFF_15:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_217_36;
+					    [n_modulations].symbol_rate
+					    = TDM_217_36;
 					break;
 				case ROLLOFF_25:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_49_9;
+					    [n_modulations].symbol_rate
+					    = TDM_49_9;
 					break;
 				default:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_91_18;
+					    [n_modulations].symbol_rate
+					    = TDM_91_18;
 					break;
 				}	//
 				break;	//
@@ -2147,18 +2121,18 @@ void parse_SH_delivery_system_descriptor(const unsigned char *buf,
 				switch (modulation_loop[n_modulations].roll_off) {	//
 				case ROLLOFF_15:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_203_34;
+					    [n_modulations].symbol_rate
+					    = TDM_203_34;
 					break;
 				case ROLLOFF_25:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_189_34;
+					    [n_modulations].symbol_rate
+					    = TDM_189_34;
 					break;
 				default:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_175_34;
+					    [n_modulations].symbol_rate
+					    = TDM_175_34;
 					break;
 				}	//
 				break;	//
@@ -2168,18 +2142,18 @@ void parse_SH_delivery_system_descriptor(const unsigned char *buf,
 				switch (modulation_loop[n_modulations].roll_off) {	//
 				case ROLLOFF_15:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_196_33;
+					    [n_modulations].symbol_rate
+					    = TDM_196_33;
 					break;
 				case ROLLOFF_25:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_182_33;
+					    [n_modulations].symbol_rate
+					    = TDM_182_33;
 					break;
 				default:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_56_11;
+					    [n_modulations].symbol_rate
+					    = TDM_56_11;
 					break;
 				}	//
 				break;	//
@@ -2189,18 +2163,18 @@ void parse_SH_delivery_system_descriptor(const unsigned char *buf,
 				switch (modulation_loop[n_modulations].roll_off) {	//
 				case ROLLOFF_15:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_51_10;
+					    [n_modulations].symbol_rate
+					    = TDM_51_10;
 					break;
 				case ROLLOFF_25:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_24_5;
+					    [n_modulations].symbol_rate
+					    = TDM_24_5;
 					break;
 				default:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_87_20;
+					    [n_modulations].symbol_rate
+					    = TDM_87_20;
 					break;
 				}	// 
 				break;	//
@@ -2210,18 +2184,18 @@ void parse_SH_delivery_system_descriptor(const unsigned char *buf,
 				switch (modulation_loop[n_modulations].roll_off) {	//
 				case ROLLOFF_15:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_31_6;
+					    [n_modulations].symbol_rate
+					    = TDM_31_6;
 					break;
 				case ROLLOFF_25:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_14_3;
+					    [n_modulations].symbol_rate
+					    = TDM_14_3;
 					break;
 				default:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_13_3;
+					    [n_modulations].symbol_rate
+					    = TDM_13_3;
 					break;
 				}	//
 				break;	//
@@ -2231,18 +2205,18 @@ void parse_SH_delivery_system_descriptor(const unsigned char *buf,
 				switch (modulation_loop[n_modulations].roll_off) {	//
 				case ROLLOFF_15:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_87_17;
+					    [n_modulations].symbol_rate
+					    = TDM_87_17;
 					break;
 				case ROLLOFF_25:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_81_17;
+					    [n_modulations].symbol_rate
+					    = TDM_81_17;
 					break;
 				default:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_75_17;
+					    [n_modulations].symbol_rate
+					    = TDM_75_17;
 					break;
 				}	//
 				break;	//
@@ -2252,18 +2226,18 @@ void parse_SH_delivery_system_descriptor(const unsigned char *buf,
 				switch (modulation_loop[n_modulations].roll_off) {	//
 				case ROLLOFF_15:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_56_11;
+					    [n_modulations].symbol_rate
+					    = TDM_56_11;
 					break;
 				case ROLLOFF_25:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_52_11;
+					    [n_modulations].symbol_rate
+					    = TDM_52_11;
 					break;
 				default:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_48_11;
+					    [n_modulations].symbol_rate
+					    = TDM_48_11;
 					break;
 				}	//
 				break;	//
@@ -2273,18 +2247,18 @@ void parse_SH_delivery_system_descriptor(const unsigned char *buf,
 				switch (modulation_loop[n_modulations].roll_off) {	//
 				case ROLLOFF_15:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_17_4;
+					    [n_modulations].symbol_rate
+					    = TDM_17_4;
 					break;
 				case ROLLOFF_25:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_4_1;
+					    [n_modulations].symbol_rate
+					    = TDM_4_1;
 					break;
 				default:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_29_8;
+					    [n_modulations].symbol_rate
+					    = TDM_29_8;
 					break;
 				}	//
 				break;	//
@@ -2294,18 +2268,18 @@ void parse_SH_delivery_system_descriptor(const unsigned char *buf,
 				switch (modulation_loop[n_modulations].roll_off) {	//
 				case ROLLOFF_15:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_155_36;
+					    [n_modulations].symbol_rate
+					    = TDM_155_36;
 					break;
 				case ROLLOFF_25:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_35_9;
+					    [n_modulations].symbol_rate
+					    = TDM_35_9;
 					break;
 				default:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_65_18;
+					    [n_modulations].symbol_rate
+					    = TDM_65_18;
 					break;
 				}	//
 				break;	//
@@ -2315,18 +2289,18 @@ void parse_SH_delivery_system_descriptor(const unsigned char *buf,
 				switch (modulation_loop[n_modulations].roll_off) {	//
 				case ROLLOFF_15:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_145_34;
+					    [n_modulations].symbol_rate
+					    = TDM_145_34;
 					break;
 				case ROLLOFF_25:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_135_34;
+					    [n_modulations].symbol_rate
+					    = TDM_135_34;
 					break;
 				default:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_125_34;
+					    [n_modulations].symbol_rate
+					    = TDM_125_34;
 					break;
 				}	//
 				break;	//
@@ -2336,18 +2310,18 @@ void parse_SH_delivery_system_descriptor(const unsigned char *buf,
 				switch (modulation_loop[n_modulations].roll_off) {	//
 				case ROLLOFF_15:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_140_33;
+					    [n_modulations].symbol_rate
+					    = TDM_140_33;
 					break;
 				case ROLLOFF_25:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_130_33;
+					    [n_modulations].symbol_rate
+					    = TDM_130_33;
 					break;
 				default:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_40_11;
+					    [n_modulations].symbol_rate
+					    = TDM_40_11;
 					break;
 				}	//
 				break;	//
@@ -2357,18 +2331,18 @@ void parse_SH_delivery_system_descriptor(const unsigned char *buf,
 				switch (modulation_loop[n_modulations].roll_off) {	//
 				case ROLLOFF_15:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_34_25;
+					    [n_modulations].symbol_rate
+					    = TDM_34_25;
 					break;
 				case ROLLOFF_25:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_32_25;
+					    [n_modulations].symbol_rate
+					    = TDM_32_25;
 					break;
 				default:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_29_25;
+					    [n_modulations].symbol_rate
+					    = TDM_29_25;
 					break;
 				}	//
 				break;	//
@@ -2378,18 +2352,18 @@ void parse_SH_delivery_system_descriptor(const unsigned char *buf,
 				switch (modulation_loop[n_modulations].roll_off) {	//
 				case ROLLOFF_15:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_62_45;
+					    [n_modulations].symbol_rate
+					    = TDM_62_45;
 					break;
 				case ROLLOFF_25:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_56_45;
+					    [n_modulations].symbol_rate
+					    = TDM_56_45;
 					break;
 				default:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_52_45;
+					    [n_modulations].symbol_rate
+					    = TDM_52_45;
 					break;
 				}	//
 				break;	//
@@ -2399,18 +2373,18 @@ void parse_SH_delivery_system_descriptor(const unsigned char *buf,
 				switch (modulation_loop[n_modulations].roll_off) {	//
 				case ROLLOFF_15:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_116_85;
+					    [n_modulations].symbol_rate
+					    = TDM_116_85;
 					break;
 				case ROLLOFF_25:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_108_85;
+					    [n_modulations].symbol_rate
+					    = TDM_108_85;
 					break;
 				default:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_20_17;
+					    [n_modulations].symbol_rate
+					    = TDM_20_17;
 					break;
 				}	//
 				break;	//
@@ -2420,18 +2394,18 @@ void parse_SH_delivery_system_descriptor(const unsigned char *buf,
 				switch (modulation_loop[n_modulations].roll_off) {	//
 				case ROLLOFF_15:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_224_165;
+					    [n_modulations].symbol_rate
+					    = TDM_224_165;
 					break;
 				case ROLLOFF_25:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_208_165;
+					    [n_modulations].symbol_rate
+					    = TDM_208_165;
 					break;
 				default:
 					modulation_loop
-					    [n_modulations].symbol_rate =
-					    TDM_64_55;
+					    [n_modulations].symbol_rate
+					    = TDM_64_55;
 					break;
 				}	//
 				break;	//
@@ -2465,61 +2439,67 @@ void parse_SH_delivery_system_descriptor(const unsigned char *buf,
 			default:	//
 				modulation_loop[n_modulations].hierachy = ((*buf & 0xE) >> 1) - 1;	//
 				modulation_loop[n_modulations].modulation = QAM16;	//
-				if (modulation_loop[n_modulations].priority ==
-				    0)
-					modulation_loop[n_modulations].priority
-					    = PRIORITY_LP;
+				if (modulation_loop
+				    [n_modulations].priority == 0)
+					modulation_loop
+					    [n_modulations].priority =
+					    PRIORITY_LP;
 				else
-					modulation_loop[n_modulations].priority
-					    = PRIORITY_HP;
+					modulation_loop
+					    [n_modulations].priority =
+					    PRIORITY_HP;
 				switch (((*bp & 0x1) << 3) | ((bp[1] >> 5) & 0x7)) {	//         code_rate 4 bslbf
 				case 0:
-					modulation_loop[n_modulations].code_rate
-					    = FEC_1_5;
+					modulation_loop
+					    [n_modulations].code_rate = FEC_1_5;
 					break;	//                     // 1/5 standard
 				case 1:
-					modulation_loop[n_modulations].code_rate
-					    = FEC_2_9;
+					modulation_loop
+					    [n_modulations].code_rate = FEC_2_9;
 					break;	//                     // 2/9 standard
 				case 2:
-					modulation_loop[n_modulations].code_rate
-					    = FEC_1_4;
+					modulation_loop
+					    [n_modulations].code_rate = FEC_1_4;
 					break;	//                     // 1/4 standard
 				case 3:
-					modulation_loop[n_modulations].code_rate
-					    = FEC_2_7;
+					modulation_loop
+					    [n_modulations].code_rate = FEC_2_7;
 					break;	//                     // 2/7 standard
 				case 4:
-					modulation_loop[n_modulations].code_rate
-					    = FEC_1_3;
+					modulation_loop
+					    [n_modulations].code_rate = FEC_1_3;
 					break;	//                     // 1/3 standard 
 				case 5:
-					modulation_loop[n_modulations].code_rate
-					    = FEC_1_3_C;
+					modulation_loop
+					    [n_modulations].code_rate =
+					    FEC_1_3_C;
 					break;	//                     // 1/3 complementary
 				case 6:
-					modulation_loop[n_modulations].code_rate
-					    = FEC_2_5;
+					modulation_loop
+					    [n_modulations].code_rate = FEC_2_5;
 					break;	//                     // 2/5 standard
 				case 7:
-					modulation_loop[n_modulations].code_rate
-					    = FEC_2_5_C;
+					modulation_loop
+					    [n_modulations].code_rate =
+					    FEC_2_5_C;
 					break;	//                     // 2/5 complementary 
 				case 8:
-					modulation_loop[n_modulations].code_rate
-					    = FEC_1_2;
+					modulation_loop
+					    [n_modulations].code_rate = FEC_1_2;
 					break;	//                     // 1/2 standard 
 				case 9:
-					modulation_loop[n_modulations].code_rate
-					    = FEC_1_3_C;
+					modulation_loop
+					    [n_modulations].code_rate =
+					    FEC_1_3_C;
 					break;	//                     // 1/3 complementary
 				case 10:
-					modulation_loop[n_modulations].code_rate
-					    = FEC_2_3;
+					modulation_loop
+					    [n_modulations].code_rate = FEC_2_3;
 					break;	//                     // 2/3 standard
 				case 11:
-					modulation_loop[n_modulations].code_rate
-					    = FEC_2_3_C;
+					modulation_loop
+					    [n_modulations].code_rate =
+					    FEC_2_3_C;
 					break;	//                     // 2/3 complementary
 					//case 12 ... 15: reserved for future use                                                //
 				default:
@@ -2529,19 +2509,23 @@ void parse_SH_delivery_system_descriptor(const unsigned char *buf,
 				descriptor_length--;	//
 				switch ((*bp & 0x18) >> 3) {	//        guard_interval 2 bslbf
 				case 0:
-					modulation_loop[n_modulations].guard =
+					modulation_loop
+					    [n_modulations].guard =
 					    GUARD_INTERVAL_1_32;
 					break;	//                     // 00 1/32
 				case 1:
-					modulation_loop[n_modulations].guard =
+					modulation_loop
+					    [n_modulations].guard =
 					    GUARD_INTERVAL_1_16;
 					break;	//                     // 01 1/16
 				case 2:
-					modulation_loop[n_modulations].guard =
+					modulation_loop
+					    [n_modulations].guard =
 					    GUARD_INTERVAL_1_8;
 					break;	//                     // 10 1/8
 				case 3:
-					modulation_loop[n_modulations].guard =
+					modulation_loop
+					    [n_modulations].guard =
 					    GUARD_INTERVAL_1_4;
 					break;	//                     // 11 1/4
 				default:;	//
@@ -2592,7 +2576,8 @@ void parse_SH_delivery_system_descriptor(const unsigned char *buf,
 											      }
 #else
 //dummy.
-void parse_SH_delivery_system_descriptor(const unsigned char *buf,
+void parse_SH_delivery_system_descriptor(const unsigned char
+					 *buf,
 					 struct transponder *t,
 					 fe_spectral_inversion_t inversion)
 {
@@ -2608,8 +2593,8 @@ int crc_check(const unsigned char *buf, __u16 len)
 	__u32 crc = 0xffffffff;
 	__u32 transmitted_crc =
 	    buf[len - 4] << 24 | buf[len - 3] << 16 | buf[len -
-							  2] << 8 | buf[len -
-									1];
+							  2] <<
+	    8 | buf[len - 1];
 
 	if (!crc_initialized) {	// initialize crc lookup table before first use.
 		__u32 accu;

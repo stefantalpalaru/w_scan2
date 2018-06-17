@@ -4,6 +4,7 @@ ChangeLog:
  - move the source files in a "src" subdirectory
  - apply some of the Linux kernel coding style indentation using the Lindent
    script from the kernel tree
+ - merge w_scan-20170107
 
 [1.0.1] 2017-03-29
  - fix a corner case where a pair of transponders kept adding each other to
@@ -22,6 +23,41 @@ ChangeLog:
    The old behaviour can be enabled with -d (--delete-duplicate-transponders).
  - all files are now ASCII or UTF-8 and have Unix line terminators
  - refactored the autotools files
+
+2015-01-01
+ - check data for descriptor 0x83 to be multiple of 4bytes;
+   On S4E8 0x83 seems to be used for something different as LCN and
+   caused segfault if read in 4byte packets.
+   May be this abuse of 0x83 renders parsing of LCN unusable at all.
+ - find_transponder_by_freq(): fix logging (add missing print_transponder() calls)
+ - emulated dvb device;
+   now accept DVB-S/S2 logs down to 20130331. However, logs earlier
+   than 20140529 are missing last two bytes in SI data hexdumps. :(
+ - modify scan algorithm for tsid, onid, nid;
+   On S4E8, PAT transports wrong transport_stream_id - and therefore
+   scan was endless loop. :(
+   This was actually not an w_scan error, it is an error in sats si
+   tables.
+   1. find_transponder()
+      - now do a strict check for (ONID,NID,TSID); check all 3 pids.
+   2. check_duplicate_transponders()
+      - copy NIT updated tp props from deleted tp to remaining tp,
+        if remaining tp was not yet updated. Sync ids as well.
+      - new function copy_duplicate_tp() to not have this copy several times.
+   3. parse_pat()
+      - update tsid for TERR scans only. On terr scans, freq may be '0' or
+        completely wrong in NIT and find_transponder_by_freq() cannot find
+        those transponders otherwise.
+   4. parse_nit()
+      - move update of (ONID,NID,TSID) to later position, where also tp props
+        are updated. Code easier to read this way.
+      - call check_duplicate_transponders() as soon as new tp was added from
+        NIT.
+   5. tune_to_transponder()
+      - add missing polarization check for sat - this one is a bug fix.
+ - vdr output: update translation table for satname: w_scan <-> VDR
+ - scr_cmd: fix FE_DISEQC_SEND_MASTER_CMD data pointer.
+ - update S4E8 transponder list
 
 2014-11-22
  - move '-lrt' from LDFLAGS to AM_LDFLAGS

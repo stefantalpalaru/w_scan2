@@ -85,6 +85,7 @@ const char *guard_interval_name(int guard_interval);
 const char *hierarchy_name(int hierarchy);
 const char *interleaving_name(int interleaving);
 const char *delivery_system_name(int delsys);
+const char *property_name(int property);
 const char *bool_name(bool t);
 uint32_t freq_scale(uint32_t freq, double scale);
 
@@ -112,7 +113,7 @@ typedef struct {
 	uint32_t index;
 } cItem, *pItem;
 
-void NewList(pList list, const char *name);
+void NewList(pList const list, const char *name);
 void ClearList(pList list);
 void SortList(pList list, cmp_func compare);
 void AddItem(pList list, void *item);

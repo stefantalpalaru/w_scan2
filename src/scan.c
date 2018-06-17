@@ -130,6 +130,7 @@ static struct scr scr_config = {	// 20140101: DVB-S/S2, satellite channel routin
 
 struct timespec start_time = { 0, 0 };
 
+static bool bandwidth_auto = true;
 static enum fe_spectral_inversion caps_inversion = INVERSION_AUTO;
 static enum fe_code_rate caps_fec = FEC_AUTO;
 static enum fe_modulation caps_qam = QAM_AUTO;
@@ -168,28 +169,44 @@ static void copy_fe_params(struct transponder *dest,
 // Thus we identify TPs by frequency (scan handles only one satellite at a time).
 // Further complication: Different NITs on one satellite sometimes list the same TP with slightly different
 // frequencies, so we have to search within some bandwidth.
-struct transponder *alloc_transponder(uint32_t frequency, uint8_t type,
+struct transponder *alloc_transponder(uint32_t frequency, unsigned delsys,
 				      uint8_t polarization)
 {
 	struct transponder *tn;
 	struct transponder *t = calloc(1, sizeof(*t));
 	bool known = false;
 	char name[20];
-	struct frequency_item *freq_item;
+	struct cell *cell;
 
 	t->source = 0;
 	t->frequency = frequency;
 	t->locks_with_params = false;
+	t->delsys = delsys;
+	t->polarization = polarization;
+
+	switch (delsys) {
+	case SYS_DVBT:
+	case SYS_DVBT2:
+		t->type = SCAN_TERRESTRIAL;
+		break;
+	case SYS_ATSC:
+		t->type = SCAN_TERRCABLE_ATSC;
+		break;
+	case SYS_DVBC_ANNEX_A:
+	case SYS_DVBC_ANNEX_C:
+		t->type = SCAN_CABLE;
+		break;
+	default:
+		t->type = SCAN_SATELLITE;
+	}
 
 	// save current freq to alternative list of freqs.
-	sprintf(name, "freqs_%u", frequency);
-	t->frequencies = &(t->_frequencies);
-	NewList(t->frequencies, name);
-	freq_item = calloc(1, sizeof(struct frequency_item));
-	freq_item->frequency = frequency;
-	freq_item->transposers = &(freq_item->_transposers);
-	NewList(freq_item->transposers, "transposers");
-	AddItem(t->frequencies, freq_item);
+	sprintf(name, "cells_%u", frequency);
+	t->cells = &(t->_cells);
+	NewList(t->cells, name);
+	cell = calloc(1, sizeof(struct cell));
+	cell->center_frequencies[cell->num_center_frequencies++] = frequency;
+	AddItem(t->cells, cell);
 
 	sprintf(name, "services_%u", frequency);
 	t->services = &(t->_services);
@@ -199,8 +216,10 @@ struct transponder *alloc_transponder(uint32_t frequency, uint8_t type,
 
 	if (frequency > 0) {	//dont check, if we dont yet know freq.
 		for (tn = new_transponders->first; tn; tn = tn->next) {
+			if (tn->delsys != t->delsys)
+				continue;
 			if (tn->frequency == frequency) {
-				if ((type == SCAN_SATELLITE)
+				if ((t->type == SCAN_SATELLITE)
 				    && (polarization != tn->polarization))
 					continue;
 				known = true;
@@ -272,16 +291,18 @@ static int is_nearly_same_frequency(uint32_t f1, uint32_t f2, scantype_t type)
 	case SCAN_SATELLITE:
 		// 2MHz
 		if (diff < 2000) {
-			debug("f1 = %u is same TP as f2 = %u (diff=%d)\n", f1,
-			      f2, diff);
+			debug
+			    ("f1 = %u is same TP as f2 = %u (diff=%d)\n",
+			     f1, f2, diff);
 			return 1;
 		}
 		break;
 	default:
 		// 750kHz
 		if (diff < 750000) {
-			debug("f1 = %u is same TP as f2 = %u (diff=%d)\n", f1,
-			      f2, diff);
+			debug
+			    ("f1 = %u is same TP as f2 = %u (diff=%d)\n",
+			     f1, f2, diff);
 			return 1;
 		}
 	}
@@ -377,10 +398,9 @@ static void copy_transponder(struct transponder *dest,
 			     struct transponder *source)
 {
 	struct service *s, *sd;
-	struct frequency_item *p, *p1;
+	struct cell *p;
 
 	copy_fe_params(dest, source);
-
 	dest->network_PID = source->network_PID;
 	dest->network_id = source->network_id;
 	dest->original_network_id = source->original_network_id;
@@ -396,28 +416,26 @@ static void copy_transponder(struct transponder *dest,
 		memcpy(dest->network_name, source->network_name,
 		       strlen(source->network_name));
 	}
+	dest->cells = &(dest->_cells);
+	ClearList(dest->cells);
 
-	dest->frequencies = &(dest->_frequencies);
-	for (p = (dest->frequencies)->first; p; p = p->next)
-		ClearList(p->transposers);
-	ClearList(dest->frequencies);
-
-	for (p = (source->frequencies)->first; p; p = p->next) {
-		struct frequency_item *p2, *p3;
-		p1 = calloc(1, sizeof(*p1));
-		p1->transposers = &(p1->_transposers);
-		NewList(p1->transposers, "transposers");
-		p1->frequency = p->frequency;
+	for (p = (source->cells)->first; p; p = p->next) {
+		struct cell *p1;
+		int i;
+		p1 = calloc(1, sizeof(struct cell));
+		AddItem(dest->cells, p1);
+		for (i = 0; i < 6; i++)
+			p1->center_frequencies[i] = p->center_frequencies[i];
+		p1->num_center_frequencies = p->num_center_frequencies;
 		p1->cell_id = p->cell_id;
-		for (p2 = (p->transposers)->first; p2; p2 = p2->next) {
-			p3 = calloc(1, sizeof(*p3));
-			p3->transposers = &(p3->_transposers);
-			NewList(p3->transposers, "dont_use");
-			p3->frequency = p2->frequency;
-			p3->cell_id = p2->cell_id;
-			AddItem(p1->transposers, p3);
+
+		for (i = 0; i < 16; i++) {
+			p1->transposers[i].cell_id_extension =
+			    p->transposers[i].cell_id_extension;
+			p1->transposers[i].transposer_frequency =
+			    p->transposers[i].transposer_frequency;
 		}
-		AddItem(dest->frequencies, p1);
+		p1->num_transposers = p->num_transposers;
 	}
 
 	dest->services = &(dest->_services);
@@ -425,8 +443,8 @@ static void copy_transponder(struct transponder *dest,
 
 	// be sure that we take all services from source to dest.
 	for (s = (source->services)->first; s; s = s->next) {
-		sd = calloc(1, sizeof(*sd));
-		memcpy(sd, s, sizeof(*sd));
+		sd = calloc(1, sizeof(struct service));
+		memcpy(sd, s, sizeof(struct service));
 		sd->priv = NULL;
 		sd->prev = NULL;
 		sd->next = NULL;
@@ -468,7 +486,8 @@ static void copy_transponder(struct transponder *dest,
 }
 
 // TODO: remove this workaround.
-static struct transponder *find_transponder_by_freq(struct transponder *tn)
+static struct transponder *find_transponder_by_freq(struct transponder
+						    *tn)
 {
 	struct transponder *t;
 	char *buffer = (char *)calloc(1, 128);
@@ -477,18 +496,61 @@ static struct transponder *find_transponder_by_freq(struct transponder *tn)
 
 	verbose("        %s(%s)", __FUNCTION__, buffer);
 
-	if ((tn->type != flags.scantype) || (tn->frequency < 1)) {
+	if ((tn->type != flags.scantype)
+	    || ((tn->frequency < 1) && (!tn->cells->count))) {
 		free(buffer);
-		verbose("          -> not found.\n");
+		verbose("          -> not found. (line %d)\n", __LINE__);
 		return NULL;	// delsys doesnt match
 	}
 
 	for (t = scanned_transponders->first; t; t = t->next) {
+		if (t->delsys != tn->delsys)
+			continue;
 		if ((flags.scantype == SCAN_SATELLITE)
 		    && (t->polarization != tn->polarization))
 			continue;
+		if (flags.scantype == SCAN_TERRESTRIAL) {
+			struct cell *c;
+			int i;
+
+			for (c = (t->cells)->first; c; c = c->next) {
+				for (i = 0; i < c->num_center_frequencies; i++) {
+					//verbose("             checking t cell %u: center %7.3f\n", c->cell_id, c->center_frequencies[i]/1000000.0);
+					if (c->center_frequencies[i] ==
+					    tn->frequency) {
+						verbose
+						    ("             matches tn center\n");
+						return t;
+					}
+
+					struct cell *cn;
+					int j;
+					for (cn = (tn->cells)->first; cn;
+					     cn = cn->next) {
+						for (j = 0;
+						     j <
+						     cn->num_center_frequencies;
+						     j++) {
+							//verbose("             checking tn cell %u: center %7.3f\n", cn->cell_id, cn->center_frequencies[j]/1000000.0);
+							if (c->
+							    center_frequencies
+							    [i] ==
+							    cn->
+							    center_frequencies
+							    [j]) {
+								verbose
+								    ("             matches tn center_frequencies[%d]\n",
+								     j);
+								return t;
+							}
+						}
+					}
+				}
+			}
+		}
 		if (is_nearly_same_frequency
 		    (t->frequency, tn->frequency, tn->type)) {
+			print_transponder(buffer, t);
 			verbose
 			    ("          -> found 'scanned_transponders(%.3u)'  %s\n",
 			     t->index, buffer);
@@ -498,11 +560,48 @@ static struct transponder *find_transponder_by_freq(struct transponder *tn)
 	}
 
 	for (t = new_transponders->first; t; t = t->next) {
+		if (t->delsys != tn->delsys)
+			continue;
 		if ((flags.scantype == SCAN_SATELLITE)
 		    && (t->polarization != tn->polarization))
 			continue;
+		if (flags.scantype == SCAN_TERRESTRIAL) {
+			struct cell *c;
+			int i;
+
+			for (c = (t->cells)->first; c; c = c->next) {
+				for (i = 0; i < c->num_center_frequencies; i++) {
+					//verbose("             checking t cell %u: center %7.3f\n", c->cell_id, c->center_frequencies[i]/1000000.0);
+					if (c->center_frequencies[i] ==
+					    tn->frequency) {
+						verbose
+						    ("             matches tn center\n");
+						return t;
+					}
+
+					struct cell *cn;
+					int j;
+					for (cn = (tn->cells)->first; cn;
+					     cn = cn->next) {
+						for (j = 0;
+						     j <
+						     cn->num_center_frequencies;
+						     j++) {
+							//verbose("             checking tn cell %u: center %7.3f\n", cn->cell_id, cn->center_frequencies[j]/1000000.0);
+							if (c->center_frequencies[i] == cn->center_frequencies[j]) {
+								verbose
+								    ("             matches tn center_frequencies[%d]\n",
+								     j);
+								return t;
+							}
+						}
+					}
+				}
+			}
+		}
 		if (is_nearly_same_frequency
 		    (t->frequency, tn->frequency, tn->type)) {
+			print_transponder(buffer, t);
 			verbose
 			    ("          -> found 'new_transponders(%.3u)'  %s\n",
 			     t->index, buffer);
@@ -526,7 +625,7 @@ static struct transponder *find_transponder_by_freq(struct transponder *tn)
 	}
 
 	free(buffer);
-	verbose("          -> not found.\n");
+	verbose("          -> not found. (line %d)\n", __LINE__);
 	return NULL;
 }
 
@@ -534,64 +633,55 @@ void list_transponders();
 
 /* 300468 p22 5.2.1 NIT:  "The combination of original_network_id and transport_stream_id allow each TS to be
    uniquely identified throughout the application area of the present document." */
-static struct transponder *find_transponder(uint16_t original_network_id,
+static struct transponder *find_transponder(uint16_t
+					    original_network_id,
 					    uint16_t network_id,
 					    uint16_t transport_stream_id)
 {
 	struct transponder *t;
 	char buf[128];
+	int check_onid = original_network_id > 0;
 
-	verbose("	%s(%u:%u:%u):", __FUNCTION__, original_network_id,
-		network_id, transport_stream_id);
+	verbose("	%s(%u:%u:%u):", __FUNCTION__,
+		original_network_id, network_id, transport_stream_id);
 
 	if (transport_stream_id == 0)
 		return NULL;
 
 	if (original_network_id != 0) {
 		for (t = scanned_transponders->first; t; t = t->next) {
-			if ((t->original_network_id == original_network_id)
-			    && (t->transport_stream_id == transport_stream_id)) {
+			if (check_onid && t->original_network_id) {
+				if (t->original_network_id !=
+				    original_network_id)
+					continue;
+			}
+
+			if ((t->transport_stream_id == transport_stream_id)
+			    && (t->network_id == network_id)) {
 				print_transponder(buf, t);
 				verbose
-				    ("          -> found 'scanned_transponders(%.3u)'  %s\n",
-				     t->index, buf);
+				    ("          -> found 'scanned_transponders(%.3u)'  %s (line %d)\n",
+				     t->index, buf, __LINE__);
 				return t;
 			}
 		}
 		for (t = new_transponders->first; t; t = t->next) {
-			if ((t->original_network_id == original_network_id)
-			    && (t->transport_stream_id == transport_stream_id)) {
+			if (check_onid && t->original_network_id) {
+				if (t->original_network_id !=
+				    original_network_id)
+					continue;
+			}
+			if ((t->transport_stream_id == transport_stream_id)
+			    && (t->network_id == network_id)) {
 				print_transponder(buf, t);
 				verbose
-				    ("          -> found 'new_transponders(%.3u)'  %s\n",
-				     t->index, buf);
+				    ("          -> found 'new_transponders(%.3u)'  %s (line %d)\n",
+				     t->index, buf, __LINE__);
 				return t;
 			}
 		}
 	}
 
-	if (network_id != 0) {
-		for (t = scanned_transponders->first; t; t = t->next) {
-			if ((t->network_id == network_id)
-			    && (t->transport_stream_id == transport_stream_id)) {
-				print_transponder(buf, t);
-				verbose
-				    ("          -> found 'scanned_transponders(%.3u)'  %s\n",
-				     t->index, buf);
-				return t;
-			}
-		}
-		for (t = new_transponders->first; t; t = t->next) {
-			if ((t->network_id == network_id)
-			    && (t->transport_stream_id == transport_stream_id)) {
-				print_transponder(buf, t);
-				verbose
-				    ("          -> found 'new_transponders(%.3u)'  %s\n",
-				     t->index, buf);
-				return t;
-			}
-		}
-	}
 	verbose("          -> not found.\n");
 	return NULL;
 }
@@ -642,11 +732,12 @@ void print_transponder(char *dest, struct transponder *t)
 
 		sprintf(dest,
 			"%-8s f = %6d kHz I%sB%sC%sD%sT%sG%sY%s%s (%u:%u:%u)",
-			modulation_name(t->modulation), freq_scale(t->frequency,
-								   1e-3),
+			modulation_name(t->modulation),
+			freq_scale(t->frequency, 1e-3),
 			vdr_inversion_name(t->inversion),
 			vdr_bandwidth_name(t->bandwidth),
-			vdr_fec_name(t->coderate), vdr_fec_name(t->coderate_LP),
+			vdr_fec_name(t->coderate),
+			vdr_fec_name(t->coderate_LP),
 			vdr_transmission_mode_name(t->transmission),
 			vdr_guard_name(t->guard),
 			vdr_hierarchy_name(t->hierarchy), &plp_id[0],
@@ -678,8 +769,9 @@ void print_transponder(char *dest, struct transponder *t)
 			freq_scale(t->symbolrate, 1e-3),
 			sat_fec_to_txt(t->coderate),
 			sat_rolloff_to_txt(t->rolloff),
-			sat_mod_to_txt(t->modulation), t->original_network_id,
-			t->network_id, t->transport_stream_id);
+			sat_mod_to_txt(t->modulation),
+			t->original_network_id, t->network_id,
+			t->transport_stream_id);
 
 		break;
 	default:
@@ -694,21 +786,48 @@ void list_transponders()
 	struct transponder *t;
 	char buf[128];
 
-	verbose("          ================= %s() =======================\n",
-		__FUNCTION__);
+	verbose
+	    ("          ================= %s() =======================\n",
+	     __FUNCTION__);
 	for (t = scanned_transponders->first; t; t = t->next) {
 		print_transponder(buf, t);
-		verbose("          %s(%.3u): %s\n", scanned_transponders->name,
-			t->index, buf);
+		verbose("          %s(%.3u): %s\n",
+			scanned_transponders->name, t->index, buf);
 	}
 
 	for (t = new_transponders->first; t; t = t->next) {
 		print_transponder(buf, t);
-		verbose("          %s(%.3u): %s\n", new_transponders->name,
-			t->index, buf);
+		verbose("          %s(%.3u): %s\n",
+			new_transponders->name, t->index, buf);
 	}
 	verbose
 	    ("          =============================================================\n");
+}
+
+static void copy_duplicate_tp(struct transponder *t, struct transponder *t2)
+{
+	if (t->type == SCAN_TERRESTRIAL) {
+		if (!t->frequency)
+			t->frequency = t2->frequency;
+		if (t->cells->count == 0)
+			memcpy(t->cells, t2->cells, sizeof(cList));
+	}
+
+	if (t->original_network_id == 0)
+		t->original_network_id = t2->original_network_id;
+
+	if ((!t->source) && ((t2->source >> 8) == TABLE_NIT_ACT)) {
+		uint32_t last_freq = t->frequency;
+		copy_fe_params(t, t2);
+		// t is guessed, but t2 from nit act
+		if (last_freq) {
+			// copy_fe_params overwrote t->freq with '0' from t2.
+			t->frequency = last_freq;
+		}
+	}
+	// enshure that current_tp points to valid tp.
+	if (current_tp == t2)
+		current_tp = t;
 }
 
 void check_duplicate_transponders()
@@ -719,6 +838,8 @@ void check_duplicate_transponders()
 	verbose("          %s()\n", __FUNCTION__);
 	for (t = scanned_transponders->first; t; t = t->next) {
 		for (t2 = t->next; t2; t2 = t2->next) {
+			if (t->delsys != t2->delsys)
+				continue;
 			if (t->original_network_id && t2->original_network_id) {
 				if (t->original_network_id !=
 				    t2->original_network_id)
@@ -728,18 +849,18 @@ void check_duplicate_transponders()
 				continue;
 			if (t->transport_stream_id != t2->transport_stream_id)
 				continue;
-			if ((t->type == SCAN_TERRESTRIAL) && !t->frequency)
-				t->frequency = t2->frequency;
-			if (current_tp == t2)
-				current_tp = t;
+			copy_duplicate_tp(t, t2);
 			print_transponder(buf, t2);
 			verbose
-			    ("          DELETING DUPLICATE TRANSPONDER %s(%.3u): %s\n",
-			     scanned_transponders->name, t2->index, buf);
+			    ("          DELETING DUPLICATE TRANSPONDER %s(%.3u): %s (line:%d)\n",
+			     scanned_transponders->name, t2->index, buf,
+			     __LINE__);
 			DeleteItem(scanned_transponders, t2);
 			return;
 		}
 		for (t2 = new_transponders->first; t2; t2 = t2->next) {
+			if (t->delsys != t2->delsys)
+				continue;
 			if (t->original_network_id && t2->original_network_id) {
 				if (t->original_network_id !=
 				    t2->original_network_id)
@@ -749,20 +870,19 @@ void check_duplicate_transponders()
 				continue;
 			if (t->transport_stream_id != t2->transport_stream_id)
 				continue;
-			if ((t->type == SCAN_TERRESTRIAL) && !t->frequency)
-				t->frequency = t2->frequency;
-			if (current_tp == t2)
-				current_tp = t;
+			copy_duplicate_tp(t, t2);
 			print_transponder(buf, t2);
 			verbose
-			    ("          DELETING DUPLICATE TRANSPONDER %s(%.3u): %s\n",
-			     new_transponders->name, t2->index, buf);
+			    ("          DELETING DUPLICATE TRANSPONDER %s(%.3u): %s (line:%d)\n",
+			     new_transponders->name, t2->index, buf, __LINE__);
 			DeleteItem(new_transponders, t2);
 			return;
 		}
 	}
 	for (t = new_transponders->first; t; t = t->next) {
 		for (t2 = t->next; t2; t2 = t2->next) {
+			if (t->delsys != t2->delsys)
+				continue;
 			if (t->original_network_id && t2->original_network_id) {
 				if (t->original_network_id !=
 				    t2->original_network_id)
@@ -772,14 +892,11 @@ void check_duplicate_transponders()
 				continue;
 			if (t->transport_stream_id != t2->transport_stream_id)
 				continue;
-			if ((t->type == SCAN_TERRESTRIAL) && !t->frequency)
-				t->frequency = t2->frequency;
-			if (current_tp == t2)
-				current_tp = t;
+			copy_duplicate_tp(t, t2);
 			print_transponder(buf, t2);
 			verbose
-			    ("          DELETING DUPLICATE TRANSPONDER %s(%.3u): %s\n",
-			     new_transponders->name, t2->index, buf);
+			    ("          DELETING DUPLICATE TRANSPONDER %s(%.3u): %s (line:%d)\n",
+			     new_transponders->name, t2->index, buf, __LINE__);
 			DeleteItem(new_transponders, t2);
 			return;
 		}
@@ -810,8 +927,8 @@ struct service *find_service(struct transponder *t, uint16_t service_id)
 }
 
 static int find_descriptor(uint8_t tag, const unsigned char *buf,
-			   int descriptors_loop_len, const unsigned char **desc,
-			   int *desc_len)
+			   int descriptors_loop_len,
+			   const unsigned char **desc, int *desc_len)
 {
 	while (descriptors_loop_len > 0) {
 		unsigned char descriptor_tag = buf[0];
@@ -878,24 +995,25 @@ static void parse_descriptors(enum table_id t, const unsigned char *buf,
 			break;
 		case satellite_delivery_system_descriptor:
 			if ((scantype == SCAN_SATELLITE)
-			    && ((t == TABLE_NIT_ACT) || (t == TABLE_NIT_OTH)))
-				parse_satellite_delivery_system_descriptor(buf,
-									   data,
-									   caps_inversion);
+			    && ((t == TABLE_NIT_ACT)
+				|| (t == TABLE_NIT_OTH)))
+				parse_satellite_delivery_system_descriptor
+				    (buf, data, caps_inversion);
 			break;
 		case cable_delivery_system_descriptor:
 			if ((scantype == SCAN_CABLE)
-			    && ((t == TABLE_NIT_ACT) || (t == TABLE_NIT_OTH)))
-				parse_cable_delivery_system_descriptor(buf,
-								       data,
-								       caps_inversion);
+			    && ((t == TABLE_NIT_ACT)
+				|| (t == TABLE_NIT_OTH)))
+				parse_cable_delivery_system_descriptor
+				    (buf, data, caps_inversion);
 			break;
 		case vbi_data_descriptor:
 		case vbi_teletext_descriptor:
 		case bouquet_name_descriptor:
 			break;
 		case service_descriptor:
-			if ((t == TABLE_SDT_ACT) || (t == TABLE_SDT_OTH))
+			if ((t == TABLE_SDT_ACT)
+			    || (t == TABLE_SDT_OTH))
 				parse_service_descriptor(buf, data,
 							 flags.codepage);
 			break;
@@ -911,7 +1029,8 @@ static void parse_descriptors(enum table_id t, const unsigned char *buf,
 		case stream_identifier_descriptor:
 			break;
 		case ca_identifier_descriptor:
-			if ((t == TABLE_SDT_ACT) || (t == TABLE_SDT_OTH))
+			if ((t == TABLE_SDT_ACT)
+			    || (t == TABLE_SDT_OTH))
 				parse_ca_identifier_descriptor(buf, data);
 			break;
 		case content_descriptor:
@@ -924,7 +1043,8 @@ static void parse_descriptors(enum table_id t, const unsigned char *buf,
 			break;
 		case terrestrial_delivery_system_descriptor:
 			if ((scantype == SCAN_TERRESTRIAL)
-			    && ((t == TABLE_NIT_ACT) || (t == TABLE_NIT_OTH)))
+			    && ((t == TABLE_NIT_ACT)
+				|| (t == TABLE_NIT_OTH)))
 				parse_terrestrial_delivery_system_descriptor
 				    (buf, data, caps_inversion);
 			break;
@@ -934,8 +1054,7 @@ static void parse_descriptors(enum table_id t, const unsigned char *buf,
 			case C2_delivery_system_descriptor:
 				if ((scantype == SCAN_CABLE)
 				    && ((t == TABLE_NIT_ACT)
-					|| (t == TABLE_NIT_OTH))
-				    && (fe_info.caps & FE_CAN_2G_MODULATION)) {
+					|| (t == TABLE_NIT_OTH))) {
 					parse_C2_delivery_system_descriptor(buf,
 									    data,
 									    caps_inversion);
@@ -944,8 +1063,7 @@ static void parse_descriptors(enum table_id t, const unsigned char *buf,
 			case T2_delivery_system_descriptor:
 				if ((scantype == SCAN_TERRESTRIAL)
 				    && ((t == TABLE_NIT_ACT)
-					|| (t == TABLE_NIT_OTH))
-				    && (fe_info.caps & FE_CAN_2G_MODULATION)) {
+					|| (t == TABLE_NIT_OTH))) {
 					parse_T2_delivery_system_descriptor(buf,
 									    data,
 									    caps_inversion);
@@ -956,18 +1074,14 @@ static void parse_descriptors(enum table_id t, const unsigned char *buf,
 				     || (scantype == SCAN_TERRESTRIAL))
 				    && ((t == TABLE_NIT_ACT)
 					|| (t == TABLE_NIT_OTH))) {
-					parse_SH_delivery_system_descriptor(buf,
-									    data,
-									    caps_inversion);
+					parse_SH_delivery_system_descriptor
+					    (buf, data, caps_inversion);
 				}
 				break;
 			case network_change_notify_descriptor:
-				parse_network_change_notify_descriptor(buf,
-								       &((struct
-									  transponder
-									  *)
-									 data)->
-								       network_change);
+				parse_network_change_notify_descriptor
+				    (buf, &((struct transponder *)
+					    data)->network_change);
 				break;
 				// all other extended descriptors here: do nothing so far.
 			case image_icon_descriptor:
@@ -995,7 +1109,8 @@ static void parse_descriptors(enum table_id t, const unsigned char *buf,
 			break;
 		case frequency_list_descriptor:
 			if ((scantype == SCAN_TERRESTRIAL)
-			    && ((t == TABLE_NIT_ACT) || (t == TABLE_NIT_OTH)))
+			    && ((t == TABLE_NIT_ACT)
+				|| (t == TABLE_NIT_OTH)))
 				parse_frequency_list_descriptor(buf, data);
 			break;
 		case partial_transport_stream_descriptor:
@@ -1022,7 +1137,8 @@ static void parse_descriptors(enum table_id t, const unsigned char *buf,
 			break;
 		case s2_satellite_delivery_system_descriptor:
 			if ((scantype == SCAN_SATELLITE)
-			    && ((t == TABLE_NIT_ACT) || (t == TABLE_NIT_OTH))
+			    && ((t == TABLE_NIT_ACT)
+				|| (t == TABLE_NIT_OTH))
 			    && (fe_info.caps & FE_CAN_2G_MODULATION))
 				parse_S2_satellite_delivery_system_descriptor
 				    (buf, data);
@@ -1032,7 +1148,8 @@ static void parse_descriptors(enum table_id t, const unsigned char *buf,
 		case aac_descriptor:
 			break;
 		case logical_channel_descriptor:
-			if ((t == TABLE_NIT_ACT) || (t == TABLE_NIT_OTH))
+			if ((t == TABLE_NIT_ACT)
+			    || (t == TABLE_NIT_OTH))
 				parse_logical_channel_descriptor(buf, data);
 			break;
 		case 0xF2:	// 0xF2 Private DVB Descriptor  Premiere.de, Content Transmission Descriptor
@@ -1049,22 +1166,29 @@ static void parse_descriptors(enum table_id t, const unsigned char *buf,
 
 /* EN 13818-1 p.43 Table 2-25 - Program association section
  */
-em_static void parse_pat(const unsigned char *buf, uint16_t section_length,
+em_static void parse_pat(const unsigned char *buf,
+			 uint16_t section_length,
 			 uint16_t transport_stream_id, uint32_t section_flags)
 {
 	verbose("PAT (xxxx:xxxx:%u)\n", transport_stream_id);
 	hexdump(__FUNCTION__, buf, section_length);
 
 	if (current_tp->transport_stream_id != transport_stream_id) {
-		char buffer[128];
-		print_transponder(buffer, current_tp);
-		info("        %s : updating transport_stream_id: -> (%u:%u:%u)\n", buffer, current_tp->original_network_id, current_tp->network_id, transport_stream_id);
-		current_tp->transport_stream_id = transport_stream_id;
-		if (flags.delete_duplicate_transponders) {
-			check_duplicate_transponders();
-		}
-		if (verbosity > 1)
-			list_transponders();
+		if (current_tp->type == SCAN_TERRESTRIAL) {
+			char buffer[128];
+			print_transponder(buffer, current_tp);
+			info("        %s : updating transport_stream_id: -> (%u:%u:%u)\n", buffer, current_tp->original_network_id, current_tp->network_id, transport_stream_id);
+			current_tp->transport_stream_id = transport_stream_id;
+			if (flags.delete_duplicate_transponders) {
+				check_duplicate_transponders();
+			}
+			if (verbosity > 1)
+				list_transponders();
+		} else if (current_tp->transport_stream_id)
+			verbose
+			    ("unexpected transport_stream_id %d, expected %d\n",
+			     transport_stream_id,
+			     current_tp->transport_stream_id);
 	}
 
 	while (section_length > 0) {
@@ -1089,17 +1213,17 @@ em_static void parse_pat(const unsigned char *buf, uint16_t section_length,
 		if (!(section_flags & SECTION_FLAG_INITIAL)) {
 			if (s->priv == NULL) {	//  && s->pmt_pid) {  pmt_pid is by spec: 0x0010 .. 0x1FFE . see EN13818-1 p.19 Table 2-3 - PID table
 				s->priv = calloc(1, sizeof(struct section_buf));
-				setup_filter(s->priv, demux_devname, s->pmt_pid,
-					     TABLE_PMT, -1, 1, 0,
-					     SECTION_FLAG_FREE);
+				setup_filter(s->priv, demux_devname,
+					     s->pmt_pid, TABLE_PMT, -1,
+					     1, 0, SECTION_FLAG_FREE);
 				add_filter(s->priv);
 			}
 		}
 	}
 }
 
-em_static void parse_pmt(const unsigned char *buf, uint16_t section_length,
-			 uint16_t service_id)
+em_static void parse_pmt(const unsigned char *buf,
+			 uint16_t section_length, uint16_t service_id)
 {
 	int program_info_len;
 	struct service *s;
@@ -1137,8 +1261,9 @@ em_static void parse_pmt(const unsigned char *buf, uint16_t section_length,
 		switch (buf[0]) {	// stream type
 		case iso_iec_11172_video_stream:
 		case iso_iec_13818_1_11172_2_video_stream:
-			moreverbose("  VIDEO     : PID %d (stream type 0x%x)\n",
-				    elementary_pid, buf[0]);
+			moreverbose
+			    ("  VIDEO     : PID %d (stream type 0x%x)\n",
+			     elementary_pid, buf[0]);
 			if (s->video_pid == 0) {
 				s->video_pid = elementary_pid;
 				s->video_stream_type = buf[0];
@@ -1146,8 +1271,9 @@ em_static void parse_pmt(const unsigned char *buf, uint16_t section_length,
 			break;
 		case iso_iec_11172_audio_stream:
 		case iso_iec_13818_3_audio_stream:
-			moreverbose("  AUDIO     : PID %d (stream type 0x%x)\n",
-				    elementary_pid, buf[0]);
+			moreverbose
+			    ("  AUDIO     : PID %d (stream type 0x%x)\n",
+			     elementary_pid, buf[0]);
 			if (s->audio_num < AUDIO_CHAN_MAX) {
 				s->audio_pid[s->audio_num] = elementary_pid;
 				s->audio_stream_type[s->audio_num] = buf[0];
@@ -1164,16 +1290,16 @@ em_static void parse_pmt(const unsigned char *buf, uint16_t section_length,
 		case iso_iec_13818_1_private_data:
 			// ITU-T Rec. H.222.0 | ISO/IEC 13818-1 PES packets containing private data
 			if (find_descriptor
-			    (teletext_descriptor, buf + 5, ES_info_len, NULL,
-			     NULL)) {
+			    (teletext_descriptor, buf + 5, ES_info_len,
+			     NULL, NULL)) {
 				moreverbose("  TELETEXT  : PID %d\n",
 					    elementary_pid);
 				s->teletext_pid = elementary_pid;
 				break;
 			} else
 			    if (find_descriptor
-				(subtitling_descriptor, buf + 5, ES_info_len,
-				 NULL, NULL)) {
+				(subtitling_descriptor, buf + 5,
+				 ES_info_len, NULL, NULL)) {
 				// Note: The subtitling descriptor can also signal
 				// teletext subtitling, but then the teletext descriptor
 				// will also be present; so we can be quite confident
@@ -1186,8 +1312,8 @@ em_static void parse_pmt(const unsigned char *buf, uint16_t section_length,
 				break;
 			} else
 			    if (find_descriptor
-				(ac3_descriptor, buf + 5, ES_info_len, NULL,
-				 NULL)) {
+				(ac3_descriptor, buf + 5, ES_info_len,
+				 NULL, NULL)) {
 				moreverbose
 				    ("  AC3       : PID %d (stream type 0x%x)\n",
 				     elementary_pid, buf[0]);
@@ -1195,9 +1321,10 @@ em_static void parse_pmt(const unsigned char *buf, uint16_t section_length,
 					s->ac3_pid[s->ac3_num] = elementary_pid;
 					s->ac3_stream_type[s->ac3_num] = buf[0];
 					s->ac3_num++;
-					parse_descriptors(TABLE_PMT, buf + 5,
-							  ES_info_len, s,
-							  flags.scantype);
+					parse_descriptors(TABLE_PMT,
+							  buf + 5,
+							  ES_info_len,
+							  s, flags.scantype);
 				} else
 					warning
 					    ("more than %i ac3 audio channels, truncating\n",
@@ -1205,8 +1332,8 @@ em_static void parse_pmt(const unsigned char *buf, uint16_t section_length,
 				break;
 			} else
 			    if (find_descriptor
-				(enhanced_ac3_descriptor, buf + 5, ES_info_len,
-				 NULL, NULL)) {
+				(enhanced_ac3_descriptor, buf + 5,
+				 ES_info_len, NULL, NULL)) {
 				moreverbose
 				    ("  EAC3      : PID %d (stream type 0x%x)\n",
 				     elementary_pid, buf[0]);
@@ -1214,9 +1341,10 @@ em_static void parse_pmt(const unsigned char *buf, uint16_t section_length,
 					s->ac3_pid[s->ac3_num] = elementary_pid;
 					s->ac3_stream_type[s->ac3_num] = buf[0];
 					s->ac3_num++;
-					parse_descriptors(TABLE_PMT, buf + 5,
-							  ES_info_len, s,
-							  flags.scantype);
+					parse_descriptors(TABLE_PMT,
+							  buf + 5,
+							  ES_info_len,
+							  s, flags.scantype);
 				} else
 					warning
 					    ("more than %i eac3 audio channels, truncating\n",
@@ -1224,8 +1352,9 @@ em_static void parse_pmt(const unsigned char *buf, uint16_t section_length,
 				break;
 			}
 			// we shouldn't reach this one, usually it should be Teletext, Subtitling or AC3 .. 
-			moreverbose("  unknown private data: PID 0x%04x\n",
-				    elementary_pid);
+			moreverbose
+			    ("  unknown private data: PID 0x%04x\n",
+			     elementary_pid);
 			break;
 		case iso_iec_13522_MHEG:
 			//
@@ -1278,8 +1407,9 @@ em_static void parse_pmt(const unsigned char *buf, uint16_t section_length,
 			     elementary_pid);
 			break;
 		case iso_iec_13818_1_auxiliary:
-			moreverbose("  ISO/IEC 13818-1 auxiliary : PID %d\n",
-				    elementary_pid);
+			moreverbose
+			    ("  ISO/IEC 13818-1 auxiliary : PID %d\n",
+			     elementary_pid);
 			break;
 		case iso_iec_13818_7_audio_w_ADTS_transp:
 			moreverbose
@@ -1300,8 +1430,9 @@ em_static void parse_pmt(const unsigned char *buf, uint16_t section_length,
 				     AUDIO_CHAN_MAX);
 			break;
 		case iso_iec_14496_2_visual:
-			moreverbose("  ISO/IEC 14496-2 Visual : PID %d\n",
-				    elementary_pid);
+			moreverbose
+			    ("  ISO/IEC 14496-2 Visual : PID %d\n",
+			     elementary_pid);
 			break;
 		case iso_iec_14496_3_audio_w_LATM_transp:
 			moreverbose
@@ -1401,8 +1532,9 @@ em_static void parse_pmt(const unsigned char *buf, uint16_t section_length,
 				     AC3_CHAN_MAX);
 			break;
 		default:
-			moreverbose("  OTHER     : PID %d TYPE 0x%02x\n",
-				    elementary_pid, buf[0]);
+			moreverbose
+			    ("  OTHER     : PID %d TYPE 0x%02x\n",
+			     elementary_pid, buf[0]);
 		}		//END switch stream type
 		buf += ES_info_len + 5;
 		section_length -= ES_info_len + 5;
@@ -1412,8 +1544,9 @@ em_static void parse_pmt(const unsigned char *buf, uint16_t section_length,
 	tmp += sprintf(tmp, "%d (%.4s)", s->audio_pid[0], s->audio_lang[0]);
 
 	if (s->audio_num >= AUDIO_CHAN_MAX) {
-		warning("more than %i audio channels: %i, truncating to %i\n",
-			AUDIO_CHAN_MAX - 1, s->audio_num, AUDIO_CHAN_MAX);
+		warning
+		    ("more than %i audio channels: %i, truncating to %i\n",
+		     AUDIO_CHAN_MAX - 1, s->audio_num, AUDIO_CHAN_MAX);
 		s->audio_num = AUDIO_CHAN_MAX;
 	}
 
@@ -1428,12 +1561,13 @@ em_static void parse_pmt(const unsigned char *buf, uint16_t section_length,
 	     s->service_name, s->pmt_pid, s->video_pid, msg_buf);
 }
 
-em_static void parse_nit(const unsigned char *buf, uint16_t section_length,
-			 uint8_t table_id, uint16_t network_id,
-			 uint32_t section_flags)
+em_static void parse_nit(const unsigned char *buf,
+			 uint16_t section_length, uint8_t table_id,
+			 uint16_t network_id, uint32_t section_flags)
 {
 	char buffer[128];
 	int descriptors_loop_len = ((buf[0] & 0x0f) << 8) | buf[1];
+	bool update_pids;
 
 	verbose("%s: (xxxx:%u:xxxx)\n",
 		table_id == 0x40 ? "NIT(act)" : "NIT(oth)", network_id);
@@ -1443,8 +1577,8 @@ em_static void parse_nit(const unsigned char *buf, uint16_t section_length,
 	    && (current_tp->network_id != network_id)) {
 		print_transponder(buffer, current_tp);
 		info("        %s : updating network_id -> (%u:%u:%u)\n",
-		     buffer, current_tp->original_network_id, network_id,
-		     current_tp->transport_stream_id);
+		     buffer, current_tp->original_network_id,
+		     network_id, current_tp->transport_stream_id);
 		current_tp->network_id = network_id;
 		if (flags.delete_duplicate_transponders) {
 			check_duplicate_transponders();
@@ -1456,13 +1590,13 @@ em_static void parse_nit(const unsigned char *buf, uint16_t section_length,
 	if (section_length < descriptors_loop_len + 4) {
 		warning
 		    ("section too short: network_id == 0x%04x, section_length == %i, "
-		     "descriptors_loop_len == %i\n", network_id, section_length,
-		     descriptors_loop_len);
+		     "descriptors_loop_len == %i\n", network_id,
+		     section_length, descriptors_loop_len);
 		return;
 	}
 	// update network_name
-	parse_descriptors(table_id, buf + 2, descriptors_loop_len, current_tp,
-			  flags.scantype);
+	parse_descriptors(table_id, buf + 2, descriptors_loop_len,
+			  current_tp, flags.scantype);
 	section_length -= descriptors_loop_len + 4;
 	buf += descriptors_loop_len + 4;
 
@@ -1485,27 +1619,8 @@ em_static void parse_nit(const unsigned char *buf, uint16_t section_length,
 			     section_length, descriptors_loop_len);
 			break;
 		}
-		//if (section_flags & SECTION_FLAG_INITIAL) {
-		if (table_id == TABLE_NIT_ACT) {
-			// first lookup of this transponders NIT
-			// - high prio: try to find tp by ts_id && update nid, onid
-			// - low  prio: find other tp's
-			//t = current_tp->transport_stream_id == transport_stream_id ? current_tp : NULL;
-			t = find_transponder(0, network_id,
-					     transport_stream_id);
-			if (t != NULL) {
-				if (t->original_network_id !=
-				    original_network_id) {
-					print_transponder(buffer, t);
-					info("        %s : updating original_network_id -> (%u:%u:%u)\n", buffer, original_network_id, t->network_id, t->transport_stream_id);
-					t->original_network_id =
-					    original_network_id;
-					if (verbosity > 1)
-						list_transponders();
-				}
-			}
-		}
 
+		update_pids = false;
 		memset(&tn, 0, sizeof(tn));
 		tn.type = current_tp->type;
 		tn.network_PID = current_tp->network_PID;
@@ -1516,58 +1631,103 @@ em_static void parse_nit(const unsigned char *buf, uint16_t section_length,
 
 		tn.services = &tn._services;
 		NewList(tn.services, "tn_services");
-		tn.frequencies = &tn._frequencies;
-		NewList(tn.frequencies, "tn_frequencies");
+		tn.cells = &tn._cells;
+		NewList(tn.cells, "tn_cells");
 
-		if ((current_tp->original_network_id == original_network_id) &&
-		    (current_tp->transport_stream_id == transport_stream_id) &&
-		    (table_id == TABLE_NIT_ACT)) {
+		if ((current_tp->original_network_id == original_network_id)
+		    && (current_tp->transport_stream_id == transport_stream_id)
+		    && (table_id == TABLE_NIT_ACT)) {
 			// if we've found the current tp by onid && ts_id and update it from nit(act), use actual settings as default.      
 			copy_fe_params(&tn, current_tp);	//  tn.param = current_tp->param;
 		}
 
-		parse_descriptors(table_id, buf + 6, descriptors_loop_len, &tn,
-				  flags.scantype);
+		parse_descriptors(table_id, buf + 6,
+				  descriptors_loop_len, &tn, flags.scantype);
 		tn.source |= table_id << 8;
 
 		t = find_transponder(original_network_id, network_id, transport_stream_id);	// try to find tp by transport_stream_id;
+		if (t == NULL) {
+			if ((t = find_transponder_by_freq(&tn))) {
+				print_transponder(buffer, t);
+				info("        already known: (%s), but not found by pids\n", buffer);
+				update_pids = true;
+			}
+		}
 
 		if (t != NULL) {
 			// this transponder is already known. Should we update its informations?
 			if (tn.other_frequency_flag)
 				tn.frequency = t->frequency;
+			if (t->locks_with_params && !tn.bandwidth)
+				tn.bandwidth = t->bandwidth;
 			if (table_id == TABLE_NIT_ACT
 			    && flags.delete_duplicate_transponders) {
 				// only nit_actual should update transponders, too much garbage in satellite nit_other.
+				if (update_pids) {
+					update_pids = false;
+					// 300468: The combination of original_network_id and transport_stream_id allow each TS to be uniquely 
+					//         identified throughout the application area of the present document.
+					//         Any sections of the NIT which describe the actual network (that is, the network of which
+					//         the TS containing the NIT is a part) shall have the table_id 0x40. (TABLE_NIT_ACT)
+					if ((t->original_network_id !=
+					     original_network_id)
+					    || (t->network_id != network_id)
+					    || (t->transport_stream_id !=
+						transport_stream_id)) {
+						print_transponder(buffer, t);
+						info("        %s : updating tp ids -> (%u:%u:%u)\n", buffer, original_network_id, network_id, transport_stream_id);
+						t->original_network_id =
+						    original_network_id;
+						t->network_id = network_id;
+						t->transport_stream_id =
+						    transport_stream_id;
+						if (verbosity > 1)
+							list_transponders();
+						if (flags.
+						    delete_duplicate_transponders)
+						{
+							check_duplicate_transponders
+							    ();
+						}
+					}
+				}
 				if (is_different_transponder_deep_scan(t, &tn, 0) && ((!t->locks_with_params) || is_auto_params(t))) {	// || t->source != tn.source) {
 					/* some of the informations is still set to AUTO */
 					print_transponder(buffer, t);
 					info("        updating transponder:\n           (%s) 0x%.4X\n", buffer, t->source);
 					copy_transponder(t, &tn);
 					print_transponder(buffer, t);
-					info("        to (%s) 0x%.4X\n", buffer,
-					     t->source);
-					if (t->frequencies->count > 0) {
-						struct frequency_item *fi, *tr;
-						for (fi = t->frequencies->first;
-						     fi; fi = fi->next) {
-							verbose
-							    ("           cell id %u, freq = %u\n",
-							     fi->cell_id,
-							     fi->frequency);
-							if (fi->transposers->
-							    count > 0) {
-								for (tr =
+					info("        to (%s) 0x%.4X\n",
+					     buffer, t->source);
+					if (t->cells->count > 0) {
+						struct cell *fi;
+						for (fi = (t->cells)->first; fi;
+						     fi = fi->next) {
+							int n;
+							for (n = 0;
+							     n <
+							     fi->
+							     num_center_frequencies;
+							     n++)
+								verbose
+								    ("             cell%d: center_frequency%u\n",
 								     fi->
-								     transposers->
-								     first; tr;
-								     tr =
-								     fi->next) {
-									verbose
-									    ("              transposer = %u\n",
-									     tr->
-									     frequency);
-								}
+								     cell_id,
+								     fi->
+								     center_frequencies
+								     [n]);
+							for (n = 0;
+							     n <
+							     fi->
+							     num_transposers;
+							     n++) {
+								verbose
+								    ("                transposer%d transposer_frequency%u\n",
+								     n,
+								     fi->
+								     transposers
+								     [n].
+								     transposer_frequency);
 							}
 						}
 					}
@@ -1579,41 +1739,46 @@ em_static void parse_nit(const unsigned char *buf, uint16_t section_length,
 			// we could not find the transponder by freq and fe_type. probably a new one - so adding it to scan list
 			if (flags.add_frequencies > 0
 			    && (tn.type == flags.scantype)) {
-				if (find_transponder_by_freq(&tn)) {
-					print_transponder(buffer, &tn);
-					info("        already known: (%s), but not found by pids\n", buffer);
+				if ((t = find_transponder_by_freq(&tn))) {
+					print_transponder(buffer, t);
+					info("        unexpected: already known tp (%s), but not found by pids\n", buffer);
 				} else {
 					t = alloc_transponder(tn.frequency,
-							      tn.type,
+							      tn.delsys,
 							      tn.polarization);
 					copy_transponder(t, &tn);
 					if (t->type == SCAN_SATELLITE)
 						t->pilot = PILOT_AUTO;
 					print_transponder(buffer, t);
 					info("        new transponder: (%s) 0x%.4X\n", buffer, t->source);
-					if (t->frequencies->count > 0) {
-						struct frequency_item *fi, *tr;
-						for (fi = t->frequencies->first;
-						     fi; fi = fi->next) {
-							verbose
-							    ("           cell id %u, freq = %u\n",
-							     fi->cell_id,
-							     fi->frequency);
-							if (fi->transposers->
-							    count > 0) {
-								for (tr =
-								     fi->
-								     transposers->
-								     first; tr;
-								     tr =
-								     fi->next) {
-									verbose
-									    ("              transposer = %u\n",
-									     tr->
-									     frequency);
-								}
+					if (t->cells->count > 0) {
+						struct cell *fi;
+						for (fi = (t->cells)->first; fi;
+						     fi = fi->next) {
+							int n;
+							for (n = 0;
+							     n <
+							     fi->num_center_frequencies;
+							     n++)
+								verbose
+								    ("             cell%d: center_frequency%u\n",
+								     fi->cell_id,
+								     fi->center_frequencies
+								     [n]);
+							for (n = 0;
+							     n <
+							     fi->num_transposers;
+							     n++) {
+								verbose
+								    ("                transposer%d transposer_frequency%u\n",
+								     n,
+								     fi->transposers
+								     [n].transposer_frequency);
 							}
 						}
+					}
+					if (flags.delete_duplicate_transponders) {
+						check_duplicate_transponders();
 					}
 					if (verbosity > 1)
 						list_transponders();
@@ -1627,8 +1792,8 @@ em_static void parse_nit(const unsigned char *buf, uint16_t section_length,
 	}
 }
 
-em_static void parse_sdt(const unsigned char *buf, uint16_t section_length,
-			 uint16_t transport_stream_id)
+em_static void parse_sdt(const unsigned char *buf,
+			 uint16_t section_length, uint16_t transport_stream_id)
 {
 	hexdump(__FUNCTION__, buf, section_length);
 
@@ -1656,8 +1821,8 @@ em_static void parse_sdt(const unsigned char *buf, uint16_t section_length,
 		s->running = (buf[3] >> 5) & 0x7;
 		s->scrambled = (buf[3] >> 4) & 1;
 
-		parse_descriptors(TABLE_SDT_ACT, buf + 5, descriptors_loop_len,
-				  s, flags.scantype);
+		parse_descriptors(TABLE_SDT_ACT, buf + 5,
+				  descriptors_loop_len, s, flags.scantype);
 
 		section_length -= descriptors_loop_len + 5;
 		buf += descriptors_loop_len + 5;
@@ -1690,8 +1855,9 @@ em_static void parse_psip_descriptors(struct service *s,
 	}
 }
 
-em_static void parse_psip_vct(const unsigned char *buf, uint16_t section_length,
-			      uint8_t table_id, uint16_t transport_stream_id)
+em_static void parse_psip_vct(const unsigned char *buf,
+			      uint16_t section_length, uint8_t table_id,
+			      uint16_t transport_stream_id)
 {
 	(void)section_length;
 	(void)table_id;
@@ -1821,8 +1987,8 @@ static int parse_section(struct section_buf *s)
 
 		pList list = s->garbage;
 		unsigned char *p = (unsigned char *)calloc(1,
-							   SECTION_BUF_SIZE +
-							   sizeof(cItem));
+							   SECTION_BUF_SIZE
+							   + sizeof(cItem));
 		if (list == NULL) {
 			list = (pList) calloc(1, sizeof(cList));
 			NewList(list, "s->garbage");
@@ -1869,10 +2035,12 @@ static int parse_section(struct section_buf *s)
 		struct section_buf *next_seg = s->next_seg;
 
 		if (s->section_version_number != -1 && s->table_id_ext != -1)
-			debug("section version_number or table_id_ext changed "
-			      "%d -> %d / %04x -> %04x\n",
-			      s->section_version_number, section_version_number,
-			      s->table_id_ext, table_id_ext);
+			debug
+			    ("section version_number or table_id_ext changed "
+			     "%d -> %d / %04x -> %04x\n",
+			     s->section_version_number,
+			     section_version_number, s->table_id_ext,
+			     table_id_ext);
 		s->table_id_ext = table_id_ext;
 		s->section_version_number = section_version_number;
 		s->sectionfilter_done = 0;
@@ -1898,16 +2066,17 @@ static int parse_section(struct section_buf *s)
 			parse_pat(buf, section_length, table_id_ext, s->flags);
 			break;
 		case TABLE_PMT:
-			verbose("PMT %d (0x%04x) for service %d (0x%04x)\n",
-				s->pid, s->pid, table_id_ext, table_id_ext);
+			verbose
+			    ("PMT %d (0x%04x) for service %d (0x%04x)\n",
+			     s->pid, s->pid, table_id_ext, table_id_ext);
 			parse_pmt(buf, section_length, table_id_ext);
 			break;
 		case TABLE_NIT_ACT:
 		case TABLE_NIT_OTH:
 			//verbose("NIT(%s TS, network_id %d (0x%04x) )\n", table_id == 0x40 ? "actual":"other",
 			//       table_id_ext, table_id_ext);
-			parse_nit(buf, section_length, table_id, table_id_ext,
-				  s->flags);
+			parse_nit(buf, section_length, table_id,
+				  table_id_ext, s->flags);
 			break;
 		case TABLE_SDT_ACT:
 		case TABLE_SDT_OTH:
@@ -1919,8 +2088,9 @@ static int parse_section(struct section_buf *s)
 			break;
 		case TABLE_VCT_TERR:
 		case TABLE_VCT_CABLE:
-			verbose("ATSC VCT, table_id %d, table_id_ext %d\n",
-				table_id, table_id_ext);
+			verbose
+			    ("ATSC VCT, table_id %d, table_id_ext %d\n",
+			     table_id, table_id_ext);
 			parse_psip_vct(buf, section_length, table_id,
 				       table_id_ext);
 			break;
@@ -2313,8 +2483,8 @@ static int set_frontend(int frontend_fd, struct transponder *t)
 
 		if (scr_config.user_frequency > 0) {
 			// satellite channel routing.
-			if (setup_scr(frontend_fd, t, &this_lnb, &scr_config) !=
-			    0)
+			if (setup_scr
+			    (frontend_fd, t, &this_lnb, &scr_config) != 0)
 				return -2;
 			// repeat diseqc sequence after 100msec, because it may fail and we cannot check here.
 			usleep(100000);
@@ -2330,10 +2500,11 @@ static int set_frontend(int frontend_fd, struct transponder *t)
 
 				if (flags.emulate == 0) {
 					if (setup_switch
-					    (frontend_fd, committed_switch,
+					    (frontend_fd,
+					     committed_switch,
 					     t->polarization ==
-					     POLARIZATION_VERTICAL ? 0 : 1,
-					     switch_to_high_band,
+					     POLARIZATION_VERTICAL ? 0 :
+					     1, switch_to_high_band,
 					     uncommitted_switch) != 0)
 						return -2;	//error
 
@@ -2361,7 +2532,8 @@ static int set_frontend(int frontend_fd, struct transponder *t)
 					intermediate_freq =
 					    abs(t->frequency -
 						this_lnb.high_val);
-				em_lnb(t->polarization != POLARIZATION_VERTICAL,
+				em_lnb(t->polarization !=
+				       POLARIZATION_VERTICAL,
 				       this_lnb.high_val, this_lnb.low_val);
 			}
 		} else {	// Monopoint LNB w/o switch
@@ -2430,15 +2602,17 @@ static int set_frontend(int frontend_fd, struct transponder *t)
 
 	switch (flags.api_version) {
 	case 0x0500 ... 0x05FF:
-		//debug("%s: using DVB API %u.%u\n",
-		//  __FUNCTION__,
-		// flags.api_version >> 8,
-		// flags.api_version & 0xFF);
-
-		/* some 'shortcut' here :-)) --wk 20090324 */
+#ifdef HWDBG
+#define set_cmd_sequence(_cmd, _data)   cmds[sequence_len].cmd = _cmd; \
+                                                cmds[sequence_len].u.data = _data; \
+                                                cmdseq.num = ++sequence_len; \
+                                                info("%s:%d: %-40s = %d\n", __FUNCTION__,__LINE__, \
+                                                      property_name(_cmd), _data)
+#else
 #define set_cmd_sequence(_cmd, _data)   cmds[sequence_len].cmd = _cmd; \
                                                 cmds[sequence_len].u.data = _data; \
                                                 cmdseq.num = ++sequence_len
+#endif
 
 		set_cmd_sequence(DTV_CLEAR, DTV_UNDEFINED);
 		switch (t->type) {
@@ -2560,7 +2734,8 @@ static int __tune_to_transponder(int frontend_fd, struct transponder *t, int v)
 	if ((verbosity >= 1) && (v > 0)) {
 		char *buf = (char *)malloc(128);	// paranoia, max = 52
 		print_transponder(buf, t);
-		dprintf(1, "tune to: %s (time: %s) %s\n", buf, run_time(),
+		dprintf(1, "tune to: %s (time: %s) %s\n", buf,
+			run_time(),
 			t->last_tuning_failed ? " (no signal)" : "");
 		free(buf);
 	}
@@ -2618,7 +2793,6 @@ static int __tune_to_transponder(int frontend_fd, struct transponder *t, int v)
 		t->locks_with_params = true;
 		return 0;
 	}
-	t->locks_with_params = false;
 
 	if (v > 0)
 		info("----------no signal----------\n");
@@ -2626,7 +2800,7 @@ static int __tune_to_transponder(int frontend_fd, struct transponder *t, int v)
 		info("\n");
 
 	t->last_tuning_failed = 1;
-	t->locks_with_params = 1;
+	t->locks_with_params = false;
 
 	/* tuning didnt work, retry with auto. */
 	if (t->delsys != SYS_DVBS2)
@@ -2652,6 +2826,9 @@ static int tune_to_transponder(int frontend_fd, struct transponder *t)
 	}
 
 	for (st = scanned_transponders->first; st; st = st->next) {
+		if ((flags.scantype == SCAN_SATELLITE)
+		    && (t->polarization != st->polarization))
+			continue;
 		if (is_nearly_same_frequency
 		    (st->frequency, t->frequency, t->type)) {
 			known = true;
@@ -2692,16 +2869,15 @@ static int tune_to_next_transponder(int frontend_fd)
 		if (t->frequency && (tune_to_transponder(frontend_fd, t) == 0))
 			return 0;
 
-		if (t->other_frequency_flag && ((t->frequencies)->count > 0)) {
-			while (i < (t->frequencies)->count) {
+		if (t->other_frequency_flag && ((t->cells)->count > 0)) {
+			while (i < (t->cells)->count) {
 				struct transponder *test = NULL;
-				struct frequency_item *next =
-				    GetItem(t->frequencies, i++);
+				struct cell *next = GetItem(t->cells, i++);
 
 				if (next == NULL)
 					continue;	// GetItem may return NULL; dont want to segfault here.
 
-				t->frequency = next->frequency;
+				t->frequency = next->center_frequencies[0];
 				j = 0;
 				test = find_transponder_by_freq(t);
 				if ((test != NULL)
@@ -2712,10 +2888,10 @@ static int tune_to_next_transponder(int frontend_fd)
 						return 0;
 
 				}
-				while (j < (next->transposers)->count) {
-					struct frequency_item *transposer =
-					    GetItem(next->transposers, j++);
-					t->frequency = transposer->frequency;
+				while (j < next->num_transposers) {
+					t->frequency =
+					    next->
+					    transposers[j].transposer_frequency;
 					test = find_transponder_by_freq(t);
 					if ((test != NULL)
 					    &&
@@ -2874,7 +3050,8 @@ static bool initial_table_lookup(int frontend_fd)
 	    do {
 		result = read_filters();
 	}
-	while ((running_filters->count > 0) || (waiting_filters->count > 0));
+	while ((running_filters->count > 0)
+	       || (waiting_filters->count > 0));
 
 	if (result == 0) {
 		// doesnt look like valid tp.
@@ -2885,14 +3062,15 @@ static bool initial_table_lookup(int frontend_fd)
 	fe_get_delsys(frontend_fd, current_tp);
 	memset(&s, 0, sizeof(s));
 	verbose("        initial NIT lookup..\n");
-	setup_filter(&s, demux_devname, current_tp->network_PID, TABLE_NIT_ACT,
-		     -1, 1, 0, SECTION_FLAG_INITIAL);
+	setup_filter(&s, demux_devname, current_tp->network_PID,
+		     TABLE_NIT_ACT, -1, 1, 0, SECTION_FLAG_INITIAL);
 	add_filter(&s);
 	EMUL(em_readfilters, &result)
 	    do {
 		result = read_filters();
 	}
-	while ((running_filters->count > 0) || (waiting_filters->count > 0));
+	while ((running_filters->count > 0)
+	       || (waiting_filters->count > 0));
 	return true;
 }
 
@@ -2943,8 +3121,10 @@ static int initial_tune(int frontend_fd, int tuning_data)
 			// disable qam loop, disable symbolrate loop
 			modulation_min = modulation_max = 0;
 			dvbc_symbolrate_min = dvbc_symbolrate_max = 0;
+			// enable legacy delsys loop.
+			delsys_min = delsysloop_min(0, this_channellist);
 			// enable T2 loop.
-			delsys_max = 1;
+			delsys_max = delsysloop_max(0, this_channellist);
 			break;
 		case SCAN_CABLE:
 			// if choosen srate is too high for channellist's bandwidth,
@@ -2977,16 +3157,16 @@ static int initial_tune(int frontend_fd, int tuning_data)
 		 * please change freqs inside country.c for ATSC, DVB-T, DVB-C
 		 * and inside satellites.c for DVB-S(2)
 		 */
-		for (delsys_parm = delsys_min; delsys_parm <= delsys_max;
-		     delsys_parm++) {
+		for (delsys_parm = delsys_min;
+		     delsys_parm <= delsys_max; delsys_parm++) {
 			if ((delsys_parm > 0)
 			    && ((fe_info.caps & FE_CAN_2G_MODULATION) == 0)) {
 				break;
 			}
 			for (mod_parm = modulation_min;
 			     mod_parm <= modulation_max; mod_parm++) {
-				for (channel = 0; channel <= channel_max;
-				     channel++) {
+				for (channel = 0;
+				     channel <= channel_max; channel++) {
 					for (offs = freq_offset_min;
 					     offs <= freq_offset_max; offs++) {
 						for (sr_parm =
@@ -3029,24 +3209,23 @@ static int initial_tune(int frontend_fd, int tuning_data)
 								    (channel,
 								     this_channellist,
 								     offs);
-								if (test.
-								    bandwidth !=
-								    (__u32)
+								if (test.bandwidth != (__u32)
 								    bandwidth
 								    (channel,
 								     this_channellist))
 									info("Scanning %sMHz frequencies...\n", vdr_bandwidth_name(bandwidth(channel, this_channellist)));
-								test.frequency =
-								    f;
-								test.inversion =
+								test.frequency
+								    = f;
+								test.inversion
+								    =
 								    caps_inversion;
-								test.bandwidth =
-								    (__u32)
+								test.bandwidth
+								    = (__u32)
 								    bandwidth
 								    (channel,
 								     this_channellist);
-								test.coderate =
-								    caps_fec;
+								test.coderate
+								    = caps_fec;
 								test.coderate_LP
 								    = caps_fec;
 								test.modulation
@@ -3062,7 +3241,8 @@ static int initial_tune(int frontend_fd, int tuning_data)
 								test.delsys =
 								    delsys;
 								test.plp_id = 0;
-								time2carrier =
+								time2carrier
+								    =
 								    carrier_timeout
 								    (test.
 								     delsys);
@@ -3103,16 +3283,19 @@ static int initial_tune(int frontend_fd, int tuning_data)
 									fatal
 									    ("unknown modulation id\n");
 								}
-								test.frequency =
-								    f;
-								test.inversion =
+								test.frequency
+								    = f;
+								test.inversion
+								    =
 								    caps_inversion;
 								test.modulation
 								    = this_atsc;
-								test.delsys =
+								test.delsys
+								    =
 								    atsc_del_sys
 								    (this_atsc);
-								time2carrier =
+								time2carrier
+								    =
 								    carrier_timeout
 								    (test.
 								     delsys);
@@ -3156,11 +3339,9 @@ static int initial_tune(int frontend_fd, int tuning_data)
 								     (channel,
 								      this_channellist)))
 									continue;	//skip symbol rates higher than theoretical limit given by bw && roll_off
-								this_qam =
-								    caps_qam;
-								if (flags.
-								    qam_no_auto
-								    > 0) {
+								this_qam
+								    = caps_qam;
+								if (flags.qam_no_auto > 0) {
 									this_qam
 									    =
 									    dvbc_modulation
@@ -3168,17 +3349,20 @@ static int initial_tune(int frontend_fd, int tuning_data)
 									if (test.modulation != this_qam)
 										info("searching QAM%s...\n", vdr_modulation_name(this_qam));
 								}
-								test.inversion =
+								test.inversion
+								    =
 								    caps_inversion;
-								test.delsys =
+								test.delsys
+								    =
 								    SYS_DVBC_ANNEX_A;
 								test.modulation
 								    = this_qam;
 								test.symbolrate
 								    = this_sr;
-								test.coderate =
-								    caps_fec;
-								time2carrier =
+								test.coderate
+								    = caps_fec;
+								time2carrier
+								    =
 								    carrier_timeout
 								    (test.
 								     delsys);
@@ -3204,9 +3388,11 @@ static int initial_tune(int frontend_fd, int tuning_data)
 								}
 								break;
 							case SCAN_SATELLITE:
-								test.inversion =
+								test.inversion
+								    =
 								    caps_inversion;
-								test.frequency =
+								test.frequency
+								    =
 								    sat_list
 								    [this_channellist].
 								    items
@@ -3276,12 +3462,11 @@ static int initial_tune(int frontend_fd, int tuning_data)
 								    lock_timeout
 								    (test.
 								     delsys);
-								if (test.
-								    delsys ==
+								if (test.delsys
+								    ==
 								    SYS_DVBS2) {
 									if (!
-									    (fe_info.
-									     caps
+									    (fe_info.caps
 									     &
 									     FE_CAN_2G_MODULATION)
 || (flags.api_version < 0x0500)) {
@@ -3327,14 +3512,16 @@ static int initial_tune(int frontend_fd, int tuning_data)
 
 							// look for some signal.
 							while ((ret &
-								(FE_HAS_SIGNAL |
+								(FE_HAS_SIGNAL
+								 |
 								 FE_HAS_CARRIER))
 							       == 0) {
 								ret =
 								    check_frontend
 								    (frontend_fd,
 								     0);
-								if (ret !=
+								if (ret
+								    !=
 								    lastret) {
 									get_time
 									    (&meas_stop);
@@ -3374,8 +3561,8 @@ static int initial_tune(int frontend_fd, int tuning_data)
 								usleep(50000);
 							}
 							if ((ret &
-							     (FE_HAS_SIGNAL |
-							      FE_HAS_CARRIER))
+							     (FE_HAS_SIGNAL
+							      | FE_HAS_CARRIER))
 							    == 0) {
 								if (sr_parm ==
 								    dvbc_symbolrate_max)
@@ -3391,13 +3578,14 @@ static int initial_tune(int frontend_fd, int tuning_data)
 							set_timeout(time2lock * flags.tuning_timeout, &timeout);	// N msec * {1,2,3}
 
 							while ((ret &
-								FE_HAS_LOCK) ==
-							       0) {
+								FE_HAS_LOCK)
+							       == 0) {
 								ret =
 								    check_frontend
 								    (frontend_fd,
 								     0);
-								if (ret !=
+								if (ret
+								    !=
 								    lastret) {
 									get_time
 									    (&meas_stop);
@@ -3451,7 +3639,8 @@ static int initial_tune(int frontend_fd, int tuning_data)
 
 							if ((test.type ==
 							     SCAN_TERRESTRIAL)
-							    && (delsys !=
+							    && (delsys
+								!=
 								fe_get_delsys
 								(frontend_fd,
 								 NULL))) {
@@ -3462,7 +3651,7 @@ static int initial_tune(int frontend_fd, int tuning_data)
 							//   continue;
 							t = alloc_transponder(f,
 									      test.
-									      type,
+									      delsys,
 									      test.
 									      polarization);
 							t->type = ptest->type;
@@ -3470,8 +3659,8 @@ static int initial_tune(int frontend_fd, int tuning_data)
 							t->network_name = NULL;
 							init_tp(t);
 
-							copy_fe_params(t,
-								       ptest);
+							copy_fe_params
+							    (t, ptest);
 							print_transponder
 							    (buffer, t);
 							info("        signal ok:\t%s\n", buffer);
@@ -3593,7 +3782,8 @@ static void scan_tp_atsc(void)
 	    do {
 		read_filters();
 	}
-	while ((running_filters->count > 0) || (waiting_filters->count > 0));
+	while ((running_filters->count > 0)
+	       || (waiting_filters->count > 0));
 }
 
 static void scan_tp_dvb(void)
@@ -3612,7 +3802,8 @@ static void scan_tp_dvb(void)
 	    do {
 		read_filters();
 	}
-	while ((running_filters->count > 0) || (waiting_filters->count > 0));
+	while ((running_filters->count > 0)
+	       || (waiting_filters->count > 0));
 
 	// second run: now all filters; start slowest filters first.
 	setup_filter(&s[0], demux_devname, current_tp->network_PID,
@@ -3620,12 +3811,13 @@ static void scan_tp_dvb(void)
 	add_filter(&s[0]);
 	if (flags.get_other_nits > 0) {
 		/* Note: There is more than one NIT-other: one per network, separated by the network_id. */
-		setup_filter(&s[1], demux_devname, current_tp->network_PID,
-			     TABLE_NIT_OTH, -1, 1, 1, 0);
+		setup_filter(&s[1], demux_devname,
+			     current_tp->network_PID, TABLE_NIT_OTH, -1,
+			     1, 1, 0);
 		add_filter(&s[1]);
 	}
-	setup_filter(&s[2], demux_devname, PID_SDT_BAT_ST, TABLE_SDT_ACT, -1, 1,
-		     0, 0);
+	setup_filter(&s[2], demux_devname, PID_SDT_BAT_ST,
+		     TABLE_SDT_ACT, -1, 1, 0, 0);
 	add_filter(&s[2]);
 	setup_filter(&s[3], demux_devname, PID_PAT, TABLE_PAT, -1, 1, 0, 0);
 	add_filter(&s[3]);
@@ -3633,7 +3825,8 @@ static void scan_tp_dvb(void)
 	    do {
 		read_filters();
 	}
-	while ((running_filters->count > 0) || (waiting_filters->count > 0));
+	while ((running_filters->count > 0)
+	       || (waiting_filters->count > 0));
 }
 
 static void scan_tp(void)
@@ -3759,11 +3952,13 @@ static void dump_lists(int adapter, int frontend)
 				continue;	/* FTA only */
 			n++;
 		}
-		if ((verbosity > 4) && (flags.scantype == SCAN_SATELLITE)) {
+		if ((verbosity > 4)
+		    && (flags.scantype == SCAN_SATELLITE)) {
 			verbose
 			    ("{%d, %05u, %d, %05u, %-2d, %d, %-2d},              // (%-5d, %-5d,%-5d)\n",
 			     t->delsys, freq_scale(t->frequency, 1e-3),
-			     t->polarization, freq_scale(t->symbolrate, 1e-3),
+			     t->polarization, freq_scale(t->symbolrate,
+							 1e-3),
 			     t->coderate, t->rolloff, t->modulation,
 			     t->original_network_id, t->network_id,
 			     t->transport_stream_id);
@@ -3791,8 +3986,8 @@ static void dump_lists(int adapter, int frontend)
 		}
 		for (s = (t->services)->first; s; s = s->next) {
 			if (!s->service_name) {	// no service name in SDT                                
-				snprintf(sn, sizeof(sn), "service_id %d",
-					 s->service_id);
+				snprintf(sn, sizeof(sn),
+					 "service_id %d", s->service_id);
 				s->service_name = strdup(sn);
 			}
 			/* ':' is field separator in vdr service lists */
@@ -3800,8 +3995,8 @@ static void dump_lists(int adapter, int frontend)
 				if (s->service_name[i] == ':')
 					s->service_name[i] = ' ';
 			}
-			for (i = 0; s->provider_name && s->provider_name[i];
-			     i++) {
+			for (i = 0;
+			     s->provider_name && s->provider_name[i]; i++) {
 				if (s->provider_name[i] == ':')
 					s->provider_name[i] = ' ';
 			}
@@ -3815,22 +4010,21 @@ static void dump_lists(int adapter, int frontend)
 				continue;	/* FTA only */
 			switch (output_format) {
 			case OUTPUT_VDR:
-				vdr_dump_service_parameter_set(dest, s, t,
-							       &flags);
+				vdr_dump_service_parameter_set(dest, s,
+							       t, &flags);
 				break;
 			case OUTPUT_XINE:
-				xine_dump_service_parameter_set(dest, s, t,
-								&flags);
+				xine_dump_service_parameter_set(dest, s,
+								t, &flags);
 				break;
 			case OUTPUT_MPLAYER:
-				mplayer_dump_service_parameter_set(dest, s, t,
+				mplayer_dump_service_parameter_set(dest,
+								   s, t,
 								   &flags);
 				break;
 			case OUTPUT_VLC_M3U:
-				vlc_dump_service_parameter_set_as_xspf(dest, s,
-								       t,
-								       &flags,
-								       &this_lnb);
+				vlc_dump_service_parameter_set_as_xspf
+				    (dest, s, t, &flags, &this_lnb);
 				break;
 			default:
 				break;
@@ -3872,11 +4066,15 @@ bool fe_supports_scan(int fd, scantype_t type, struct dvb_frontend_info info)
 			fe_delivery_system_t delsys =
 			    p[0].u.buffer.data[p[0].u.buffer.len - 1];
 			const char *dname[] = {
-				"UNDEFINED", "DVB-C ann.A", "DVB-C ann.B",
-				"DVB-T", "DSS", "DVB-S", "DVB-S2", "DVB-H",
+				"UNDEFINED", "DVB-C ann.A",
+				"DVB-C ann.B",
+				"DVB-T", "DSS", "DVB-S", "DVB-S2",
+				"DVB-H",
 				"ISDB-T", "ISDB-S",
-				"ISDB-C", "ATSC", "ATSC/MH", "DTMB", "CMMB",
-				"DAB", "DVB-T2", "TURBO-FEC", "DVB-C ann.C"
+				"ISDB-C", "ATSC", "ATSC/MH", "DTMB",
+				"CMMB",
+				"DAB", "DVB-T2", "TURBO-FEC",
+				"DVB-C ann.C"
 			};
 			verbose("           %s\n",
 				delsys <=
@@ -4217,10 +4415,11 @@ int main(int argc, char **argv)
 		case 'a':	//adapter
 			if (strstr(optarg, "/dev/dvb")) {
 				if (sscanf
-				    (optarg, "/dev/dvb/adapter%d/frontend%d",
+				    (optarg,
+				     "/dev/dvb/adapter%d/frontend%d",
 				     &adapter, &frontend) != 2)
-					adapter = DVB_ADAPTER_AUTO, frontend =
-					    0;
+					adapter =
+					    DVB_ADAPTER_AUTO, frontend = 0;
 			} else {
 				adapter = DVB_ADAPTER_AUTO, frontend = 0;
 				if (sscanf(optarg, "%d", &adapter) < 1) {
@@ -4326,8 +4525,8 @@ int main(int argc, char **argv)
 				char c = 'A';
 				int i1 = 0, i2 = 0, i3 = 0xFFFF;
 				if (sscanf
-				    (optarg, "%d:%d:%c:%d", &i1, &i2, &c,
-				     &i3) < 3)
+				    (optarg, "%d:%d:%c:%d", &i1, &i2,
+				     &c, &i3) < 3)
 					bad_usage(argv[0]);
 				scr_config.slot = i1;
 				scr_config.user_frequency = i2;
@@ -4466,8 +4665,9 @@ int main(int argc, char **argv)
 				break;
 			default:
 				cleanup();
-				fatal("Could not parse Argument \"-D\"\n"
-				      "Should be number followed \"u\" or \"c\"\n");
+				fatal
+				    ("Could not parse Argument \"-D\"\n"
+				     "Should be number followed \"u\" or \"c\"\n");
 			}
 			break;
 		case 'E':	//include encrypted channels
@@ -4550,8 +4750,9 @@ int main(int argc, char **argv)
 		cleanup();
 		return 0;
 	}
-	info("%s version %s (compiled for DVB API %d.%d)\n", PACKAGE_NAME,
-	     PACKAGE_VERSION, DVB_API_VERSION, DVB_API_VERSION_MINOR);
+	info("%s version %s (compiled for DVB API %d.%d)\n",
+	     PACKAGE_NAME, PACKAGE_VERSION, DVB_API_VERSION,
+	     DVB_API_VERSION_MINOR);
 	if (NULL == initdata) {
 		if ((NULL == country) && (scantype != SCAN_SATELLITE)) {
 			country =
@@ -4570,7 +4771,8 @@ int main(int argc, char **argv)
 		cleanup();
 		return -1;
 	}
-	if (((adapter >= DVB_ADAPTER_MAX) && (adapter != DVB_ADAPTER_AUTO)
+	if (((adapter >= DVB_ADAPTER_MAX)
+	     && (adapter != DVB_ADAPTER_AUTO)
 	     && (!flags.emulate)) || (adapter < 0)) {
 		info("Invalid adapter: out of range (0..%d)\n",
 		     DVB_ADAPTER_MAX - 1);
@@ -4618,8 +4820,9 @@ int main(int argc, char **argv)
 			cl(positionfile);
 			if (!valid_rotor_data) {
 				cleanup();
-				fatal("could not parse rotor position file\n"
-				      "CHECK IDENTIFIERS AND FILE FORMAT.\n");
+				fatal
+				    ("could not parse rotor position file\n"
+				     "CHECK IDENTIFIERS AND FILE FORMAT.\n");
 			}
 		}
 		if (scr_config.user_frequency)
@@ -4650,8 +4853,8 @@ int main(int argc, char **argv)
 			sleep(10);	// enshure that user reads warning.
 		}
 	}
-	info("scan type %s, channellist %d\n", scantype_to_text(scantype),
-	     this_channellist);
+	info("scan type %s, channellist %d\n",
+	     scantype_to_text(scantype), this_channellist);
 	switch (output_format) {
 	case OUTPUT_VDR:
 		switch (flags.vdr_version) {
@@ -4723,8 +4926,9 @@ int main(int argc, char **argv)
 					continue;
 				}
 				/* determine FE type and caps */
-				if (ioctl(frontend_fd, FE_GET_INFO, &fe_info) ==
-				    -1) {
+				if (ioctl
+				    (frontend_fd, FE_GET_INFO,
+				     &fe_info) == -1) {
 					info("   ERROR: unable to determine frontend type\n");
 					close(frontend_fd);
 					continue;
@@ -4743,10 +4947,12 @@ int main(int argc, char **argv)
 					    (fe_info.caps, fe_info.name,
 					     scantype) >= device_preferred) {
 						if (device_is_preferred
-						    (fe_info.caps, fe_info.name,
+						    (fe_info.caps,
+						     fe_info.name,
 						     scantype) >
 						    device_preferred) {
-							device_preferred =
+							device_preferred
+							    =
 							    device_is_preferred
 							    (fe_info.caps,
 							     fe_info.name,
@@ -4778,9 +4984,10 @@ int main(int argc, char **argv)
 			}	// END: for j
 		}		// END: for i
 		if (adapter < DVB_ADAPTER_AUTO) {
-			snprintf(frontend_devname, sizeof(frontend_devname),
-				 "/dev/dvb/adapter%i/frontend%i", adapter,
-				 frontend);
+			snprintf(frontend_devname,
+				 sizeof(frontend_devname),
+				 "/dev/dvb/adapter%i/frontend%i",
+				 adapter, frontend);
 			info("Using %s frontend (adapter %s)\n",
 			     scantype_to_text(scantype), frontend_devname);
 		}
@@ -4804,8 +5011,8 @@ int main(int argc, char **argv)
 	EMUL(em_open, &frontend_fd)
 	    if ((frontend_fd = open(frontend_devname, fe_open_mode)) < 0) {
 		cleanup();
-		fatal("failed to open '%s': %d %s\n", frontend_devname, errno,
-		      strerror(errno));
+		fatal("failed to open '%s': %d %s\n", frontend_devname,
+		      errno, strerror(errno));
 	}
 	info("-_-_-_-_ Getting frontend capabilities-_-_-_-_ \n");
 	/* determine FE type and caps */
@@ -4875,6 +5082,13 @@ int main(int argc, char **argv)
 		} else {
 			info("FEC_AUTO not supported, trying FEC_NONE.\n");
 			caps_fec = FEC_NONE;
+		}
+		if (fe_info.caps & FE_CAN_BANDWIDTH_AUTO) {
+			info("BANDWIDTH_AUTO\n");
+			bandwidth_auto = true;
+		} else {
+			info("BANDWIDTH_AUTO not supported, trying 6/7/8 MHz.\n");
+			bandwidth_auto = false;
 		}
 		if (fe_info.frequency_min == 0 || fe_info.frequency_max == 0) {
 			info("This dvb driver is *buggy*: the frequency limits are undefined - please report to linuxtv.org\n");

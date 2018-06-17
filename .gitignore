@@ -52,6 +52,7 @@ Makefile.in
 # editors
 *.swp
 *.swo
+*~
 
 # other
 *.pyc

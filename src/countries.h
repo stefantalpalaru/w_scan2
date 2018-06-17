@@ -41,6 +41,8 @@ enum channellist_t {
 	DVBC_FR = 9,
 	DVBC_BR = 10,
 	ISDBT_6MHZ = 11,
+	DAB_DE = 12,
+	DVBT2_CO = 13,
 	USERLIST = 999
 };
 
@@ -84,6 +86,8 @@ int freq_offset(int channel, int channellist, int index);
 int max_dvbc_srate(int bandwidth);
 
 int dvbt_transmission_mode(int channel, int channellist);
+int delsysloop_min(int channel, int channellist);
+int delsysloop_max(int channel, int channellist);
 
 int dvbc_qam_max(int channel, int channellist);
 int dvbc_qam_min(int channel, int channellist);

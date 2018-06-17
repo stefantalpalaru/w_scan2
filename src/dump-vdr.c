@@ -35,70 +35,162 @@ struct cTr {
 };
 
 static struct cTr translations[] = {
-	{"S4E8", "S5E"},
-	{"S7E0", "S7E"},
-	{"S9E0", "S9E"},
-	{"S10E0", "S10E"},
-	{"S13E0", "S13E"},
-	{"S16E0", "S16E"},
-	{"S19E2", "S19.2E"},
-	{"S21E6", "S21.6E"},
-	{"S23E5", "S23.5E"},
-	{"S25E5", "S25.5E"},
-	{"S26EX", "S26E"},
-	{"S28E2", "S28.2E"},
-	{"S28E5", "S28.5E"},
-	{"S31E5", "S31.5E"},
-	{"S32E9", "S33E"},
-	{"S33E0", "S33E"},
-	{"S35E9", "S36E"},
-	{"S36E0", "S36E"},
-	{"S38E0", "S38E"},
-	{"S39E0", "S39E"},
-	{"S40EX", "S40E"},
-	{"S42E0", "S42E"},
-	{"S45E0", "S45E"},
-	{"S49E0", "S49E"},
-	{"S53E0", "S53E"},
-	{"S57E0", "S56E"},
-	{"S57EX", "S57E"},
-	{"S60EX", "S60E"},
-	{"S62EX", "S62E"},
-	{"S64E2", "S64E"},
-	{"S68EX", "S68.5E"},
-	{"S70E5", "S70.5E"},
-	{"S72EX", "S72E"},
-	{"S75EX", "S75E"},
-	{"S76EX", "S76.5E"},
-	{"S78E5", "S78.5E"},
-	{"S80EX", "S80E"},
-	{"S83EX", "S83E"},
-	{"S87E5", "S87.5E"},
-	{"S88EX", "S88E"},
-	{"S90EX", "S90E"},
-	{"S91E5", "S91.5E"},
-	{"S93E5", "S93.5E"},
-	{"S95E0", "S95E"},
-	{"S96EX", "S96.5E"},
-	{"S100EX", "S100.5E"},
-	{"S105EX", "S105.5E"},
-	{"S108EX", "S108E"},
-	{"S140EX", "S140E"},
-	{"S160E0", "S160E"},
-	{"S0W8", "S1W"},
-	{"S4W0", "S4W"},
-	{"S5WX", "S5W"},
-	{"S7W0", "S7W"},
-	{"S8W0", "S8W"},
-	{"S11WX", "S11W"},
-	{"S12W5", "S12.5W"},
-	{"S14W0", "S14W"},
-	{"S15W0", "S15W"},
-	{"S18WX", "S18W"},
-	{"S22WX", "S22W"},
-	{"S24WX", "S24.5W"},
-	{"S27WX", "S27.5W"},
-	{"S30W0", "S30W"}
+	{"S180E0", "S180E"},	// S180E   Intelsat 18                     //
+	{"S172E0", "S172E"},	// S172E   Eutelsat 172A                   //
+	{"S169E0", "S169E"},	// S169E   Intelsat 8                      //
+	{"S166E0", "S166E"},	// S166E   Intelsat 19                     //
+				// S164E   Optus B3                        //
+	{"S162E0", "S162E"},	// S162E   Superbird B2                    //
+	{"S160E0", "S160E"},	// S160E   Optus D1                        //
+	{"S156E0", "S156E"},	// S156E   Optus C1/D3                     //
+	{"S154E0", "S154E"},	// S154E   JCSAT 2A                        //
+	{"S152E0", "S152E"},	// S152E   Optus D2                        //
+				// S150E   JCSAT 1B                        //
+	{"S144E0", "S144E"},	// S144E   Superbird C2                    //
+	{"S140E0", "S140E"},	// S140E   Express AM3                     //
+	{"S138E0", "S138E"},	// S138E   Telstar 18                      //
+	{"S134E0", "S134E"},	// S134E   Apstar 6                        //
+	{"S132E0", "S132E"},	// S132E   Vinasat 1 & JCSAT 5A            //
+	{"S128E0", "S128E"},	// S128E   JCSAT 3A                        //
+	{"S125E0", "S125E"},	// S125E   ChinaSat 6A                     //
+	{"S124E0", "S124E"},	// S124E   JCSAT 4B                        //
+	{"S122E2", "S122.2E"},	// S122.2E Asiasat 4                       //
+				// S119.5E Thaicom 4                       //
+	{"S118E0", "S118E"},	// S118E   Telkom 2                        //
+	{"S116E0", "S116E"},	// S116E   ABS 7 & Koreasat 6              //
+	{"S115E5", "S115.5E"},	// S115.5E ChinaSat 6B                     //
+	{"S113E0", "S113E"},	// S113E   Palapa D & Koreasat 5           //
+	{"S110E5", "S110.5E"},	// S110.5E ChinaSat 10                     //
+	{"S110E0", "S110E"},	// S110E   N-Sat 110 & BSAT 3A/3C          //
+	{"S108E2", "S108.2E"},	// S108.2E Telkom 1 & NSS 11 & SES 7       //
+	{"S105E5", "S105.5E"},	// S105.5E Asiasat 3S                      //
+	{"S103E0", "S103E"},	// S103E   Express A2                      //
+	{"S100E5", "S100.5E"},	// S100.5E Asiasat 5                       //
+	{"S96E5", "S96.5E"},	// S96.5E  Express AM33                    //
+	{"S95E0", "S95E"},	// S95E    NSS 6                           //
+	{"S93E5", "S93.5E"},	// S93.5E  Insat 3A/4B                     //
+				// S92.2E  ChinaSat 9                      //
+	{"S91E5", "S91.5E"},	// S91.5E  Measat 3/3A                     //
+	{"S90E0", "S90E"},	// S90E    Yamal 201/300K                  //
+	{"S88E0", "S88E"},	// S88E    ST 2                            //
+	{"S87E5", "S87.5E"},	// S87.5E  ChinaSat 12                     //
+	{"S86E5", "S86.5E"},	// S86.5E                                  //
+	{"S85E0", "S85.2E"},	// S85.2E  Intelsat 15 & Horizons 2        //
+	{"S83E0", "S83E"},	// S83E    Insat 4A                        //
+				// S80E    Express AM2                     //
+	{"S78E5", "S78.5E"},	// S78.5E  Thaicom 5/6A                    //
+	{"S76E5", "S76.5E"},	// S76.5E  Apstar 7                        //
+	{"S75E0", "S75E"},	// S75E    ABS 1A                          //
+				// S74E    Insat 3C/4CR                    //
+				// S72E    Intelsat 22                     //
+	{"S70E5", "S70.5E"},	// S70.5E  Eutelsat 70B                    //
+	{"S68E5", "S68.5E"},	// S68.5E  Intelsat 7/10                   //
+	{"S66E0", "S66E"},	// S66E    Intelsat 17                     //
+	{"S64E2", "S64E"},	// S64E    Intelsat 906                    //
+	{"S62E0", "S62E"},	// S62E    Intelsat 902                    //
+	{"S60E0", "S60E"},	// S60E    Intelsat 904                    //
+	{"S57E0", "S57E"},	// S57E    NSS 12                          //
+	{"S56E0", "S56E"},	// S56E    DirecTV 1R                      //
+	{"S53E0", "S53E"},	// S53E    Express AM22                    //
+	{"S52E5", "S52.5E"},	// S52.5E  Yahsat 1A                       //
+	{"S49E0", "S49E"},	// S49E    Yamal 202                       //
+				// S47.5E  Intelsat 10                     //
+				// S46E    Azerspace-1                     //
+	{"S45E0", "S45E"},	// S45E    Intelsat 12                     //
+	{"S42E0", "S42E"},	// S42E    Turksat 2A/3A                   //
+	{"S40E0", "S40E"},	// S40E    Express AM1                     //
+	{"S39E0", "S39E"},	// S39E    Hellas Sat 2                    //
+	{"S38E0", "S38E"},	// S38E    Paksat 1R                       //
+	{"S36E0", "S36E"},	// S36E    Eutelsat 36A/36B                //
+	{"S33E0", "S33E"},	// S33E    Eutelsat 33A & Intelsat 28      //
+	{"S31E5", "S31.5E"},	// S31.5E  Astra 1G                        //
+	{"S30E5", "S30.5E"},	// S30.5E  Arabsat 5A                      //
+	{"S28E2", "S28.2E"},	// S28.2E  Astra 1N/2A/2F                  //
+	{"S26E0", "S26E"},	// S26E    Badr C/3/4/5/6                  //
+	{"S25E5", "S25.5E"},	// S25.5E  Eutelsat 25B                    //
+	{"S23E5", "S23.5E"},	// S23.5E  Astra 3B                        //
+	{"S21E6", "S21.6E"},	// S21.6E  Eutelsat 21B                    //
+	{"S20E0", "S20E"},	// S20E    Arabsat 5C                      //
+	{"S19E2", "S19.2E"},	// S19.2E  Astra 1KR/1L/1M/2C              //
+				// S17E    Amos 5                          //
+	{"S16E0", "S16E"},	// S16E    Eutelsat 16A/16B                //
+	{"S13E0", "S13E"},	// S13E    Eutelsat Hot Bird 13B/13C/13D   //
+	{"S10E0", "S10E"},	// S10E    Eutelsat 10A                    //
+	{"S9E0", "S9E"},	// S9E     Eutelsat 9A/Ka-Sat 9A           //
+	{"S7E0", "S7E"},	// S7E     Eutelsat 7A                     //
+	{"S4E8", "S4.8E"},	// S4.8E   Astra 4A & SES 5                //
+				// S4E     Eutelsat 4B                     //
+	{"S3E0", "S3E"},	// S3E     Eutelsat 3A/3D & Rascom 1R      //
+	{"S0W8", "S1W"},	// S1W     Thor 3/5 & Intelsat 10-02       //
+	{"S4W0", "S4W"},	// S4W     Amos 1/2/3                      //
+	{"S5W0", "S5W"},	// S5W     Eutelsat 5 West A               //
+	{"S7W0", "S7W"},	// S7W     Nilesat 101/201 & Eutelsat 7W A //
+	{"S8W0", "S8W"},	// S8W     Eutelsat 8 West A/C             //
+	{"S11W0", "S11W"},	// S11W    Express AM44                    //
+	{"S12W5", "S12.5W"},	// S12.5W  Eutelsat 12 West A              //
+	{"S14W0", "S14W"},	// S14W    Express A4                      //
+	{"S15W0", "S15W"},	// S15W    Telstar 12                      //
+	{"S18W0", "S18W"},	// S18W    Intelsat 901                    //
+	{"S20W0", "S20W"},	// S20W    NSS 7                           //
+	{"S22W0", "S22W"},	// S22W    SES 4                           //
+	{"S24W5", "S24.5W"},	// S24.5W  Intelsat 905                    //
+	{"S27W5", "S27.5W"},	// S27.5W  Intelsat 907                    //
+	{"S30W0", "S30W"},	// S30W    Hispasat 1D/1E                  //
+	{"S31W5", "S31.5W"},	// S31.5W  Intelsat 25                     //
+	{"S34W5", "S34.5W"},	// S34.5W  Intelsat 903                    //
+	{"S37W5", "S37.5W"},	// S37.5W  NSS 10 & Telstar 11N            //
+	{"S40W5", "S40.5W"},	// S40.5W  SES 6                           //
+	{"S43W0", "S43W"},	// S43W    Intelsat 11                     //
+	{"S45W0", "S45W"},	// S45W    Intelsat 14                     //
+	{"S50W0", "S50W"},	// S50W    Intelsat 1R                     //
+	{"S53W0", "S53W"},	// S53W    Intelsat 23                     //
+	{"S55W5", "S55.5W"},	// S55.5W  Intelsat 805                    //
+	{"S58W0", "S58W"},	// S58W    Intelsat 21                     //
+				// S61W    Amazonas 2/3                    //
+				// S61.5W  Echostar 16                     //
+	{"S63W0", "S63W"},	// S63W    Telstar 14R                     //
+	{"S65W0", "S65W"},	// S65W    Star One C1                     //
+				// S67W    AMC 4                           //
+	{"S70W0", "S70W"},	// S70W    Star One C2                     //
+	{"S72W0", "S72W"},	// S72W    AMC 6                           //
+				// S72.7W  Nimiq 5                         //
+				// S75W    Star One C3                     //
+				// S77W    QuetzSat 1                      //
+	{"S78W0", "S78W"},	// S78W                                    //
+				// S82W    Nimiq 4                         //
+	{"S83W0", "S83W"},	// S83W    AMC 9                           //
+	{"S84W0", "S84W"},	// S84W    Brasilsat B4                    //
+	{"S85W0", "S85W"},	// S85W    AMC 16                          //
+				// S85.1W  XM 3                            //
+	{"S87W0", "S87W"},	// S87W    SES 2                           //
+	{"S89W0", "S89W"},	// S89W    Galaxy 28                       //
+	{"S91W0", "S91W"},	// S91W    Galaxy 17 & Nimiq 6             //
+	{"S93W1", "S93.1W"},	// S93.1W  Galaxy 25                       //
+	{"S95W0", "S95W"},	// S95W    Galaxy 3C                       //
+	{"S97W0", "S97W"},	// S97W    Galaxy 19                       //
+	{"S99W2", "S99W2"},	// S99.2W  Galaxy 16                       //
+	{"S101W0", "S101W"},	// S101W   DirecTV 4S/8 & SES 1            //
+	{"S103W0", "S103W"},	// S103W   AMC 1                           //
+	{"S105W0", "S105W"},	// S105W   AMC 15/18                       //
+	{"S107W3", "S107.3W"},	// S107.3W Anik F1R/G1                     //
+				// S110W   DirecTV 5 & Echostar 10/11      //
+	{"S111W1", "S111.1W"},	// S111.1W Anik F2                         //
+	{"S113W0", "S113W"},	// S113W   SatMex 6                        //
+				// S114.9W SatMex 5                        //
+	{"S116W8", "S116.8W"},	// S116.8W SatMex 8                        //
+	{"S119W0", "S118.8W"},	// S118.8W Anik F3                         //
+				// S119W   Echostar 14 & DirecTV 7S        //
+	{"S121W0", "S121W"},	// S121W   Echostar 9/Galaxy 23            //
+	{"S123W0", "S123W"},	// S123W   Galaxy 18                       //
+	{"S125W0", "S125W"},	// S125W   Galaxy 14 & AMC 21              //
+	{"S127W0", "S127W"},	// S127W   Galaxy 13/Horizons 1            //
+				// S129W   Ciel 2                          //
+	{"S131W0", "S131W"},	// S131W   AMC 11                          //
+	{"S133W0", "S133W"},	// S133W   Galaxy 15                       //
+	{"S135W0", "S135W"},	// S135W   AMC 10                          //
+	{"S137W0", "S137W"},	// S137W   AMC 7                           //
+	{"S139W0", "S139W"},	// S139W   AMC 8                           //
+	{"S177W0", "S177W"},	// S177W   NSS 9                           //
 };
 
 #define TR_COUNT(x) (sizeof(x)/sizeof(struct cTr))

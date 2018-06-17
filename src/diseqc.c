@@ -571,7 +571,7 @@ static int scr_cmd(int frontend_fd, struct dvb_diseqc_master_cmd *diseqc)
 	}
 	msleep(5);		// AN2056: "more than 4ms" after 13V -> 18V; EN50494: 4..22ms
 
-	if ((err = ioctl(frontend_fd, FE_DISEQC_SEND_MASTER_CMD, &diseqc))) {
+	if ((err = ioctl(frontend_fd, FE_DISEQC_SEND_MASTER_CMD, diseqc))) {
 		info("%s:%d: FE_DISEQC_SEND_MASTER_CMD failed.\n", __FUNCTION__,
 		     __LINE__);
 		return err;

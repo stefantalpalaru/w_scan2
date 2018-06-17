@@ -268,7 +268,8 @@ void xml_dump(FILE * dest, pList transponders)
 							    "%s<param terr_interleaver=\"%s\"/>\n",
 							    get_indent(indent),
 							    interleaver_name
-							    (t->terr_interleaver));
+							    (t->
+							     terr_interleaver));
 					if needs_param
 						(coderate_LP)
 						    fprintf(dest,
@@ -309,8 +310,8 @@ void xml_dump(FILE * dest, pList transponders)
 						    get_indent(indent),
 						    t->plp_id);
 				if ((t->other_frequency_flag != false)
-				    && ((t->frequencies)->count > 0)) {
-					struct frequency_item *f, *g;
+				    && ((t->cells)->count > 0)) {
+					struct cell *f;
 					if needs_param
 						(other_frequency_flag) {
 						fprintf(dest,
@@ -321,21 +322,14 @@ void xml_dump(FILE * dest, pList transponders)
 							"%s<frequency_list>\n",
 							get_indent(indent));
 						indent++;
-						for (f = t->frequencies->first;
-						     f; f = f->next) {
+						for (f = t->cells->first; f;
+						     f = f->next) {
 							if (t->tfs_flag) {
 								fprintf(dest,
 									"%s<tfs_center>\n",
 									get_indent
 									(indent));
 
-							} else {
-								for (g =
-								     f->transposers->first;
-								     g;
-								     g =
-								     g->next) {
-								}
 							}
 						}
 

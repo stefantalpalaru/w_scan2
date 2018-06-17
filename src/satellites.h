@@ -65,6 +65,7 @@ struct cSat {
 	const uint16_t orbital_position;
 	int rotor_position;	// Note: *not* const
 	const char *source_id;	// VDR sources.conf
+	const int skew;
 };
 #define SAT_COUNT(x) (sizeof(x)/sizeof(struct cSat))
 

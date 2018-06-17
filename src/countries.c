@@ -23,6 +23,7 @@
 #include "scan.h"
 #include <stdio.h>
 #include <string.h>
+#include <strings.h>
 #include <unistd.h>
 #include <ctype.h>
 #include <locale.h>
@@ -97,6 +98,7 @@ int choose_country(const char *country,
 	case AT:		//      AUSTRIA
 	case BE:		//      BELGIUM
 	case CH:		//      SWITZERLAND
+	case CO:		//      COLOMBIA, DVB-C + DVB-T2
 	case CZ:		//      CZECH REPUBLIC
 	case DE:		//      GERMANY
 	case DK:		//      DENMARK
@@ -255,6 +257,17 @@ int choose_country(const char *country,
 			info("QAM US/CA\n");
 		}
 		break;
+	case CO:		//      COLOMBIA, 6MHz offs 389MHz
+		switch (*dvb) {
+		case SCAN_CABLE:
+			info("cable colombia not yet defined.\n");
+			break;
+		default:
+			*channellist = DVBT2_CO;
+			info("DVB-T2 CO\n");
+			break;
+		}
+		break;
 	case BR:		//      BRAZIL, DVB-C/ISDB-T w. ATSC freq list
 		switch (*dvb) {
 		case SCAN_CABLE:
@@ -315,6 +328,16 @@ int base_offset(int channel, int channellist)
 		default:
 			return SKIP_CHANNEL;
 		}
+	case DVBT2_CO:		// DVB-T2 Colombia, 6 MHz step
+		switch (channel) {
+			//channels 21..51 are not stated as digital,
+			//however ch 27, 28, 43 are marked as T2 in other docs.
+			//scan up to ch 51 (end of band V)
+		case 14 ... 51:
+			return 389000000;
+		default:
+			return SKIP_CHANNEL;
+		}
 	case ISDBT_6MHZ:	// ISDB-T, 6 MHz central frequencies
 		switch (channel) {
 			// Channels 7-13 are reserved but aren't used yet
@@ -324,7 +347,7 @@ int base_offset(int channel, int channellist)
 		default:
 			return SKIP_CHANNEL;
 		}
-	case DVBT_AU:		//AUSTRALIA, 7MHz step list
+	case DVBT_AU:		//AUSTRALIA, 7MHz step list, offset 0/+125kHz
 		switch (channel) {
 		case 5 ... 12:
 			return 142500000;
@@ -337,8 +360,8 @@ int base_offset(int channel, int channellist)
 	case DVBT_FR:		//FRANCE, +/- offset 166kHz & +offset 332kHz & +offset 498kHz
 	case DVBT_GB:		//UNITED KINGDOM, +/- offset
 		switch (channel) {
-		case 5 ... 12:
-			return 142500000;	// VHF unused in FRANCE, skip those in offset loop
+			/*case  5 ... 12: */
+			/*return  142500000; // VHF no longer used in Europe. */
 		case 21 ... 69:
 			return 306000000;
 		default:
@@ -387,8 +410,9 @@ int freq_step(int channel, int channellist)
 	case ATSC_QAM:
 	case ATSC_VSB:
 	case DVBC_BR:
+	case DVBT2_CO:
 	case ISDBT_6MHZ:
-		return 6000000;	// atsc, 6MHz step
+		return 6000000;	// atsc region, 6MHz step
 	case DVBT_AU:
 		return 7000000;	// dvb-t australia, 7MHz step
 	case DVBT_DE:
@@ -579,6 +603,40 @@ int dvbt_transmission_mode(int channel, int channellist)
 		// GB seems to use 8k since 12/2009
 	default:
 		return TRANSMISSION_MODE_8K;
+	}
+}
+
+/*
+ * some countries don't use legacy delsys anymore
+ */
+int delsysloop_min(int channel, int channellist)
+{
+	switch (channellist) {
+	case DVBT2_CO:
+		return 1;	//DVB-T2 only.
+	default:
+		return 0;
+	}
+}
+
+/*
+ * some countries don't use 2nd gen delsys yet
+ */
+int delsysloop_max(int channel, int channellist)
+{
+	switch (channellist) {
+	case ATSC_VSB:
+	case ATSC_QAM:
+	case DVBC_QAM:
+	case DVBC_FI:
+	case DVBC_FR:
+	case DVBC_BR:
+	case ISDBT_6MHZ:
+	case DAB_DE:
+	case USERLIST:
+		return 0;
+	default:
+		return 1;
 	}
 }
 
@@ -913,8 +971,7 @@ const char *country_to_full_name(int idx)
 	for (i = 0; i < COUNTRY_COUNT(country_list); i++)
 		if (idx == country_list[i].id)
 			return country_list[i].full_name;
-	warning
-	    ("COUNTRY CODE NOT DEFINED. PLEASE RE-CHECK WETHER YOU TYPED CORRECTLY.\n");
+	warning("COUNTRY CODE NOT DEFINED. PLEASE RE-CHECK WETHER YOU TYPED CORRECTLY.\n");
 	usleep(5000000);
 	return "GERMANY";	// w_scan2 defaults to DVB-t de_DE
 }
