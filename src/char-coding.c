@@ -1,7 +1,7 @@
 /*
  * Simple MPEG/DVB parser to achieve network/service information without initial tuning data
  *
- * Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 Winfried Koehler 
+ * Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 Winfried Koehler
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -42,7 +42,7 @@
 
 /*
  * handle character set correctly (via glib iconv),
- * ISO/EN 300 468 annex A 
+ * ISO/EN 300 468 annex A
  */
 void char_coding(char **inbuf, size_t * inbytesleft, char **outbuf,
 		 size_t * outbytesleft, unsigned user_charset_id)
@@ -412,7 +412,7 @@ int get_user_codepage(void)
 		// Note: program's locale is not changed here, since locale isn't given.
 		//       the returned char * should be "C", "POSIX" or something valid.
 		//       If valid, we can only *guess* which format is returned.
-		//       Assume here something like "de_DE.iso8859-1@euro" or "de_DE.utf-8" 
+		//       Assume here something like "de_DE.iso8859-1@euro" or "de_DE.utf-8"
 		if (!(buf = setlocale(cats[cat], "")) || strlen(buf) < 2)
 			continue;
 

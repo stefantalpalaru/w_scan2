@@ -1,7 +1,7 @@
 /*
  * Simple MPEG/DVB parser to achieve network/service information without initial tuning data
  *
- * Copyright (C) 2006-2014 Winfried Koehler 
+ * Copyright (C) 2006-2014 Winfried Koehler
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -84,7 +84,7 @@ const xml_param xml_params[] = {
 	{"input_stream_id", {SYS_DVBS2, 0}, NO_AUTO},
 	{"pilot", {SYS_DVBS2, 0}, PILOT_AUTO},
 
-	// 
+	//
 	{"interleave", {SYS_DTMB, 0}, INTERLEAVING_AUTO},
 
 	// C2_delivery_system_descriptor

@@ -1,7 +1,7 @@
 /*
  * Simple MPEG/DVB parser to achieve network/service information without initial tuning data
  *
- * Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 Winfried Koehler 
+ * Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 Winfried Koehler
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,7 +27,7 @@ int get_codepage_index(const char *codepage);
 
 /*
  * handle character set correctly (via libiconv),
- * ISO/EN 300 468 annex A 
+ * ISO/EN 300 468 annex A
  *
  * WARNING: do NOT pass pointers to temporarly allocated memory here, which should be freed afterwards.
  * *inbuf && *outbuf will point to *different* memory afterwards.

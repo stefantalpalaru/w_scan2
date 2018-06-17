@@ -1,7 +1,7 @@
 /*
  * Simple MPEG/DVB parser to achieve network/service information without initial tuning data
  *
- * Copyright (C) 2006 - 2014 Winfried Koehler 
+ * Copyright (C) 2006 - 2014 Winfried Koehler
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,7 +27,7 @@
 #include "tools.h"
 
 /*******************************************************************************
-/* common typedefs && logging.                                                  
+/* common typedefs && logging.
  ******************************************************************************/
 int verbosity = 2;		// need signed -> use of fatal()
 
@@ -310,7 +310,7 @@ void SwapItem(pList list, pItem a, pItem b)
 
 // sort the list. assign sort criteria function
 // 'compare' to list before first use.
-// warning: procedure is *slow* for large lists. 
+// warning: procedure is *slow* for large lists.
 void SortList(pList list, cmp_func compare)
 {
 	dbg("%s %d: list:'%s'\n", __FUNCTION__, __LINE__, list->name);

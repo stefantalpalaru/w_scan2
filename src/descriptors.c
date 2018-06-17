@@ -1,7 +1,7 @@
 /*
  * Simple MPEG/DVB parser to achieve network/service information without initial tuning data
  *
- * Copyright (C) 2006-2014 Winfried Koehler 
+ * Copyright (C) 2006-2014 Winfried Koehler
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -729,7 +729,7 @@ void parse_cable_delivery_system_descriptor(const unsigned char *buf,
 	   character (e.g. 0312,0000 MHz).
 	 */
 	t->frequency = 100 * bcd32_to_cpu(buf[2], buf[3], buf[4], buf[5]);
-	//t->reserved_future_use = (buf[6] << 4) | ((buf[7] & 0xf0) >> 4); 
+	//t->reserved_future_use = (buf[6] << 4) | ((buf[7] & 0xf0) >> 4);
 	//FEC_outer 4 bslbf -> not used by linuxtv dvb api. WHY?
 	//   switch (buf[7] & 0x0f) {
 	//      case 1: t->fec_outer = FEC_NONE;       break;
@@ -1040,7 +1040,7 @@ void parse_terrestrial_delivery_system_descriptor(const unsigned char *buf,
 	t->other_frequency_flag = ((buf[8] & 0x01) != 0);	// other_frequency_flag 1 bslbf
 	// reserved_future_use 32 bslbf
 	// ----------------------------------------------------------------------------
-	if (center_frequency > 0) {	// now: add center freq. 
+	if (center_frequency > 0) {	// now: add center freq.
 		if (!t->other_frequency_flag)
 			t->frequency = center_frequency;
 		else {
@@ -1339,7 +1339,7 @@ void parse_T2_delivery_system_descriptor(const unsigned char *buf,
 					cell->center_frequencies
 					    [cell->num_center_frequencies++]
 					    = center_frequency;
-				}	// frequency_loop                                                                    //              }  
+				}	// frequency_loop                                                                    //              }
 			}	// end tfs flag                                                                         //          }
 			else {	//      else { // no tfs_flag, just one center freq. the usual case.
 				center_frequency = 10 * get_u32(bp);
@@ -1953,7 +1953,7 @@ void parse_SH_delivery_system_descriptor(const unsigned char
 			case 4:
 				modulation_loop[n_modulations].code_rate
 				    = FEC_1_3;
-				break;	//                     // 1/3 standard 
+				break;	//                     // 1/3 standard
 			case 5:
 				modulation_loop[n_modulations].code_rate
 				    = FEC_1_3_C;
@@ -1965,11 +1965,11 @@ void parse_SH_delivery_system_descriptor(const unsigned char
 			case 7:
 				modulation_loop[n_modulations].code_rate
 				    = FEC_2_5_C;
-				break;	//                     // 2/5 complementary 
+				break;	//                     // 2/5 complementary
 			case 8:
 				modulation_loop[n_modulations].code_rate
 				    = FEC_1_2;
-				break;	//                     // 1/2 standard 
+				break;	//                     // 1/2 standard
 			case 9:
 				modulation_loop[n_modulations].code_rate
 				    = FEC_1_3_C;
@@ -1984,10 +1984,10 @@ void parse_SH_delivery_system_descriptor(const unsigned char
 				break;	//                     // 2/3 complementary
 				//case 12 ... 15: reserved for future use                                                   //
 			default:
-				modulation_loop[n_modulations].code_rate = FEC_AUTO;	//        
-			}	//                                 
+				modulation_loop[n_modulations].code_rate = FEC_AUTO;	//
+			}	//
 			bp++;
-			descriptor_length--;	//  
+			descriptor_length--;	//
 			switch ((*bp >> 1) & 0x1F) {	//         symbol_rate 5 bslbf
 			case 0:
 				modulation_loop[n_modulations].bandwidth = 8000000;	//                     // 00000 8   1/4  34/5    32/5    29/5
@@ -2072,7 +2072,7 @@ void parse_SH_delivery_system_descriptor(const unsigned char
 					    = TDM_64_11;
 					break;
 				}	//
-				break;	//        
+				break;	//
 			case 4:
 				modulation_loop[n_modulations].bandwidth = 7000000;	//                     // 00100 7   1/4  119/20  28/5    203/40
 				modulation_loop[n_modulations].guard = GUARD_INTERVAL_1_4;	//
@@ -2176,7 +2176,7 @@ void parse_SH_delivery_system_descriptor(const unsigned char
 					    [n_modulations].symbol_rate
 					    = TDM_87_20;
 					break;
-				}	// 
+				}	//
 				break;	//
 			case 9:
 				modulation_loop[n_modulations].bandwidth = 6000000;	//                     // 01001 6   1/8  31/6    14/3    13/3
@@ -2468,7 +2468,7 @@ void parse_SH_delivery_system_descriptor(const unsigned char
 				case 4:
 					modulation_loop
 					    [n_modulations].code_rate = FEC_1_3;
-					break;	//                     // 1/3 standard 
+					break;	//                     // 1/3 standard
 				case 5:
 					modulation_loop
 					    [n_modulations].code_rate =
@@ -2482,11 +2482,11 @@ void parse_SH_delivery_system_descriptor(const unsigned char
 					modulation_loop
 					    [n_modulations].code_rate =
 					    FEC_2_5_C;
-					break;	//                     // 2/5 complementary 
+					break;	//                     // 2/5 complementary
 				case 8:
 					modulation_loop
 					    [n_modulations].code_rate = FEC_1_2;
-					break;	//                     // 1/2 standard 
+					break;	//                     // 1/2 standard
 				case 9:
 					modulation_loop
 					    [n_modulations].code_rate =
@@ -2503,7 +2503,7 @@ void parse_SH_delivery_system_descriptor(const unsigned char
 					break;	//                     // 2/3 complementary
 					//case 12 ... 15: reserved for future use                                                //
 				default:
-					modulation_loop[n_modulations].code_rate = FEC_AUTO;	//        
+					modulation_loop[n_modulations].code_rate = FEC_AUTO;	//
 				}	//
 				bp++;
 				descriptor_length--;	//
@@ -2529,7 +2529,7 @@ void parse_SH_delivery_system_descriptor(const unsigned char
 					    GUARD_INTERVAL_1_4;
 					break;	//                     // 11 1/4
 				default:;	//
-				}	// 
+				}	//
 				switch ((*bp & 0x6) >> 1) {	//        transmission_mode 2 bslbf
 				case 0:
 					modulation_loop[n_modulations].transmission = TRANSMISSION_MODE_1K;	//                     // 00 1k
@@ -2544,7 +2544,7 @@ void parse_SH_delivery_system_descriptor(const unsigned char
 					modulation_loop[n_modulations].transmission = TRANSMISSION_MODE_8K;	//                     // 11 8k
 					break;	//
 				default:;	//
-				}	// 
+				}	//
 				modulation_loop[n_modulations].common_frequency = *bp & 0x1;	//        common_frequency 1 bslbf
 				bp++;
 				descriptor_length--;	//

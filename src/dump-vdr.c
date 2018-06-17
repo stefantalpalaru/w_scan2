@@ -1,7 +1,7 @@
 /*
  * Simple MPEG/DVB parser to achieve network/service information without initial tuning data
  *
- * Copyright (C) 2006-2014 Winfried Koehler 
+ * Copyright (C) 2006-2014 Winfried Koehler
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -196,7 +196,7 @@ static struct cTr translations[] = {
 #define TR_COUNT(x) (sizeof(x)/sizeof(struct cTr))
 
 /******************************************************************************
- * translate short names used by w_scan2 into VDR satellite identifiers. 
+ * translate short names used by w_scan2 into VDR satellite identifiers.
  *
  *****************************************************************************/
 
@@ -210,7 +210,7 @@ static const char *short_name_to_vdr_name(const char *satname)
 }
 
 /******************************************************************************
- * translate VDR satellite identifiers into short names used by w_scan2. 
+ * translate VDR satellite identifiers into short names used by w_scan2.
  *
  *****************************************************************************/
 
@@ -224,7 +224,7 @@ const char *vdr_name_to_short_name(const char *satname)
 }
 
 /******************************************************************************
- * translate linuxtv inversions to VDR inversion identifiers. 
+ * translate linuxtv inversions to VDR inversion identifiers.
  *
  *****************************************************************************/
 
@@ -241,7 +241,7 @@ const char *vdr_inversion_name(int inversion)
 }
 
 /******************************************************************************
- * translate linuxtv forw err corr to VDR fec identifiers. 
+ * translate linuxtv forw err corr to VDR fec identifiers.
  *
  *****************************************************************************/
 
@@ -276,7 +276,7 @@ const char *vdr_fec_name(int fec)
 }
 
 /******************************************************************************
- * translate linuxtv modulation types to VDR > 1.7.0 identifiers. 
+ * translate linuxtv modulation types to VDR > 1.7.0 identifiers.
  *
  *****************************************************************************/
 
@@ -321,7 +321,7 @@ const char *vdr_modulation_name(int modulation)
 }
 
 /******************************************************************************
- * translate linuxtv bandwidth values to VDR identifiers. 
+ * translate linuxtv bandwidth values to VDR identifiers.
  *
  *****************************************************************************/
 
@@ -346,7 +346,7 @@ const char *vdr_bandwidth_name(int bandwidth)
 }
 
 /******************************************************************************
- * translate linuxtv tm values to VDR identifiers. 
+ * translate linuxtv tm values to VDR identifiers.
  *
  *****************************************************************************/
 
@@ -371,7 +371,7 @@ const char *vdr_transmission_mode_name(int transmission_mode)
 }
 
 /******************************************************************************
- * translate linuxtv guard values to VDR identifiers. 
+ * translate linuxtv guard values to VDR identifiers.
  *
  *****************************************************************************/
 
@@ -419,7 +419,7 @@ const char *vdr_hierarchy_name(int hierarchy)
 }
 
 /******************************************************************************
- * translate linuxtv rolloffs values to VDR identifiers. 
+ * translate linuxtv rolloffs values to VDR identifiers.
  *
  *****************************************************************************/
 
@@ -436,7 +436,7 @@ const char *vdr_rolloff_name(int rolloff)
 }
 
 /******************************************************************************
- * translate linuxtv delivery_system values to VDR identifiers. 
+ * translate linuxtv delivery_system values to VDR identifiers.
  *
  *****************************************************************************/
 
@@ -455,7 +455,7 @@ const char *vdr_delsys_name(int delsys)
 }
 
 /******************************************************************************
- * print "frequency:<params>:symbolrate:" to 'f' in vdr >= 1.7.4 format 
+ * print "frequency:<params>:symbolrate:" to 'f' in vdr >= 1.7.4 format
  * NOTE: 1.7.0 .. 1.7.3 not supported here.
  *****************************************************************************/
 #define vdrprint(fd, Param, Default, ID, Value) if (Param != Default) fprintf(fd,"%s%s", ID, Value)
@@ -545,7 +545,7 @@ void dump_param_vdr(FILE * f, struct transponder *t, struct w_scan_flags *flags)
 }
 
 /******************************************************************************
- * print complete vdr channels.conf line from service params. 
+ * print complete vdr channels.conf line from service params.
  *
  *****************************************************************************/
 

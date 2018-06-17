@@ -1,7 +1,7 @@
 /*
  * Simple MPEG/DVB parser to achieve network/service information without initial tuning data
  *
- * Copyright (C) 2006 - 2014 Winfried Koehler 
+ * Copyright (C) 2006 - 2014 Winfried Koehler
  * Copyright © 2016-2017 Ștefan Talpalaru <stefantalpalaru@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or
@@ -92,7 +92,7 @@ struct w_scan_flags flags = {
 	0,			// need 2nd generation frontend
 	DE,			// country index or sat index
 	1,			// tuning speed {1 = fast, 2 = medium, 3 = slow}
-	0,			// filter timeout {0 = default, 1 = long} 
+	0,			// filter timeout {0 = default, 1 = long}
 	1,			// get_other_nits, atm always
 	1,			// add_frequencies, atm always
 	1,			// dump_provider, dump also provider name
@@ -117,9 +117,9 @@ static unsigned int dvbc_symbolrate_max = 1;	// initialization of symbolrate loo
 static unsigned int freq_offset_min = 0;	// initialization of freq offset loop. 0 == offset (0), 1 == offset(+), 2 == offset(-), 3 == offset1(+), 4 == offset2(+)
 static unsigned int freq_offset_max = 4;	// initialization of freq offset loop.
 static int this_channellist = DVBT_DE;	// w_scan2 uses by default DVB-t
-static unsigned int ATSC_type = ATSC_VSB;	// 20090227: flag type vars shouldnt be signed. 
-static unsigned int no_ATSC_PSIP = 0;	// 20090227: initialization was missing, signed -> unsigned                
-static unsigned int serv_select = 3;	// 20080106: radio and tv as default (no service/other). 20090227: flag type vars shouldnt be signed. 
+static unsigned int ATSC_type = ATSC_VSB;	// 20090227: flag type vars shouldnt be signed.
+static unsigned int no_ATSC_PSIP = 0;	// 20090227: initialization was missing, signed -> unsigned
+static unsigned int serv_select = 3;	// 20080106: radio and tv as default (no service/other). 20090227: flag type vars shouldnt be signed.
 static int this_rotor_pos = -1;	// 20090320: DVB-S/S2, current rotor position
 static int committed_switch = 0;	// 20090320: DVB-S/S2, DISEQC committed switch position
 static int uncommitted_switch = 0;	// 20090320: DVB-S/S2, DISEQC uncommitted switch position
@@ -1351,7 +1351,7 @@ em_static void parse_pmt(const unsigned char *buf,
 					     AC3_CHAN_MAX);
 				break;
 			}
-			// we shouldn't reach this one, usually it should be Teletext, Subtitling or AC3 .. 
+			// we shouldn't reach this one, usually it should be Teletext, Subtitling or AC3 ..
 			moreverbose
 			    ("  unknown private data: PID 0x%04x\n",
 			     elementary_pid);
@@ -1382,17 +1382,17 @@ em_static void parse_pmt(const unsigned char *buf,
 			// DSM-CC may be used for controlling the video reception, providing features normally found
 			// on VCR (fast-forward, rewind, pause, etc). It may also be used for a wide variety of other purposes
 			// including packet data transport. MPEG-2 ISO/IEC 13818-6 (part 6 of the MPEG-2 standard).
-			// 
+			//
 			// DSM-CC defines or extends five distinct protocols:
-			//  * User-User 
-			//  * User-Network 
+			//  * User-User
+			//  * User-Network
 			//  * MPEG transport profiles (profiles to the standard MPEG transport protocol ISO/IEC 13818-1 to allow
 			//          transmission of event, synchronization, download, and other information in the MPEG transport stream)
-			//  * Download 
+			//  * Download
 			//  * Switched Digital Broadcast-Channel Change Protocol (SDB/CCP)
 			//         Enables a client to remotely switch from channel to channel in a broadcast environment.
 			//         Used to attach a client to a continuous-feed session (CFS) or other broadcast feed. Sometimes used in pay-per-view.
-			// 
+			//
 			moreverbose("  DSM-CC U-N Messages : PID %d\n",
 				    elementary_pid);
 			break;
@@ -1637,7 +1637,7 @@ em_static void parse_nit(const unsigned char *buf,
 		if ((current_tp->original_network_id == original_network_id)
 		    && (current_tp->transport_stream_id == transport_stream_id)
 		    && (table_id == TABLE_NIT_ACT)) {
-			// if we've found the current tp by onid && ts_id and update it from nit(act), use actual settings as default.      
+			// if we've found the current tp by onid && ts_id and update it from nit(act), use actual settings as default.
 			copy_fe_params(&tn, current_tp);	//  tn.param = current_tp->param;
 		}
 
@@ -1665,7 +1665,7 @@ em_static void parse_nit(const unsigned char *buf,
 				// only nit_actual should update transponders, too much garbage in satellite nit_other.
 				if (update_pids) {
 					update_pids = false;
-					// 300468: The combination of original_network_id and transport_stream_id allow each TS to be uniquely 
+					// 300468: The combination of original_network_id and transport_stream_id allow each TS to be uniquely
 					//         identified throughout the application area of the present document.
 					//         Any sections of the NIT which describe the actual network (that is, the network of which
 					//         the TS containing the NIT is a part) shall have the table_id 0x40. (TABLE_NIT_ACT)
@@ -1973,7 +1973,7 @@ static int parse_section(struct section_buf *s)
 	if (s->table_id != table_id)
 		return -1;
 //section_syntax_indicator = buf[1] & 0x80;
-	section_length = (((buf[1] & 0x0f) << 8) | buf[2]) - 9;	// skip 9bytes: 5byte header + 4byte CRC32 
+	section_length = (((buf[1] & 0x0f) << 8) | buf[2]) - 9;	// skip 9bytes: 5byte header + 4byte CRC32
 
 	if (!crc_check(&buf[0], section_length + 12)) {
 		int verbosity = 5;
@@ -2419,12 +2419,12 @@ static int read_filters(void)
 // static int mem_is_zero(const void * mem, unsigned int size) {
 //   const char * p = mem;
 //   unsigned long i;
-// 
+//
 //   for(i=0; i<size; i++) {
 //      if (p[i] != 0x0)
 //         return 0;
 //   }
-// 
+//
 //   return 1;
 // }
 
@@ -3029,7 +3029,7 @@ uint16_t fe_get_delsys(int frontend_fd, struct transponder * t)
 	if (t != NULL) {
 		t->delsys = p[0].u.data;
 	}
-	return p[0].u.data;	// success           
+	return p[0].u.data;	// success
 }
 
 /* called during first scan loop. scans an successful tuned new transponder's
@@ -3686,7 +3686,7 @@ static int initial_tune(int frontend_fd, int tuning_data)
 							break;
 						}	// END: for sr_parm
 					}	// END: for offs
-				}	// END: for channel       
+				}	// END: for channel
 			}	// END: for mod_parm
 		}		// END: for delsys_parm
 	}			// END: if (tuning_data <= 0)
@@ -3985,7 +3985,7 @@ static void dump_lists(int adapter, int frontend)
 			continue;
 		}
 		for (s = (t->services)->first; s; s = s->next) {
-			if (!s->service_name) {	// no service name in SDT                                
+			if (!s->service_name) {	// no service name in SDT
 				snprintf(sn, sizeof(sn),
 					 "service_id %d", s->service_id);
 				s->service_name = strdup(sn);
@@ -4100,7 +4100,7 @@ bool fe_supports_scan(int fd, scantype_t type, struct dvb_frontend_info info)
 			default:;
 			}
 		}
-		return result;	// not found.           
+		return result;	// not found.
 	} else {
 		warning("YOU ARE USING OUTDATED DVB DRIVERS.\n");
 		p[0].cmd = DTV_DELIVERY_SYSTEM;
@@ -5224,7 +5224,7 @@ int main(int argc, char **argv)
 		// DVB API v5 doesnt allow checking for
 		// S2 capabilities fec3/5, fec9/10, PSK_8,
 		// allowed rolloff..
-		// 
+		//
 		break;
 	default:
 		cleanup();

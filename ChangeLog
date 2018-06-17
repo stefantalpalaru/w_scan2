@@ -80,7 +80,7 @@ ChangeLog:
  - alloc_transponder(): check for polarization on sat.
  - update S19E2, based on emulated scan with logfiles
    from easy-vdr.de developers.
- - move freq calculations from Hz to MHz to separate func 
+ - move freq calculations from Hz to MHz to separate func
  - if tuning fails on on any tp; instead of simply retrying with same
    settings -> redo with as much as possible params to AUTO. On some
    wrong NIT tables, params are just wrong, this *may* help in some cases.
@@ -124,7 +124,7 @@ ChangeLog:
    - reduce diseqc repeat to 100ms
    - remove a few comments and debug stuff
    - still experimental, waiting for tests - if you own such devices, pls send
-     me logs: 'w_scan -fs -s SXXX (..) -u<ID>:<USERBAND>:<A|B> 2>&1 | tee log.txt' 
+     me logs: 'w_scan -fs -s SXXX (..) -u<ID>:<USERBAND>:<A|B> 2>&1 | tee log.txt'
  - VLC xspf
    - remove unused stuff && started to adopt to current vlc;
      but no doc avail for this VLC file format. :(
@@ -150,11 +150,11 @@ ChangeLog:
          since DVB-S means by DVB standard *always* RO = 0.35
  - print transponder data from satellite list during scan to make debug reports easier
    to read
-   
+
 2012-05-25
  - update all supported satellites
  - add the following satellites:
-     * 180.0 east Intelsat 18  
+     * 180.0 east Intelsat 18
      * 172.0 east GE 23
      * 169.0 east Intelsat 5
      * 162.0 east Superbird B2
@@ -251,7 +251,7 @@ ChangeLog:
       make install
 2012-01-28
  - modify dvb api < 5.5 logic, to find out which delsys are supported by hw
- - init-data: plot only verified data 
+ - init-data: plot only verified data
  - transponder scan logic modified:
     - alloc_transponder(): add newly allocated transponder only to new_transponders,
       if freq not yet known.
@@ -276,7 +276,7 @@ ChangeLog:
 
 2012-01-07
  - big cleanup:
-    - no longer tune with dvb api 3.2 drivers (pls upgrade your drivers) 
+    - no longer tune with dvb api 3.2 drivers (pls upgrade your drivers)
     - remove all occurencies of..
        - BANDWIDTH_*
        - FE_QPSK
@@ -329,13 +329,13 @@ ChangeLog:
    old: output standard audio only.
    new: output AC3 audio. If not found, fall back to standard audio
  - change mplayer output:
-   old: output '+' separated list of standard audio pids.   
+   old: output '+' separated list of standard audio pids.
    new: output '+' separated list of ac3 audio pids, followed by standard audio pids.
  - change vlc xspf output:
    - apply stray newlines patch for vlc dvb-s format,
      as reported by Juergen Lock (cosmetics)
    - convert to UTF-8 using glibc
-   - remove unneeded duplicated char recoding 
+   - remove unneeded duplicated char recoding
 
 2011-07-02
  - add requested format 'Gstreamer Plugin dvbsrc'
@@ -377,7 +377,7 @@ ChangeLog:
    - add 6086
    - add 5217
    - remove 7000, because unreasonable
- - update man page accordingly 
+ - update man page accordingly
  - update S23E5 TP16
 
 2011-03-13
@@ -392,7 +392,7 @@ ChangeLog:
  - fix memory leak in scan.c:2654 (main; char * country)
  - fix memory leak in scan.c:2722 (main; char * satellite)
  - fix memory leak in scan.c:3192 (main; char * initdata)
- - remove unused videodev.h from countries.c. Thanks to Felix Kaechele. 
+ - remove unused videodev.h from countries.c. Thanks to Felix Kaechele.
  - fix octals in countries.c (backport from vdr-plugin wirbelscan-0.0.7)
  - check/report hardware frequency and symbolrate limits to avoid error
    messages in syslog
@@ -401,7 +401,7 @@ ChangeLog:
 2011-02-06
  - bugfix: fix wrong comparison in check_frontend(), which lets the caller assume
    that to not yet have pll lock and wait until timeout is over. This may speed up
-   each tuning to a new transponder a little. Thanks to Dick Streefland. 
+   each tuning to a new transponder a little. Thanks to Dick Streefland.
  - set PILOT_AUTO on satellite transponders found by NIT. There's no flag inside NIT
    to find explicitly 'ON' or 'OFF', so AUTO is the very best approach here.
    Thanks to Dick Streefland.
@@ -416,7 +416,7 @@ ChangeLog:
  - multiple AC3 pids
  - bug fix: missing string termination in parse_psip_vct (ATSC only)
  - cosmetics
- 
+
 2010-10-01
  - add: DVB-C symbol rates 6956, 6956.5 for New Zealand
  - mplayer output format as suggested by Pedro A. Aranda
@@ -435,13 +435,13 @@ ChangeLog:
  - add Telstar 5 S97W0
  - add ATSC channel syntax VDR-1.7.14
  - add DVB-C symbol rates 5156, 5483
- 
+
 2009-12-30
  - DVB-T UK: default to 8k transmission mode
 
 2009-11-18
- - allow any 5.xx DVB API 
- - removed some compiling warnings w. glibc-2.10.1/gcc-4.4.2 
+ - allow any 5.xx DVB API
+ - removed some compiling warnings w. glibc-2.10.1/gcc-4.4.2
  - update transponders S28E2
 
 2009-08-08
@@ -450,7 +450,7 @@ ChangeLog:
  - changed struct tvct_channel to avoid gcc-4.4 warnings
  - is_nearly_same_frequency changed to allow 2MHz on sat; 500kHz otherwise
  - bugfix: is_different_transponder_deep_scan:304 auto = "ROLLOFF_AUTO"
- 
+
 2009-05-23
  - added S160E (requested by realkano)
  - using configure scripts now. If anybody can help improving configure script - you're welcome..
@@ -478,11 +478,11 @@ ChangeLog:
  - restructured code
  - changed DVB-C frequency list
  - added freq list for Australia
- - improved freq lists for FR, GB, FI 
+ - improved freq lists for FR, GB, FI
  - added Option -e, extended scan flags, which allows to extend the scan to
     * additional scan QAM_128 (default: QAM_AUTO with fallback to QAM_64 + QAM_256)
     or
-    * scan these additional symbolrates (default: 6900 and 6875 only) 
+    * scan these additional symbolrates (default: 6900 and 6875 only)
         6111, 6250, 6790, 6811, 5900, 5000, 3450, 6950, 7000, 6952
    NOTE: expert settings, will slow down by a factor of up to 10.
  - reintroduced possibility to set manually
@@ -503,7 +503,7 @@ ChangeLog:
 			-D (DiSEqC switch)
  - w_scan now shares the list of satellites with wirbelscan plugin (0.0.5 pre1 or higher)
  - removed folder patches (obsolet)
- 
+
 2008-11-06
  - improved frontend detection (thanks to Hans Werner)
  - added a patch for single frequency scanning, see folder patches.
@@ -542,7 +542,7 @@ ChangeLog:
 2006-08-10
  - w_scan start script (first version)
 2006-07-05:
- - removed QAM256 option "-Q", w_scan now uses either QAM_AUTO or (if not supported by hardware) 
+ - removed QAM256 option "-Q", w_scan now uses either QAM_AUTO or (if not supported by hardware)
    it will do a two-step scan starting with QAM64 and QAM256
 2006-02-16:
  - changed initialization for all cards, fix for airstar2 dvb-t and avermedia 771 dvb-t

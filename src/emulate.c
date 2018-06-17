@@ -553,7 +553,7 @@ void em_readfilters(int *result)
 				      __FUNCTION__, __LINE__, filter->table_id);
 			}
 			//if (filter->run_once) /* probably i would have to check version nums here. */
-			//   break;                 
+			//   break;
 		}
 
 		if (!data_found) {
@@ -759,7 +759,7 @@ static int parse_tp(const char *str)
 		//    vdr_transmission_mode_name(em_device.transmission),              \
 		//    vdr_guard_name(em_device.guard),                                 \
 		//    vdr_hierarchy_name(em_device.hierarchy),                         \
-		//    mbuf); 
+		//    mbuf);
 		break;
 	case SCAN_TERRCABLE_ATSC:
 		sscanf(str, "%8s f=%u kHz ", mbuf, &args[0]);
@@ -1343,7 +1343,7 @@ static int parse_logfile(const char *log)
 			unsigned args[9];
 			int nargs, tmp;
 //                            parse_section:1376: pid 0x10 tid 0x40 table_id_ext 0x0056, 2/3 (version 16)
-//                            parse_section:1376: pid 17 (0x11), tid 66 (0x42), table_id_ext 30 (0x001e), section_number 0, last_section_number 0, version 3\n" 
+//                            parse_section:1376: pid 17 (0x11), tid 66 (0x42), table_id_ext 30 (0x001e), section_number 0, last_section_number 0, version 3\n"
 			nargs = sscanf(line, "parse_section:%d: pid %x tid %x table_id_ext %x, %i/%i (version %i)",	//",
 				       &tmp, &args[0], &args[1], &args[2], &args[3], &args[4], &args[5]);	//);
 			if (nargs != 7)
@@ -1401,7 +1401,7 @@ static int parse_logfile(const char *log)
 				if (fgets(line, 256, logfile) != NULL) {
 					EM_INFO("next: %s\n", line);
 				}
-				line_no++;	//"NIT (act" 
+				line_no++;	//"NIT (act"
 				if (fgets(line, 256, logfile) != NULL) {
 					EM_INFO("next: %s\n", line);
 				}

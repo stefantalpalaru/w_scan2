@@ -279,7 +279,7 @@ float rotor_angle(uint16_t channellist)
 }
 
 /******************************************************************************
- * positioning status bits, see "3.11. Read Positioner Status Byte (Level 2.2)" 
+ * positioning status bits, see "3.11. Read Positioner Status Byte (Level 2.2)"
  *
  ******************************************************************************/
 
@@ -365,7 +365,7 @@ extern int rotate_rotor(int frontend_fd, int *from, int to, uint8_t voltage_18,
 	if (to > -1) {
 		if (*from != to) {
 			if (*from < 0) {
-				/* starting from unknown position, therefore 
+				/* starting from unknown position, therefore
 				 * assuming worst case: 180°
 				 * diseqc-2.2 rotor should stop earlier
 				 */
@@ -637,7 +637,7 @@ static void scr_prepare_tune_EN50494(uint16_t fIF, struct scr *config,
 		diseqc->msg[5] = config->pin;
 	}
 	diseqc->msg[3] = (config->slot << 5) |	// slot        is D0 bit 7..5
-	    (hiband << 2) |	// hi/lo band  is D0 bit 2 
+	    (hiband << 2) |	// hi/lo band  is D0 bit 2
 	    (horizontal << 3) |	// polariz     is D0 bit 3
 	    (config->pos << 4);	// sat pos A/B is D0 bit 4
 
@@ -655,7 +655,7 @@ static void scr_prepare_tune_EN50494(uint16_t fIF, struct scr *config,
  *    0         on success
  *    non-zero  on error (check errno)
  *
- * As EN50494 is not available to me, i collected known details here:  
+ * As EN50494 is not available to me, i collected known details here:
  *  - http://www.vdr-wiki.de/wiki/index.php/SCR_Satellite_Channel_Routing
  */
 int setup_scr(int frontend_fd, struct transponder *t, struct lnb_types_st *lnb,

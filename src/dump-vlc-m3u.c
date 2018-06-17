@@ -337,7 +337,7 @@ void vlc_dump_dvb_parameters_as_xspf(FILE * f, struct transponder *t,
 		break;
 
 	case SCAN_SATELLITE:
-		/* NOTE: VLC         20140102) more than 3 years later.. 
+		/* NOTE: VLC         20140102) more than 3 years later..
 		 *       now supports DVB API v5 and S2 - good. But still seems to miss Rotor/positioner, SCR and DISEQC support.
 		 *       But at least they broke this xspf file format successfully several times in this time.
 		 *       - Comma vs. Semicolon change
@@ -455,7 +455,7 @@ void vlc_dump_service_parameter_set_as_xspf(FILE * f, struct service *s,
 				buf[j++] = 'o';
 				buf[j++] = 's';
 				buf[j++] = ';';
-			} else if (range(u, 0x3C, 0x3C)) {	// less-than sign 
+			} else if (range(u, 0x3C, 0x3C)) {	// less-than sign
 				buf[j++] = '&';
 				buf[j++] = 'l';
 				buf[j++] = 't';

@@ -1,7 +1,7 @@
 /*
  * Simple MPEG/DVB parser to achieve network/service information without initial tuning data
  *
- * Copyright (C) 2006, 2007, 2008, 2009 Winfried Koehler 
+ * Copyright (C) 2006, 2007, 2008, 2009 Winfried Koehler
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -681,7 +681,7 @@ int atsc_is_qam(int atsc)
 	return (atsc & ATSC_QAM);
 }
 
-/* 
+/*
  * two letters constants from ISO 3166-1.
  * sorted alphabetically by long country name
  */

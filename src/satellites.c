@@ -1,7 +1,7 @@
 /*
  * Simple MPEG/DVB parser to achieve network/service information without initial tuning data
  *
- * Copyright (C) 2006, 2007, 2008, 2009 Winfried Koehler 
+ * Copyright (C) 2006, 2007, 2008, 2009 Winfried Koehler
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -140,7 +140,7 @@ void print_satellites(void)
 //        param->sat.symbol_rate       = sat_list[i].items[table_index].symbol_rate;
 //        param->sat.fec_inner         = sat_list[i].items[table_index].fec_inner;
 //        param->sat.rolloff           = sat_list[i].items[table_index].rolloff;
-//        param->sat.modulation_type   = sat_list[i].items[table_index].modulation_type;    
+//        param->sat.modulation_type   = sat_list[i].items[table_index].modulation_type;
 //        return 1;
 //        }
 //return 0; // error
