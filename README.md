@@ -8,7 +8,7 @@ It's based on the old "scan" tool from linuxtv-dvb-apps-1.1.0. The differences a
 - it detects automatically which DVB/ATSC card to use
 - much more output formats, interfacing to other dtv software.
 
-*w\_scan2* is a fork of the original *w\_scan* from http://wirbel.htpc-forum.de/w\_scan/index2.html
+*w\_scan2* is a fork of the original *w\_scan* from http://wirbel.htpc-forum.de/w_scan/index2.html
 
 #### main changes from **w\_scan** to **w\_scan2**
 
