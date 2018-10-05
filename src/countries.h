@@ -84,6 +84,8 @@ int freq_step(int channel, int channellist);
 int bandwidth(int channel, int channellist);
 int freq_offset(int channel, int channellist, int index);
 int max_dvbc_srate(int bandwidth);
+int plp_id_loop_min (int country_id);
+int plp_id_loop_max (int country_id);
 
 int dvbt_transmission_mode(int channel, int channellist);
 int delsysloop_min(int channel, int channellist);

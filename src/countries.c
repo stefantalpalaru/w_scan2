@@ -1048,6 +1048,26 @@ int get_user_country(void)
 	return DE;
 }
 
+int plp_id_loop_min (int country_id)
+{
+	switch (country_id) {
+	case AT:		//      AUSTRIA
+		return 0;	// may be changed to 1, because it seems that only PLP 1 is used in Austria 
+	default:
+		return 0;
+	}
+}
+
+int plp_id_loop_max (int country_id)
+{
+	switch (country_id) {
+	case AT:		//      AUSTRIA
+		return 1;
+	default:
+		return 0;
+	}
+}
+
 #ifdef VDRVERSNUM
 }				// end namespace COUNTRY
 #endif

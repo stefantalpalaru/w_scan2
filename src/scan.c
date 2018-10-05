@@ -115,7 +115,7 @@ static unsigned int modulation_max = 1;	// initialization of modulation loop. QA
 static unsigned int dvbc_symbolrate_min = 0;	// initialization of symbolrate loop. 6900
 static unsigned int dvbc_symbolrate_max = 1;	// initialization of symbolrate loop. 6875
 static unsigned int plp_id_min = 0; // initialization of delsys loop.
-static unsigned int plp_id_max = 1; // initialization of delsys loop.
+static unsigned int plp_id_max = 0; // initialization of delsys loop.
 static unsigned int freq_offset_min = 0;	// initialization of freq offset loop. 0 == offset (0), 1 == offset(+), 2 == offset(-), 3 == offset1(+), 4 == offset2(+)
 static unsigned int freq_offset_max = 4;	// initialization of freq offset loop.
 static int this_channellist = DVBT_DE;	// w_scan2 uses by default DVB-t
@@ -3128,6 +3128,9 @@ static int initial_tune(int frontend_fd, int tuning_data)
 			delsys_min = delsysloop_min(0, this_channellist);
 			// enable T2 loop.
 			delsys_max = delsysloop_max(0, this_channellist);
+			// set plp_id range
+			plp_id_min = plp_id_loop_min (flags.list_id);
+			plp_id_max = plp_id_loop_max (flags.list_id);
 			break;
 		case SCAN_CABLE:
 			// if choosen srate is too high for channellist's bandwidth,
