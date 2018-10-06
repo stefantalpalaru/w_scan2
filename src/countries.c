@@ -609,35 +609,28 @@ int dvbt_transmission_mode(int channel, int channellist)
 /*
  * some countries don't use legacy delsys anymore
  */
-int delsysloop_min(int channel, int channellist)
+int delsysloop_min (int country_id)
 {
-	switch (channellist) {
-	case DVBT_DE:
-	case DVBT2_CO:
-		return 1;	//DVB-T2 only.
+	switch (country_id) {
+	case AT:		//      AUSTRIA
+	case DE:		//      GERMANY
+	case CO:		//      COLOMBIA
+		return 1;	//DVB-T2
 	default:
-		return 0;
+		return 0;	//DVB-T
 	}
 }
 
 /*
  * some countries don't use 2nd gen delsys yet
  */
-int delsysloop_max(int channel, int channellist)
+int delsysloop_max(int country_id)
 {
-	switch (channellist) {
-	case ATSC_VSB:
-	case ATSC_QAM:
-	case DVBC_QAM:
-	case DVBC_FI:
-	case DVBC_FR:
-	case DVBC_BR:
-	case ISDBT_6MHZ:
-	case DAB_DE:
-	case USERLIST:
-		return 0;
+	switch (country_id) {
+	case -1:		//      countries to be added here
+		return 0;	//DVB-T
 	default:
-		return 1;
+		return 1;	//DVB-T2
 	}
 }
 
