@@ -612,6 +612,7 @@ int dvbt_transmission_mode(int channel, int channellist)
 int delsysloop_min(int channel, int channellist)
 {
 	switch (channellist) {
+	case DVBT_DE:
 	case DVBT2_CO:
 		return 1;	//DVB-T2 only.
 	default:
@@ -1045,6 +1046,26 @@ int get_user_country(void)
 
 	warning("could not guess your country. Falling back to 'DE'\n");
 	return DE;
+}
+
+int plp_id_loop_min (int country_id)
+{
+	switch (country_id) {
+	case AT:		//      AUSTRIA
+		return 0;	// may be changed to 1, because it seems that only PLP 1 is used in Austria 
+	default:
+		return 0;
+	}
+}
+
+int plp_id_loop_max (int country_id)
+{
+	switch (country_id) {
+	case AT:		//      AUSTRIA
+		return 1;
+	default:
+		return 0;
+	}
 }
 
 #ifdef VDRVERSNUM

@@ -57,3 +57,6 @@ Makefile.in
 # other
 *.pyc
 
+# output files
+*.xspf
+
