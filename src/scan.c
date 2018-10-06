@@ -3205,7 +3205,7 @@ static int initial_tune(int frontend_fd, int tuning_data)
 										info("%d: skipped (already known transponder)\n", freq_scale(f, 1e-3));
 										continue;
 									}
-									info("%d: PLP: %d ", freq_scale(f, 1e-3), test.plp_id);
+									info("%d PLP %d: ", freq_scale(f, 1e-3), test.plp_id);
 									break;
 								case SCAN_TERRCABLE_ATSC:
 									switch(mod_parm) {
