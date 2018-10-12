@@ -3310,7 +3310,7 @@ static int initial_tune(int frontend_fd, int tuning_data)
 								default:;
 								}	// END: switch (test.type)
 
-								info("(time: %s) ", run_time());	
+								info("(time: %s) ", run_time());
 								if (set_frontend(frontend_fd, ptest) < 0) {
 									print_transponder(buffer, ptest);
 									dprintf(1, "\n%s:%d: Setting frontend failed %s\n", __FUNCTION__, __LINE__, buffer);
