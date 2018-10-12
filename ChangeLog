@@ -1,6 +1,14 @@
 ChangeLog:
 --------------------
-[1.0.2]
+[1.0.3] 2018-10-13, contributed by DF5EQ
+- DVB-T scanning is skipped for AT, DE and CO
+- DVB_T2 scanning is no longer skipped at all, but a mechanism is in place for
+  doing it by country
+- PLP ID 1 is enabled for AT
+- some manual code formatting in scan.c, where the line length limits of the
+  formatting script rendered the code hard to read
+
+[1.0.2] 2018-06-17
  - move the source files in a "src" subdirectory
  - apply some of the Linux kernel coding style indentation using the Lindent
    script from the kernel tree
