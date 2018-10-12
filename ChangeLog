@@ -1,5 +1,7 @@
 ChangeLog:
 --------------------
+[1.0.4]
+
 [1.0.3] 2018-10-13, contributed by DF5EQ
 - DVB-T scanning is skipped for AT, DE and CO
 - DVB_T2 scanning is no longer skipped at all, but a mechanism is in place for
