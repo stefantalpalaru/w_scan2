@@ -4129,10 +4129,12 @@ static const char *usage = "\n"
     "usage: %s [options...] \n"
     "       -f type, --frontend type\n"
     "               What programs do you want to search for?\n"
-    "               a = atsc (vsb/qam)\n"
-    "               c = cable \n"
-    "               s = sat \n"
-    "               t = terrestrian [default]\n"
+    "               a  = atsc (vsb/qam)\n"
+    "               c  = cable \n"
+    "               s  = sat \n"
+    "               t  = terrestrian DVB-T and DVB-T2 [default]\n"
+    "               t1 = terrestrian DVB-T only\n"
+    "               t2 = terrestrian DVB-T2 only\n"
     "       -A N, --atsc_type N\n"
     "               specify ATSC type\n"
     "               1 = Terrestrial [default]\n"
@@ -4450,6 +4452,14 @@ int main(int argc, char **argv)
 		case 'f':	//frontend type -> hmmm..., actually it's scan type now! 20120109, -wk-
 			if (strcmp(optarg, "t") == 0)
 				scantype = SCAN_TERRESTRIAL;
+			if (strcmp(optarg, "t1") == 0) {
+				info("DVB-T only\n");
+				scantype = SCAN_TERRESTRIAL;
+			}
+			if (strcmp(optarg, "t2") == 0) {
+				info("DVB-T2 only\n");
+				scantype = SCAN_TERRESTRIAL;
+			}
 			if (strcmp(optarg, "c") == 0)
 				scantype = SCAN_CABLE;
 			if (strcmp(optarg, "a") == 0)
