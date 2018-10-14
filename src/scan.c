@@ -4374,6 +4374,7 @@ int main(int argc, char **argv)
 	int frontend_fd = -1;
 	int fe_open_mode;
 	uint16_t scantype = SCAN_TERRESTRIAL;
+	uint16_t delsys = SYS_UNDEFINED;
 	int Radio_Services = 1;
 	int TV_Services = 1;
 	int Other_Services = 0;	// 20080106: don't search other services by default.
@@ -4453,12 +4454,12 @@ int main(int argc, char **argv)
 			if (strcmp(optarg, "t") == 0)
 				scantype = SCAN_TERRESTRIAL;
 			if (strcmp(optarg, "t1") == 0) {
-				info("DVB-T only\n");
 				scantype = SCAN_TERRESTRIAL;
+				delsys = SYS_DVBT;
 			}
 			if (strcmp(optarg, "t2") == 0) {
-				info("DVB-T2 only\n");
 				scantype = SCAN_TERRESTRIAL;
+				delsys = SYS_DVBT2;
 			}
 			if (strcmp(optarg, "c") == 0)
 				scantype = SCAN_CABLE;
@@ -4863,8 +4864,8 @@ int main(int argc, char **argv)
 			sleep(10);	// enshure that user reads warning.
 		}
 	}
-	info("scan type %s, channellist %d\n",
-	     scantype_to_text(scantype), this_channellist);
+	info("scan type %s, delivery system %s, channellist %d\n",
+	     scantype_to_text(scantype), delivery_system_name(delsys), this_channellist);
 	switch (output_format) {
 	case OUTPUT_VDR:
 		switch (flags.vdr_version) {
