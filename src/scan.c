@@ -106,6 +106,7 @@ struct w_scan_flags flags = {
 	0,			// print pmt
 	0,			// emulate
 	0,			// delete duplicate transponders
+	SYS_UNDEFINED, // delivery system not defined
 };
 
 static unsigned int delsys_min = 0;	// initialization of delsys loop. 0 = delsys legacy.
@@ -4374,7 +4375,6 @@ int main(int argc, char **argv)
 	int frontend_fd = -1;
 	int fe_open_mode;
 	uint16_t scantype = SCAN_TERRESTRIAL;
-	uint16_t delsys = SYS_UNDEFINED;
 	int Radio_Services = 1;
 	int TV_Services = 1;
 	int Other_Services = 0;	// 20080106: don't search other services by default.
@@ -4455,11 +4455,11 @@ int main(int argc, char **argv)
 				scantype = SCAN_TERRESTRIAL;
 			if (strcmp(optarg, "t1") == 0) {
 				scantype = SCAN_TERRESTRIAL;
-				delsys = SYS_DVBT;
+				flags.delsys = SYS_DVBT;
 			}
 			if (strcmp(optarg, "t2") == 0) {
 				scantype = SCAN_TERRESTRIAL;
-				delsys = SYS_DVBT2;
+				flags.delsys = SYS_DVBT2;
 			}
 			if (strcmp(optarg, "c") == 0)
 				scantype = SCAN_CABLE;
@@ -4865,7 +4865,7 @@ int main(int argc, char **argv)
 		}
 	}
 	info("scan type %s, delivery system %s, channellist %d\n",
-	     scantype_to_text(scantype), delivery_system_name(delsys), this_channellist);
+	     scantype_to_text(scantype), delivery_system_name(flags.delsys), this_channellist);
 	switch (output_format) {
 	case OUTPUT_VDR:
 		switch (flags.vdr_version) {

@@ -57,6 +57,7 @@ struct w_scan_flags {
 	uint8_t print_pmt;
 	uint8_t emulate;
 	uint8_t delete_duplicate_transponders;
+	uint16_t delsys;
 };
 
 struct service *find_service(struct transponder *t, uint16_t service_id);
