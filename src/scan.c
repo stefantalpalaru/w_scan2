@@ -3123,9 +3123,9 @@ static int initial_tune(int frontend_fd, int tuning_data)
 			modulation_min = modulation_max = 0;
 			dvbc_symbolrate_min = dvbc_symbolrate_max = 0;
 			// enable legacy delsys loop.
-			delsys_min = delsysloop_min(0, this_channellist);
+			delsys_min = delsysloop_min(0, this_channellist, flags.delsys);
 			// enable T2 loop.
-			delsys_max = delsysloop_max(0, this_channellist);
+			delsys_max = delsysloop_max(0, this_channellist, flags.delsys);
 			break;
 		case SCAN_CABLE:
 			// if choosen srate is too high for channellist's bandwidth,

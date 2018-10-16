@@ -609,8 +609,9 @@ int dvbt_transmission_mode(int channel, int channellist)
 /*
  * some countries don't use legacy delsys anymore
  */
-int delsysloop_min(int channel, int channellist)
+int delsysloop_min(int channel, int channellist, uint16_t delsys)
 {
+	info("desysloop_min: %s\n", delivery_system_name(delsys));	
 	switch (channellist) {
 	case DVBT2_CO:
 		return 1;	//DVB-T2 only.
@@ -622,8 +623,9 @@ int delsysloop_min(int channel, int channellist)
 /*
  * some countries don't use 2nd gen delsys yet
  */
-int delsysloop_max(int channel, int channellist)
+int delsysloop_max(int channel, int channellist, uint16_t delsys)
 {
+	info("desysloop_max: %s\n", delivery_system_name(delsys));	
 	switch (channellist) {
 	case ATSC_VSB:
 	case ATSC_QAM:

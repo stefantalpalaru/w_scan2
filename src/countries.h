@@ -86,8 +86,8 @@ int freq_offset(int channel, int channellist, int index);
 int max_dvbc_srate(int bandwidth);
 
 int dvbt_transmission_mode(int channel, int channellist);
-int delsysloop_min(int channel, int channellist);
-int delsysloop_max(int channel, int channellist);
+int delsysloop_min(int channel, int channellist, uint16_t delsys);
+int delsysloop_max(int channel, int channellist, uint16_t delsys);
 
 int dvbc_qam_max(int channel, int channellist);
 int dvbc_qam_min(int channel, int channellist);
