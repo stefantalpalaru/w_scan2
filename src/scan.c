@@ -3125,9 +3125,9 @@ static int initial_tune(int frontend_fd, int tuning_data)
 			modulation_min = modulation_max = 0;
 			dvbc_symbolrate_min = dvbc_symbolrate_max = 0;
 			// enable legacy delsys loop.
-			delsys_min = delsysloop_min(flags.list_id);
+			delsys_min = delsysloop_min(0, this_channellist);
 			// enable T2 loop.
-			delsys_max = delsysloop_max(flags.list_id);
+			delsys_max = delsysloop_max(0, this_channellist);
 			// set plp_id range
 			plp_id_min = plp_id_loop_min (flags.list_id);
 			plp_id_max = plp_id_loop_max (flags.list_id);

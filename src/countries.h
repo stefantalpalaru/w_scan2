@@ -88,8 +88,8 @@ int plp_id_loop_min (int country_id);
 int plp_id_loop_max (int country_id);
 
 int dvbt_transmission_mode(int channel, int channellist);
-int delsysloop_min(int country_id);
-int delsysloop_max(int country_id);
+int delsysloop_min(int channel, int channellist);
+int delsysloop_max(int channel, int channellist);
 
 int dvbc_qam_max(int channel, int channellist);
 int dvbc_qam_min(int channel, int channellist);
