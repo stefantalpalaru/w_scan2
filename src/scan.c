@@ -114,8 +114,8 @@ static unsigned int modulation_min = 0;	// initialization of modulation loop. QA
 static unsigned int modulation_max = 1;	// initialization of modulation loop. QAM256 if FE_QAM
 static unsigned int dvbc_symbolrate_min = 0;	// initialization of symbolrate loop. 6900
 static unsigned int dvbc_symbolrate_max = 1;	// initialization of symbolrate loop. 6875
-static unsigned int plp_id_min = 0; // initialization of delsys loop.
-static unsigned int plp_id_max = 0; // initialization of delsys loop.
+static unsigned int plp_id_min = 0; // initialization of plp_id loop.
+static unsigned int plp_id_max = 0; // initialization of plp_id loop.
 static unsigned int freq_offset_min = 0;	// initialization of freq offset loop. 0 == offset (0), 1 == offset(+), 2 == offset(-), 3 == offset1(+), 4 == offset2(+)
 static unsigned int freq_offset_max = 4;	// initialization of freq offset loop.
 static int this_channellist = DVBT_DE;	// w_scan2 uses by default DVB-t
@@ -3128,9 +3128,6 @@ static int initial_tune(int frontend_fd, int tuning_data)
 			delsys_min = delsysloop_min(0, this_channellist);
 			// enable T2 loop.
 			delsys_max = delsysloop_max(0, this_channellist);
-			// set plp_id range
-			plp_id_min = plp_id_loop_min (flags.list_id);
-			plp_id_max = plp_id_loop_max (flags.list_id);
 			break;
 		case SCAN_CABLE:
 			// if choosen srate is too high for channellist's bandwidth,
@@ -3171,6 +3168,11 @@ static int initial_tune(int frontend_fd, int tuning_data)
 				for (channel = 0; channel <= channel_max; channel++) {
 					for (offs = freq_offset_min; offs <= freq_offset_max; offs++) {
 						for (sr_parm = dvbc_symbolrate_min; sr_parm <= dvbc_symbolrate_max; sr_parm++) {
+							if (flags.scantype == SCAN_TERRESTRIAL) {
+								// set plp_id range for DVB-T : DVB-T2
+								plp_id_min = delsys_parm == 0 ? 0 : plp_id_loop_min (flags.list_id);
+								plp_id_max = delsys_parm == 0 ? 0 : plp_id_loop_max (flags.list_id);
+							}
 							for (plp_id_parm = plp_id_min; plp_id_parm <= plp_id_max; plp_id_parm++) {
 								test.type = flags.scantype;
 								switch (test.type) {
@@ -3188,7 +3190,6 @@ static int initial_tune(int frontend_fd, int tuning_data)
 									f += freq_offset(channel, this_channellist, offs);
 									if (test.bandwidth != (__u32) bandwidth(channel, this_channellist))
 										info("Scanning %sMHz frequencies...\n", vdr_bandwidth_name(bandwidth(channel, this_channellist)));
-									test.frequency    = f;
 									test.inversion    = caps_inversion;
 									test.bandwidth    = (__u32)bandwidth(channel, this_channellist);
 									test.coderate     = caps_fec;
@@ -3201,11 +3202,22 @@ static int initial_tune(int frontend_fd, int tuning_data)
 									test.plp_id       = plp_id_parm;
 									time2carrier      = carrier_timeout(test.delsys);
 									time2lock         = lock_timeout(test.delsys);
-									if (is_known_initial_transponder(&test, 0)) {
-										info("%d: skipped (already known transponder)\n", freq_scale(f, 1e-3));
-										continue;
+									if (f != test.frequency) {
+										test.frequency = f;
+										if (is_known_initial_transponder(&test, 0)) {
+											info("%d: skipped (already known transponder)\n", freq_scale(f, 1e-3));
+											continue;
+										}
+										if (delsys == SYS_DVBT) {
+											info("%d: ", freq_scale(f, 1e-3));
+										} else {
+											info("%d: plp%d ", freq_scale(f, 1e-3), test.plp_id);
+										}
+									} else {
+										if (is_known_initial_transponder(&test, 0))
+											continue;
+										info("plp%d ", test.plp_id);
 									}
-									info("%d PLP %d: ", freq_scale(f, 1e-3), test.plp_id);
 									break;
 								case SCAN_TERRCABLE_ATSC:
 									switch(mod_parm) {
@@ -3310,7 +3322,7 @@ static int initial_tune(int frontend_fd, int tuning_data)
 								default:;
 								}	// END: switch (test.type)
 
-								info("(time: %s) ", run_time());	
+								info("(time: %s) ", run_time());
 								if (set_frontend(frontend_fd, ptest) < 0) {
 									print_transponder(buffer, ptest);
 									dprintf(1, "\n%s:%d: Setting frontend failed %s\n", __FUNCTION__, __LINE__, buffer);
@@ -3341,8 +3353,16 @@ static int initial_tune(int frontend_fd, int tuning_data)
 									usleep(50000);
 								}
 								if ((ret & (FE_HAS_SIGNAL | FE_HAS_CARRIER)) == 0) {
-									if (sr_parm == dvbc_symbolrate_max)
-										info("\n");
+									switch (test.delsys) {
+									case SYS_DVBT2:
+										if (plp_id_parm == plp_id_max)
+											info("\n");
+											break;
+									default:
+										if (sr_parm == dvbc_symbolrate_max)
+											info("\n");
+										break;
+									}
 									continue;
 								}
 								verbose("\n        (%.3fsec) signal", elapsed(&meas_start, &meas_stop));
@@ -3366,8 +3386,16 @@ static int initial_tune(int frontend_fd, int tuning_data)
 									usleep(50000);
 								}
 								if ((ret & FE_HAS_LOCK) == 0) {
-									if (sr_parm == dvbc_symbolrate_max)
-										info("\n");
+									switch (test.delsys) {
+									case SYS_DVBT2:
+										if (plp_id_parm == plp_id_max)
+											info("\n");
+											break;
+									default:
+										if (sr_parm == dvbc_symbolrate_max)
+											info("\n");
+										break;
+									}
 									continue;
 								}
 								verbose("\n        (%.3fsec) lock\n", elapsed(&meas_start, &meas_stop));
