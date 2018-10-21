@@ -3128,9 +3128,6 @@ static int initial_tune(int frontend_fd, int tuning_data)
 			delsys_min = delsysloop_min(0, this_channellist);
 			// enable T2 loop.
 			delsys_max = delsysloop_max(0, this_channellist);
-			// set plp_id range
-			plp_id_min = plp_id_loop_min (flags.list_id);
-			plp_id_max = plp_id_loop_max (flags.list_id);
 			break;
 		case SCAN_CABLE:
 			// if choosen srate is too high for channellist's bandwidth,
@@ -3171,6 +3168,11 @@ static int initial_tune(int frontend_fd, int tuning_data)
 				for (channel = 0; channel <= channel_max; channel++) {
 					for (offs = freq_offset_min; offs <= freq_offset_max; offs++) {
 						for (sr_parm = dvbc_symbolrate_min; sr_parm <= dvbc_symbolrate_max; sr_parm++) {
+							if (flags.scantype == SCAN_TERRESTRIAL) {
+								// set plp_id range for DVB-T : DVB-T2
+								plp_id_min = delsys_parm == 0 ? 0 : plp_id_loop_min (flags.list_id);
+								plp_id_max = delsys_parm == 0 ? 0 : plp_id_loop_max (flags.list_id);
+							}
 							for (plp_id_parm = plp_id_min; plp_id_parm <= plp_id_max; plp_id_parm++) {
 								test.type = flags.scantype;
 								switch (test.type) {
