@@ -3190,7 +3190,6 @@ static int initial_tune(int frontend_fd, int tuning_data)
 									f += freq_offset(channel, this_channellist, offs);
 									if (test.bandwidth != (__u32) bandwidth(channel, this_channellist))
 										info("Scanning %sMHz frequencies...\n", vdr_bandwidth_name(bandwidth(channel, this_channellist)));
-									test.frequency    = f;
 									test.inversion    = caps_inversion;
 									test.bandwidth    = (__u32)bandwidth(channel, this_channellist);
 									test.coderate     = caps_fec;
@@ -3203,11 +3202,18 @@ static int initial_tune(int frontend_fd, int tuning_data)
 									test.plp_id       = plp_id_parm;
 									time2carrier      = carrier_timeout(test.delsys);
 									time2lock         = lock_timeout(test.delsys);
-									if (is_known_initial_transponder(&test, 0)) {
-										info("%d: skipped (already known transponder)\n", freq_scale(f, 1e-3));
-										continue;
+									if (f != test.frequency) {
+										test.frequency = f;
+										if (is_known_initial_transponder(&test, 0)) {
+											info("%d: skipped (already known transponder)\n", freq_scale(f, 1e-3));
+											continue;
+										}
+										info("%d: plp%d ", freq_scale(f, 1e-3), test.plp_id);
+									} else {
+										if (is_known_initial_transponder(&test, 0))
+											continue;
+										info("plp%d ", test.plp_id);
 									}
-									info("%d PLP %d: ", freq_scale(f, 1e-3), test.plp_id);
 									break;
 								case SCAN_TERRCABLE_ATSC:
 									switch(mod_parm) {
@@ -3312,7 +3318,7 @@ static int initial_tune(int frontend_fd, int tuning_data)
 								default:;
 								}	// END: switch (test.type)
 
-								info("(time: %s) ", run_time());	
+								info("(time: %s) ", run_time());
 								if (set_frontend(frontend_fd, ptest) < 0) {
 									print_transponder(buffer, ptest);
 									dprintf(1, "\n%s:%d: Setting frontend failed %s\n", __FUNCTION__, __LINE__, buffer);
@@ -3343,8 +3349,16 @@ static int initial_tune(int frontend_fd, int tuning_data)
 									usleep(50000);
 								}
 								if ((ret & (FE_HAS_SIGNAL | FE_HAS_CARRIER)) == 0) {
-									if (sr_parm == dvbc_symbolrate_max)
-										info("\n");
+									switch (test.delsys) {
+									case SYS_DVBT2:
+										if (plp_id_parm == plp_id_max)
+											info("\n");
+											break;
+									default:
+										if (sr_parm == dvbc_symbolrate_max)
+											info("\n");
+										break;
+									}
 									continue;
 								}
 								verbose("\n        (%.3fsec) signal", elapsed(&meas_start, &meas_stop));
@@ -3368,8 +3382,16 @@ static int initial_tune(int frontend_fd, int tuning_data)
 									usleep(50000);
 								}
 								if ((ret & FE_HAS_LOCK) == 0) {
-									if (sr_parm == dvbc_symbolrate_max)
-										info("\n");
+									switch (test.delsys) {
+									case SYS_DVBT2:
+										if (plp_id_parm == plp_id_max)
+											info("\n");
+											break;
+									default:
+										if (sr_parm == dvbc_symbolrate_max)
+											info("\n");
+										break;
+									}
 									continue;
 								}
 								verbose("\n        (%.3fsec) lock\n", elapsed(&meas_start, &meas_stop));
