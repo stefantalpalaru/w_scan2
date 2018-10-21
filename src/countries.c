@@ -612,7 +612,6 @@ int dvbt_transmission_mode(int channel, int channellist)
 int delsysloop_min(int channel, int channellist)
 {
 	switch (channellist) {
-	case DVBT_DE:
 	case DVBT2_CO:
 		return 1;	//DVB-T2 only.
 	default:
