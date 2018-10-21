@@ -3208,7 +3208,11 @@ static int initial_tune(int frontend_fd, int tuning_data)
 											info("%d: skipped (already known transponder)\n", freq_scale(f, 1e-3));
 											continue;
 										}
-										info("%d: plp%d ", freq_scale(f, 1e-3), test.plp_id);
+										if (delsys == SYS_DVBT) {
+											info("%d: ", freq_scale(f, 1e-3));
+										} else {
+											info("%d: plp%d ", freq_scale(f, 1e-3), test.plp_id);
+										}
 									} else {
 										if (is_known_initial_transponder(&test, 0))
 											continue;
