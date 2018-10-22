@@ -4864,8 +4864,13 @@ int main(int argc, char **argv)
 			sleep(10);	// enshure that user reads warning.
 		}
 	}
-	info("scan type %s, delivery system %s, channellist %d\n",
-	     scantype_to_text(scantype), delivery_system_name(flags.delsys), this_channellist);
+	if (scantype == SCAN_TERRESTRIAL) {
+		info("scan type %s, delivery system %s, channellist %d\n",
+			scantype_to_text(scantype), delivery_system_name(flags.delsys), this_channellist);
+	} else {
+		info("scan type %s, channellist %d\n",
+			scantype_to_text(scantype), this_channellist);
+	}
 	switch (output_format) {
 	case OUTPUT_VDR:
 		switch (flags.vdr_version) {
