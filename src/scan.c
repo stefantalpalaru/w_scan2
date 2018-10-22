@@ -106,6 +106,7 @@ struct w_scan_flags flags = {
 	0,			// print pmt
 	0,			// emulate
 	0,			// delete duplicate transponders
+	SYS_UNDEFINED, // delivery system not defined
 };
 
 static unsigned int delsys_min = 0;	// initialization of delsys loop. 0 = delsys legacy.
@@ -3125,9 +3126,9 @@ static int initial_tune(int frontend_fd, int tuning_data)
 			modulation_min = modulation_max = 0;
 			dvbc_symbolrate_min = dvbc_symbolrate_max = 0;
 			// enable legacy delsys loop.
-			delsys_min = delsysloop_min(0, this_channellist);
+			delsys_min = delsysloop_min(0, this_channellist, flags.delsys);
 			// enable T2 loop.
-			delsys_max = delsysloop_max(0, this_channellist);
+			delsys_max = delsysloop_max(0, this_channellist, flags.delsys);
 			break;
 		case SCAN_CABLE:
 			// if choosen srate is too high for channellist's bandwidth,
@@ -3869,10 +3870,12 @@ static const char *usage = "\n"
     "usage: %s [options...] \n"
     "       -f type, --frontend type\n"
     "               What programs do you want to search for?\n"
-    "               a = atsc (vsb/qam)\n"
-    "               c = cable \n"
-    "               s = sat \n"
-    "               t = terrestrian [default]\n"
+    "               a  = atsc (vsb/qam)\n"
+    "               c  = cable \n"
+    "               s  = sat \n"
+    "               t  = terrestrian DVB-T and DVB-T2 [default]\n"
+    "               t1 = terrestrian DVB-T only\n"
+    "               t2 = terrestrian DVB-T2 only\n"
     "       -A N, --atsc_type N\n"
     "               specify ATSC type\n"
     "               1 = Terrestrial [default]\n"
@@ -4190,6 +4193,14 @@ int main(int argc, char **argv)
 		case 'f':	//frontend type -> hmmm..., actually it's scan type now! 20120109, -wk-
 			if (strcmp(optarg, "t") == 0)
 				scantype = SCAN_TERRESTRIAL;
+			if (strcmp(optarg, "t1") == 0) {
+				scantype = SCAN_TERRESTRIAL;
+				flags.delsys = SYS_DVBT;
+			}
+			if (strcmp(optarg, "t2") == 0) {
+				scantype = SCAN_TERRESTRIAL;
+				flags.delsys = SYS_DVBT2;
+			}
 			if (strcmp(optarg, "c") == 0)
 				scantype = SCAN_CABLE;
 			if (strcmp(optarg, "a") == 0)
@@ -4593,8 +4604,13 @@ int main(int argc, char **argv)
 			sleep(10);	// enshure that user reads warning.
 		}
 	}
-	info("scan type %s, channellist %d\n",
-	     scantype_to_text(scantype), this_channellist);
+	if (scantype == SCAN_TERRESTRIAL) {
+		info("scan type %s, delivery system %s, channellist %d\n",
+			scantype_to_text(scantype), delivery_system_name(flags.delsys), this_channellist);
+	} else {
+		info("scan type %s, channellist %d\n",
+			scantype_to_text(scantype), this_channellist);
+	}
 	switch (output_format) {
 	case OUTPUT_VDR:
 		switch (flags.vdr_version) {

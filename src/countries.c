@@ -609,12 +609,21 @@ int dvbt_transmission_mode(int channel, int channellist)
 /*
  * some countries don't use legacy delsys anymore
  */
-int delsysloop_min(int channel, int channellist)
+int delsysloop_min(int channel, int channellist, uint16_t delsys)
 {
-	switch (channellist) {
-	case DVBT2_CO:
-		return 1;	//DVB-T2 only.
-	default:
+	switch (delsys) {
+	case SYS_UNDEFINED:
+		switch (channellist) {
+		case DVBT2_CO:
+			return 1;	//DVB-T2 only.
+		default:
+			return 0;
+		}
+	case SYS_DVBT:
+		return 0;
+	case SYS_DVBT2:
+		return 1;
+	default:	// not possible
 		return 0;
 	}
 }
@@ -622,21 +631,30 @@ int delsysloop_min(int channel, int channellist)
 /*
  * some countries don't use 2nd gen delsys yet
  */
-int delsysloop_max(int channel, int channellist)
+int delsysloop_max(int channel, int channellist, uint16_t delsys)
 {
-	switch (channellist) {
-	case ATSC_VSB:
-	case ATSC_QAM:
-	case DVBC_QAM:
-	case DVBC_FI:
-	case DVBC_FR:
-	case DVBC_BR:
-	case ISDBT_6MHZ:
-	case DAB_DE:
-	case USERLIST:
+	switch (delsys) {
+	case SYS_UNDEFINED:
+		switch (channellist) {
+		case ATSC_VSB:
+		case ATSC_QAM:
+		case DVBC_QAM:
+		case DVBC_FI:
+		case DVBC_FR:
+		case DVBC_BR:
+		case ISDBT_6MHZ:
+		case DAB_DE:
+		case USERLIST:
+			return 0;
+		default:
+			return 1;
+		}
+	case SYS_DVBT:
 		return 0;
-	default:
+	case SYS_DVBT2:
 		return 1;
+	default:	// not possible
+		return 0;
 	}
 }
 
