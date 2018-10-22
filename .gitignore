@@ -59,4 +59,6 @@ Makefile.in
 
 # output files
 *.xspf
+*.conf
+*.m3u
 
