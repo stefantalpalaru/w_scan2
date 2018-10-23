@@ -1,5 +1,7 @@
 ChangeLog:
 --------------------
+[1.0.5]
+
 [1.0.4] 2018-10-23
 - replace country-based DVB-T skipping with new command line arguments:
   -ft1 and -ft2 to scan only DVB-T or DVB-T2, respectively

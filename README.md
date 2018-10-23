@@ -1,6 +1,6 @@
 ## description
 
-*w\_scan2* is a small channel scan tool which generates ATSC, DVB-C, DVB-S/S2 and DVB-T channels.conf files.
+*w\_scan2* is a small channel scan tool which generates ATSC, DVB-C, DVB-S/S2 and DVB-T/T2 channels.conf files.
 
 It's based on the old "scan" tool from linuxtv-dvb-apps-1.1.0. The differences are:
 - no initial tuning data needed, because scanning without this data is exactly
