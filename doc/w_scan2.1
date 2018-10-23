@@ -23,7 +23,7 @@ w_scan2 \- a universal ATSC and DVB blind scanner
 .B [ options ] 
 .SH "DESCRIPTION"
 .B w_scan2
-scans for DVB\-C, DVB\-S/S2, DVB\-T, ISDB-T and ATSC channels. Any other program accessing the DVB hardware (like e.g. VDR) has to be closed in order to avoid conflicts while running w_scan2.
+scans for DVB\-C, DVB\-S/S2, DVB\-T/T2, ISDB\-T and ATSC channels. Any other program accessing the DVB hardware (like e.g. VDR) has to be closed in order to avoid conflicts while running w_scan2.
 .br
 w_scan2 provides the channels in different output formats (Default: VDR channels.conf). For other output formats see OPTIONS.
 .SH "OPTIONS"
@@ -38,12 +38,16 @@ Frontend type,
 .br
 "s" = DVB-S/S2,
 .br
-"t" = DVB-T (and ISDB-T) [default]
+"t" = DVB-T, DVB-T2 and ISDB-T [default]
+.br
+"t1" = only DVB-T
+.br
+"t2" = only DVB-T2
 .br
 Depending on "TYPE", either of the arguments "-s" or "-c" is mandatory. 
 .TP 
 .B \-c COUNTRY_ID
-Mandatory argument for ATSC scans, cable scans and terrestrian scans, see option -f.
+Mandatory argument for ATSC scans, cable scans and terrestrial scans, see option -f.
 .br
 Specifies the country where you try to scan for channels as uppercase two letter identifier, e.g.
 .br
