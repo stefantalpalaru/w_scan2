@@ -3822,7 +3822,7 @@ bool fe_supports_scan(int fd, scantype_t type, struct dvb_frontend_info info)
 				SYS_DVBC_ANNEX_C ? dname[delsys] : "???");
 			switch (type) {
 			case SCAN_TERRESTRIAL:
-				if (delsys == SYS_DVBT || delsys == SYS_DVBT2)
+				if (delsys == SYS_DVBT || delsys == SYS_DVBT2 || delsys == SYS_ISDBT)
 					result = true;
 				break;
 			case SCAN_CABLE:
@@ -3876,6 +3876,7 @@ static const char *usage = "\n"
     "               t  = terrestrial - DVB-T and DVB-T2 [default]\n"
     "               t1 = terrestrial - DVB-T only\n"
     "               t2 = terrestrial - DVB-T2 only\n"
+    "               b  = terrestrial - ISDB-Tb\n"
     "       -A N, --atsc_type N\n"
     "               specify ATSC type\n"
     "               1 = Terrestrial [default]\n"
@@ -4210,6 +4211,10 @@ int main(int argc, char **argv)
 			if (scantype == SCAN_TERRCABLE_ATSC) {
 				this_channellist = ATSC_VSB;
 				country = strdup("US");
+			}
+			if (strcmp(optarg, "b") == 0) {
+				this_channellist = ISDBT_6MHZ;
+				scantype = SCAN_TERRESTRIAL;
 			}
 			break;
 		case 'h':	//basic help
