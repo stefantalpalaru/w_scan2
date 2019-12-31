@@ -77,7 +77,7 @@ namespace COUNTRY {
  * use two letter uppercase for 'country', as defined by ISO 3166-1
  */
 int choose_country(const char *country,
-		   int *atsc, int *dvb, uint16_t * scan_type, int *channellist)
+		   int *atsc, int *dvb, uint16_t *scan_type, int *channellist)
 {
 	if (*channellist == USERLIST)
 		return 0;
@@ -360,8 +360,9 @@ int base_offset(int channel, int channellist)
 	case DVBT_FR:		//FRANCE, +/- offset 166kHz & +offset 332kHz & +offset 498kHz
 	case DVBT_GB:		//UNITED KINGDOM, +/- offset
 		switch (channel) {
-			/*case  5 ... 12: */
-			/*return  142500000; // VHF no longer used in Europe. */
+		case  5 ... 12:
+			// VHF making a comeback in Europe: https://tech.ebu.ch/docs/factsheets/ebu_tech_fs_use_of_band_III.pdf
+			return  142500000;
 		case 21 ... 69:
 			return 306000000;
 		default:
