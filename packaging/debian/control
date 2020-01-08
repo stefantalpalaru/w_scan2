@@ -1,0 +1,24 @@
+Source: w-scan2
+Section: video
+Priority: optional
+Maintainer: Ștefan Talpalaru <stefantalpalaru@yahoo.com>
+Uploaders: gogo <trebelnik2@gmail.com>
+Build-Depends: debhelper (>= 9), linux-libc-dev (>= 3.0)
+Standards-Version: 4.1.2
+Vcs-Git: https://github.com/stefantalpalaru/w_scan2.git
+Vcs-Browser: https://github.com/stefantalpalaru/w_scan2
+Homepage: https://github.com/stefantalpalaru/w_scan2
+
+Package: w-scan2
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: A fork of the well-known w_scan project
+ Channel scanning tool for DVB and ATSC channels
+ w_scan2 scans for DVB-S/S2, DVB-T/T2, DVB-C and ATSC channels and creates a
+ channels.conf, that can be used directly by the Linux Video Disc Recorder VDR.
+ It is also possible to output channels in a format readable by the
+ czap/tzap tools provided by linuxtv-dvb-zap, xine, totem, kaffeine or me-tv.
+ .
+ Unlike the scan utility in linuxtv-dvb-apps, there is no need to specify
+ an initial transponder and w_scan2 automatically detects the DVB or ATSC
+ card to be used.
