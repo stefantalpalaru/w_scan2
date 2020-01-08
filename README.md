@@ -43,6 +43,11 @@ layman -a stefantalpalaru
 emerge w_scan2
 ```
 
+#### Ubuntu
+
+- Ubuntu [stable ppa](https://code.launchpad.net/~w-scan2/+archive/ubuntu/stable)
+- Ubuntu [git ppa](https://code.launchpad.net/~w-scan2/+archive/ubuntu/git)
+
 ## basic usage
 
 NOTE: Newer versions of *w\_scan2* need the '-c' option for specifying the
