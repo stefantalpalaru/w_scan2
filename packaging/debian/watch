@@ -1,0 +1,2 @@
+version=3
+https://github.com/stefantalpalaru/w_scan2/archive/(.*).tar.gz debian /bin/sh debian/repack-upstream.sh
