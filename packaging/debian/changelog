@@ -1,46 +1,7 @@
 w-scan2 (1.0.6) unstable; urgency=medium
 
   * [1.0.6] 2019-12-13
-  * - re-enable VHF band III in Europe
-
-  * [1.0.5] 2019-03-14
-  * - added new arguments for isdb-tb tuners (tested with MyGica S2870 & PlayTV USB Hybrid PV-B308U)
-
-  * [1.0.4] 2018-10-23
-  *  - replace country-based DVB-T skipping with new command line arguments:
-  *  -ft1 and -ft2 to scan only DVB-T or DVB-T2, respectively
-
-  * [1.0.3] 2018-10-13, contributed by DF5EQ
-  * - DVB-T scanning is skipped for AT, DE and CO
-  * - DVB_T2 scanning is no longer skipped at all, but a mechanism is in place for
-  *   doing it by country
-  * - PLP ID 1 is enabled for AT
-  * - some manual code formatting in scan.c, where the line length limits of the
-  *   formatting script rendered the code hard to read
-
-  * [1.0.2] 2018-06-17
-  *  - move the source files in a "src" subdirectory
-  *  - apply some of the Linux kernel coding style indentation using the Lindent
-  *    script from the kernel tree
-  *  - merge w_scan-20170107
-
-  * [1.0.1] 2017-03-29
-  *  - fix a corner case where a pair of transponders kept adding each other to
-  *    the scanning loop, without ending up in any list we use for avoiding them
-  *    in the future. The end result was an endless loop. Thanks
-  *    https://github.com/mfyorp for reporting the bug and testing the fix.
-
-  * [1.0.0] 2016-10-14
-  *  - project forked from https://www.gen2vdr.de/wirbel/w_scan/index2.html and renamed w_scan2
-  *  - keep duplicate transponders by default because a stronger transponder with
-  *    the same ID might have a higher frequency and be discarded simply because
-  *    it's scanned later. Also don't replace the current transponder with an
-  *    advertised one by default. The latter may have a lower signal strength.
-  *    More details here:
-  *    https://stefantalpalaru.wordpress.com/2016/02/04/scan-all-the-things/ .
-  *    The old behaviour can be enabled with -d (--delete-duplicate-transponders).
-  *  - all files are now ASCII or UTF-8 and have Unix line terminators
-  *  - refactored the autotools files
-
+  * New version
+  
  -- Goran Vidovic (gogo) <trebelnik2@gmail.com>  Wed, 08 Jan 2019 17:45:38 +0100
 
