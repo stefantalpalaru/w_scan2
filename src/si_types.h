@@ -197,10 +197,10 @@ struct transponder {
   /*----------------------------*/
 	char *network_name;
 	network_change_t network_change;
-} __attribute__ ((packed)) transponder_t, *p_transponder_t;
+} transponder_t, *p_transponder_t;
 
 /*******************************************************************************
-/* satellite channel routing type.
+ * satellite channel routing type.
  ******************************************************************************/
 
 struct scr {

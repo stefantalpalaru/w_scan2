@@ -614,10 +614,8 @@ static struct transponder *find_transponder_by_freq(struct transponder
 	}
 
 	// handle the case of current_tp not being in scanned_transponders or in new_transponders
-	if (!((flags.scantype == SCAN_SATELLITE)
-	      && (current_tp->polarization != tn->polarization))) {
-		if (is_nearly_same_frequency
-		    (current_tp->frequency, tn->frequency, tn->type)) {
+	if (!((flags.scantype == SCAN_SATELLITE) && (current_tp->polarization != tn->polarization))) {
+		if (is_nearly_same_frequency(current_tp->frequency, tn->frequency, tn->type)) {
 			verbose("          -> found current_tp'  %s\n", buffer);
 			t = calloc(1, sizeof(*t));
 			copy_transponder(t, tn);
@@ -702,19 +700,19 @@ static int is_known_initial_transponder(struct transponder *tn,
 			if ((t->type == tn->type)
 			    && is_nearly_same_frequency(t->frequency,
 							tn->frequency, t->type))
-				return (t->source >> 8) == 64;
+				return (t->source >> 8) == TABLE_NIT_ACT;
 			break;
 		case SCAN_TERRCABLE_ATSC:
 			if ((t->type == tn->type)
 			    && is_nearly_same_frequency(t->frequency,
 							tn->frequency, t->type)
 			    && (t->modulation == tn->modulation))
-				return (t->source >> 8) == 64;
+				return (t->source >> 8) == TABLE_NIT_ACT;
 			break;
 		case SCAN_SATELLITE:
 			if (!is_different_transponder_deep_scan
 			    (tn, t, auto_allowed))
-				return (t->source >> 8) == 64;
+				return (t->source >> 8) == TABLE_NIT_ACT;
 			break;
 		default:
 			fatal("Unhandled type %d\n", tn->type);
@@ -1566,7 +1564,7 @@ em_static void parse_pmt(const unsigned char *buf,
 
 em_static void parse_nit(const unsigned char *buf,
 			 uint16_t section_length, uint8_t table_id,
-			 uint16_t network_id, uint32_t section_flags)
+			 uint16_t network_id)
 {
 	char buffer[128];
 	int descriptors_loop_len = ((buf[0] & 0x0f) << 8) | buf[1];
@@ -1611,7 +1609,7 @@ em_static void parse_nit(const unsigned char *buf,
 		verbose
 		    ("        ----------------------------------------------------------\n");
 		verbose("        %s: (%u:%u:%u)\n",
-			table_id == 0x40 ? "NIT(act)" : "NIT(oth)",
+			table_id == TABLE_NIT_ACT ? "NIT(act)" : "NIT(oth)",
 			original_network_id, network_id, transport_stream_id);
 
 		if (section_length < descriptors_loop_len + 4) {
@@ -1647,6 +1645,8 @@ em_static void parse_nit(const unsigned char *buf,
 		parse_descriptors(table_id, buf + 6,
 				  descriptors_loop_len, &tn, flags.scantype);
 		tn.source |= table_id << 8;
+		// this seems to be the only place where the "source" field is set, so we want it coppied to current_tp
+		current_tp->source = tn.source;
 
 		t = find_transponder(original_network_id, network_id, transport_stream_id);	// try to find tp by transport_stream_id;
 		if (t == NULL) {
@@ -1740,8 +1740,7 @@ em_static void parse_nit(const unsigned char *buf,
 			}
 		} else {
 			// we could not find the transponder by freq and fe_type. probably a new one - so adding it to scan list
-			if (flags.add_frequencies > 0
-			    && (tn.type == flags.scantype)) {
+			if (flags.add_frequencies > 0 && (tn.type == flags.scantype)) {
 				if ((t = find_transponder_by_freq(&tn))) {
 					print_transponder(buffer, t);
 					info("        unexpected: already known tp (%s), but not found by pids\n", buffer);
@@ -1898,7 +1897,7 @@ em_static void parse_psip_vct(const unsigned char *buf,
 		 * May be finding transponder by transport_stream_id from PAT. However, setting
 		 * t->transport_stream_id from data in PAT may collide with the current DVB scan algorithm.
 		 */
-		current_tp->source = 0x40 << 8 | table_id;
+		current_tp->source = TABLE_NIT_ACT << 8 | table_id;
 		s = find_service(current_tp, ch.program_number);
 		if (!s)
 			s = alloc_service(current_tp, ch.program_number);
@@ -2079,7 +2078,7 @@ static int parse_section(struct section_buf *s)
 			//verbose("NIT(%s TS, network_id %d (0x%04x) )\n", table_id == 0x40 ? "actual":"other",
 			//       table_id_ext, table_id_ext);
 			parse_nit(buf, section_length, table_id,
-				  table_id_ext, s->flags);
+				  table_id_ext);
 			break;
 		case TABLE_SDT_ACT:
 		case TABLE_SDT_OTH:
@@ -2898,8 +2897,7 @@ static int tune_to_next_transponder(int frontend_fd)
 					test = find_transponder_by_freq(t);
 					if ((test != NULL)
 					    &&
-					    !(IsMember
-					      (scanned_transponders, test))) {
+					    !(IsMember(scanned_transponders, test))) {
 						info("retrying with transposer_frequency = %u\n", t->frequency);
 						if (tune_to_transponder
 						    (frontend_fd, t) == 0)
@@ -2910,7 +2908,7 @@ static int tune_to_next_transponder(int frontend_fd)
 		}
 		if (IsMember(new_transponders, t)) {
 			// moving new_transponders -> scanned_transponders is handled in tune_to_transponder(),
-			// but we may pass here w/o calling it. Enshure this tp is moved to scanned_transponders.
+			// but we may pass here w/o calling it. Ensure this tp is moved to scanned_transponders.
 			verbose("skipped: (%u:%u:%u) (time: %s)\n",
 				t->original_network_id, t->network_id,
 				t->transport_stream_id, run_time());
@@ -3520,7 +3518,7 @@ static void scan_tp_atsc(void)
 		add_filter(&s2);
 	}
 	EMUL(em_readfilters, &result)
-	    do {
+	do {
 		read_filters();
 	}
 	while ((running_filters->count > 0)
@@ -3540,7 +3538,7 @@ static void scan_tp_dvb(void)
 		     SECTION_FLAG_INITIAL);
 	add_filter(&s[0]);
 	EMUL(em_readfilters, &result)
-	    do {
+	do {
 		read_filters();
 	}
 	while ((running_filters->count > 0)
@@ -3563,7 +3561,7 @@ static void scan_tp_dvb(void)
 	setup_filter(&s[3], demux_devname, PID_PAT, TABLE_PAT, -1, 1, 0, 0);
 	add_filter(&s[3]);
 	EMUL(em_readfilters, &result)
-	    do {
+	do {
 		read_filters();
 	}
 	while ((running_filters->count > 0)
@@ -3589,8 +3587,7 @@ static void scan_tp(void)
 static void network_scan(int frontend_fd, int tuning_data)
 {
 	if (initial_tune(frontend_fd, tuning_data) < 0) {
-		error
-		    ("Sorry - i couldn't get any working frequency/transponder\n Nothing to scan!!\n");
+		error("Sorry - i couldn't get any working frequency/transponder\n Nothing to scan!!\n");
 		exit(1);
 	}
 
@@ -3721,7 +3718,7 @@ static void dump_lists(int adapter, int frontend)
 
 	for (t = scanned_transponders->first; t; t = t->next) {
 		if (output_format == OUTPUT_DVBSCAN_TUNING_DATA
-		    && ((t->source >> 8) == 64)) {
+		    && ((t->source >> 8) == TABLE_NIT_ACT)) {
 			dvbscan_dump_tuningdata(dest, t, index++, &flags);
 			continue;
 		}

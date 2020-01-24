@@ -1,6 +1,7 @@
 ChangeLog:
 --------------------
 [1.0.7]
+- fix "--output-initial"
 
 [1.0.6] 2019-12-13
 - re-enable VHF band III in Europe
