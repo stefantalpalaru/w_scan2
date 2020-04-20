@@ -104,12 +104,6 @@ NOTE: see ```./w_scan2 -s?``` for list of satellites.
 ./w_scan2 -c DE -x > initial_tuning_data.txt
 ```
 
-#### generate kaffeine-0.8.5 channels.dvb
-
-```sh
-./w_scan2 -c DE -k > channels.dvb
-```
-
 For more sophisticated scan options see ```./w_scan2 -h``` and ```./w_scan2 -H```.
 
 ## credits

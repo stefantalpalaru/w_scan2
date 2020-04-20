@@ -1,5 +1,8 @@
 ChangeLog:
 --------------------
+[1.0.8] 2020-04-20
+- Kaffeine output support was removed 6 years ago. Bring the docs up to speed.
+
 [1.0.7] 2020-01-25
 - fix "--output-initial"
 

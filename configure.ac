@@ -1,4 +1,4 @@
-AC_INIT([w_scan2], [1.0.7], [stefantalpalaru@yahoo.com], [w_scan2], [https://github.com/stefantalpalaru/w_scan2])
+AC_INIT([w_scan2], [1.0.8], [stefantalpalaru@yahoo.com], [w_scan2], [https://github.com/stefantalpalaru/w_scan2])
 AM_INIT_AUTOMAKE([foreign subdir-objects])
 
 AC_PROG_CC
