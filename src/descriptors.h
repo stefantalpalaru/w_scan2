@@ -23,6 +23,7 @@
 #define __DESCRIPTORS_H__
 
 #include "extended_frontend.h"
+#include "time.h"
 
 /******************************************************************************
  * descriptor ids as defined by standards.
