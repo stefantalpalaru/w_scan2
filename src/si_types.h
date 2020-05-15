@@ -58,7 +58,7 @@ typedef struct section_buf {
 	time_t running_time;
 	struct section_buf *next_seg;	// this is used to handle segmented tables (like NIT-other)
 	pList garbage;
-} section_t, *p_section_t;
+};
 
 /*******************************************************************************
 /* service type.
@@ -110,7 +110,7 @@ struct service {
 	uint32_t logical_channel_number;
 	uint8_t running;
 	void *priv;
-} service_t, *p_service_t;
+};
 
 /*******************************************************************************
  * transponder type.
@@ -197,7 +197,7 @@ struct transponder {
   /*----------------------------*/
 	char *network_name;
 	network_change_t network_change;
-} transponder_t, *p_transponder_t;
+};
 
 /*******************************************************************************
  * satellite channel routing type.

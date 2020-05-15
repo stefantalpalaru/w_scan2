@@ -1,6 +1,7 @@
 ChangeLog:
 --------------------
-[1.0.9]
+[1.0.9] 2020-05-16
+- support compilation with -fno-common (default in GCC 10)
 
 [1.0.8] 2020-04-20
 - Kaffeine output support was removed 6 years ago. Bring the docs up to speed.
