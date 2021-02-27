@@ -58,6 +58,7 @@
 #include "dump-vdr.h"
 #include "dump-xine.h"
 #include "dump-dvbscan.h"
+#include "dump-dvbv5scan.h"
 #include "dump-mplayer.h"
 #include "dump-vlc-m3u.h"
 #include "dump-xml.h"
@@ -150,6 +151,7 @@ enum __output_format {
 	OUTPUT_PIDS,
 	OUTPUT_XINE,
 	OUTPUT_DVBSCAN_TUNING_DATA,
+	OUTPUT_DVBV5SCAN_TUNING_DATA,
 	OUTPUT_MPLAYER,
 	OUTPUT_VLC_M3U,
 	OUTPUT_XML,
@@ -3722,6 +3724,11 @@ static void dump_lists(int adapter, int frontend)
 			dvbscan_dump_tuningdata(dest, t, index++, &flags);
 			continue;
 		}
+		if (output_format == OUTPUT_DVBV5SCAN_TUNING_DATA
+		    && ((t->source >> 8) == TABLE_NIT_ACT)) {
+			dvbv5scan_dump_tuningdata(dest, t, index++, &flags);
+			continue;
+		}
 		for (s = (t->services)->first; s; s = s->next) {
 			if (!s->service_name) {	// no service name in SDT
 				snprintf(sn, sizeof(sn),
@@ -4150,7 +4157,7 @@ int main(int argc, char **argv)
 
 	while ((opt =
 		getopt_long(argc, argv,
-			    "a:c:de:f:hi:l:o:p:qr:s:t:u:vxA:C:D:E:FGHI:LMO:PQ:R:S:T:VXZ",
+			    "5a:c:de:f:hi:l:o:p:qr:s:t:u:vxA:C:D:E:FGHI:LMO:PQ:R:S:T:VXZ",
 			    long_options, NULL)) != -1) {
 		switch (opt) {
 		case 'a':	//adapter
@@ -4251,7 +4258,7 @@ int main(int argc, char **argv)
 		case 'p':	//satellite *p*osition file
 			positionfile = strdup(optarg);
 			break;
-		case 'q':	//quite
+		case 'q':	//quiet
 			if (--verbosity < 0)
 				verbosity = 0;
 			break;
@@ -4374,6 +4381,9 @@ int main(int argc, char **argv)
 		case 'x':	//dvbscan output
 			output_format = OUTPUT_DVBSCAN_TUNING_DATA;
 			break;
+		case '5':	//dvbv5scan output
+			output_format = OUTPUT_DVBV5SCAN_TUNING_DATA;
+			break;	
 		case 'A':	//ATSC type
 			ATSC_type = strtoul(optarg, NULL, 0);
 			switch (ATSC_type) {
@@ -4640,8 +4650,11 @@ int main(int argc, char **argv)
 		info("output format mplayer\n");
 		break;
 	case OUTPUT_DVBSCAN_TUNING_DATA:
-		info("output format initial tuning data\n");
+		info("output format initial tuning data (dvbscan)\n");
 		break;
+	case OUTPUT_DVBV5SCAN_TUNING_DATA:
+		info("output format initial tuning data (dvbv5scan)\n");
+		break;	
 	case OUTPUT_PIDS:
 		info("output format PIDs only\n");
 		break;
