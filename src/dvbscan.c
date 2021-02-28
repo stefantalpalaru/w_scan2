@@ -351,6 +351,13 @@ struct init_item sat_pol_list[] = {
 	{"L", POLARIZATION_CIRCULAR_LEFT},
 };				// NOTE: no AUTO used here.
 
+struct init_item sat_pol_list_v5[] = {
+	{"HORIZONTAL", POLARIZATION_HORIZONTAL},
+	{"VERTICAL", POLARIZATION_VERTICAL},
+	{"RIGHT", POLARIZATION_CIRCULAR_RIGHT},
+	{"LEFT", POLARIZATION_CIRCULAR_LEFT},
+};				// NOTE: no AUTO used here.
+
 struct init_item sat_fec_list[] = {
 	{"NONE", FEC_NONE},
 	{"1/2", FEC_1_2},
@@ -378,6 +385,14 @@ struct init_item sat_mod_list[] = {
 	{"8PSK", PSK_8},
 	{"16APSK", APSK_16},
 	{"32APSK", APSK_32},
+	{"AUTO", QPSK},
+};				// NOTE: "AUTO" == QPSK in w_scan2 !
+
+struct init_item sat_mod_list_v5[] = {
+	{"QPSK", QPSK},
+	{"PSK/8", PSK_8},
+	{"APSK/16", APSK_16},
+	{"APSK/32", APSK_32},
 	{"AUTO", QPSK},
 };				// NOTE: "AUTO" == QPSK in w_scan2 !
 
@@ -455,6 +470,16 @@ const char *sat_pol_to_txt(int id)
 	return "H";		// fallback. should never happen.
 }
 
+const char *sat_pol_to_txt_v5(int id)
+{
+	unsigned int i;
+
+	for (i = 0; i < STRUCT_COUNT(sat_pol_list_v5); i++)
+		if (id == sat_pol_list_v5[i].id)
+			return sat_pol_list_v5[i].name;
+	return "HORIZONTAL";		// fallback. should never happen.
+}
+
 const char *sat_fec_to_txt(int id)
 {
 	unsigned int i;
@@ -482,6 +507,16 @@ const char *sat_mod_to_txt(int id)
 	for (i = 0; i < STRUCT_COUNT(sat_mod_list); i++)
 		if (id == sat_mod_list[i].id)
 			return sat_mod_list[i].name;
+	return "QPSK";		// fallback. should never happen.
+}
+
+const char *sat_mod_to_txt_v5(int id)
+{
+	unsigned int i;
+
+	for (i = 0; i < STRUCT_COUNT(sat_mod_list_v5); i++)
+		if (id == sat_mod_list_v5[i].id)
+			return sat_mod_list_v5[i].name;
 	return "QPSK";		// fallback. should never happen.
 }
 
