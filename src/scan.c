@@ -3906,6 +3906,8 @@ static const char *usage = "\n"
     "               tzap/czap/xine output instead of vdr channels.conf\n"
     "       -x, --output-initial\n"
     "               generate initial tuning data for (dvb-)scan\n"
+    "       -5, --output-dvbv5\n"
+    "               generate initial tuning data for dvbv5-scan/dvbv5-zap\n"
     "       -Z, --output-xml\n"
     "               generate w_scan2 XML tuning data\n"
     "       -H, --extended-help\n"
@@ -4060,6 +4062,7 @@ static struct option long_options[] = {
 	{"output-mplayer", no_argument, NULL, 'M'},
 	{"output-xine", no_argument, NULL, 'X'},
 	{"output-initial", no_argument, NULL, 'x'},
+	{"output-dvbv5", no_argument, NULL, '5'},
 	{"output-xml", no_argument, NULL, 'Z'},
 	{"help", no_argument, NULL, 'h'},
 	//---

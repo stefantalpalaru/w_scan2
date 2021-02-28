@@ -81,8 +81,8 @@ void dvbv5scan_dump_tuningdata(FILE * f,
 	switch (flags->scantype) {
 	case SCAN_TERRCABLE_ATSC:
 		fprintf(f, "\tDELIVERY_SYSTEM = ATSC\n");
-		fprintf(f, "\tFREQUENCY = %9i\n", t->frequency);
-		fprintf(f, "\tMODULATION = %8s\n", atsc_mod_to_txt(t->modulation));
+		fprintf(f, "\tFREQUENCY = %u\n", t->frequency);
+		fprintf(f, "\tMODULATION = %s\n", atsc_mod_to_txt(t->modulation));
 		break;
 	case SCAN_CABLE:
 		if (t->delsys == SYS_DVBC2) {
@@ -94,33 +94,31 @@ void dvbv5scan_dump_tuningdata(FILE * f,
 		else {
 			fprintf(f, "\tDELIVERY_SYSTEM = DVBC/ANNEX_A\n");
 		}
-		fprintf(f, "\tFREQUENCY = %9i\n", t->frequency);
-		fprintf(f, "\tSYMBOL_RATE = %7i\n", t->symbolrate);
-		fprintf(f, "\tCODE_RATE = %4s\n", cable_fec_to_txt(t->coderate));
-		fprintf(f, "\tMODULATION = %8s\n", cable_mod_to_txt(t->modulation));
+		fprintf(f, "\tFREQUENCY = %u\n", t->frequency);
+		fprintf(f, "\tSYMBOL_RATE = %u\n", t->symbolrate);
+		fprintf(f, "\tINNER_FEC = %s\n", sat_fec_to_txt(t->mpe_fec));
+		fprintf(f, "\tMODULATION = %s\n", cable_mod_to_txt(t->modulation));
 		break;
 	case SCAN_TERRESTRIAL:
 		fprintf(f, "\tDELIVERY_SYSTEM = %s\n", t->delsys == SYS_DVBT2 ? "DVBT2" : "DVBT");
-		fprintf(f, "\tFREQUENCY = %9i\n", t->frequency);
-		fprintf(f, "\tBANDWIDTH_HZ = %4s\n", terr_bw_to_txt(t->bandwidth));
-		fprintf(f, "\tCODE_RATE_HP = %4s\n", terr_fec_to_txt(t->coderate));
-		fprintf(f, "\tCODE_RATE_LP = %4s\n", terr_fec_to_txt(t->coderate_LP));
-		fprintf(f, "\tMODULATION = %8s\n", terr_mod_to_txt(t->modulation));
-		fprintf(f, "\tTRANSMISSION_MODE = %4s\n", terr_transmission_to_txt(t->transmission));
-		fprintf(f, "\tGUARD_INTERVAL = %4s\n", terr_guard_to_txt(t->guard));
-		fprintf(f, "\tHIERARCHY = %4s\n", terr_hierarchy_to_txt(t->hierarchy));
+		fprintf(f, "\tFREQUENCY = %u\n", t->frequency);
+		fprintf(f, "\tBANDWIDTH_HZ = %u\n", t->bandwidth);
+		fprintf(f, "#\tMODULATION = %s\n", terr_mod_to_txt(t->modulation));
+		fprintf(f, "\tTRANSMISSION_MODE = %s\n", terr_transmission_to_txt(t->transmission));
+		fprintf(f, "\tGUARD_INTERVAL = %s\n", terr_guard_to_txt(t->guard));
+		fprintf(f, "\tHIERARCHY = %s\n", terr_hierarchy_to_txt(t->hierarchy));
 		if (t->plp_id)
 			fprintf(f, "\tPLP_ID = %u\n", t->plp_id);
 		break;
 	case SCAN_SATELLITE:
-		fprintf(f, "\tDELIVERY_SYSTEM = %-2s\n", sat_delivery_system_to_txt(t->delsys));
-		fprintf(f, "\tFREQUENCY = %8i\n", t->frequency);
-		fprintf(f, "\tPOLARIZATION = %1s\n", sat_pol_to_txt(t->polarization));
-		fprintf(f, "\tSYMBOL_RATE = %8i\n", t->symbolrate);
-		fprintf(f, "\tCODE_RATE_HP = %4s\n", sat_fec_to_txt(t->coderate));
+		fprintf(f, "\tDELIVERY_SYSTEM = %s\n", t->delsys == SYS_DVBS2 ? "DVBS2" : "DVBS");
+		fprintf(f, "\tFREQUENCY = %u\n", t->frequency);
+		fprintf(f, "\tPOLARIZATION = %s\n", sat_pol_to_txt_v5(t->polarization));
+		fprintf(f, "\tSYMBOL_RATE = %u\n", t->symbolrate);
+		fprintf(f, "\tINNER_FEC = %s\n", sat_fec_to_txt(t->mpe_fec));
 		if (t->delsys != SYS_DVBS) {
-			fprintf(f, "\tROLLOFF = %2s\n", sat_rolloff_to_txt(t->rolloff));
-			fprintf(f, "\tMODULATION = %6s\n", sat_mod_to_txt(t->modulation));
+			fprintf(f, "\tROLLOFF = %s\n", sat_rolloff_to_txt(t->rolloff));
+			fprintf(f, "\tMODULATION = %s\n", sat_mod_to_txt_v5(t->modulation));
 		}
 		break;
 	default:
