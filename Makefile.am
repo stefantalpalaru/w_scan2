@@ -5,6 +5,7 @@ w_scan2_SOURCES	= src/atsc_psip_section.c src/atsc_psip_section.h \
 		  src/descriptors.c src/descriptors.h \
 		  src/diseqc.c src/diseqc.h \
 		  src/dump-dvbscan.c src/dump-dvbscan.h \
+		  src/dump-dvbv5scan.c src/dump-dvbv5scan.h \
 		  src/dump-vdr.c src/dump-vdr.h \
 		  src/dump-xine.c src/dump-xine.h \
 		  src/dump-mplayer.c src/dump-mplayer.h \

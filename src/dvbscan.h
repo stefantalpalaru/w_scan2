@@ -89,9 +89,11 @@ int txt_to_sat_mod(const char *txt);
 /*convert identifier to text */
 const char *sat_delivery_system_to_txt(int id);
 const char *sat_pol_to_txt(int id);
+const char *sat_pol_to_txt_v5(int id);
 const char *sat_fec_to_txt(int id);
 const char *sat_rolloff_to_txt(int id);
 const char *sat_mod_to_txt(int id);
+const char *sat_mod_to_txt_v5(int id);
 
 /********************************************************************
  * non-frontend specific part
