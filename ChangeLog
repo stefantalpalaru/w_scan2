@@ -1,6 +1,7 @@
 ChangeLog:
 --------------------
 [1.0.10]
+- generate initial tuning data output for dvbv5-scan
 
 [1.0.9] 2020-05-16
 - support compilation with -fno-common (default in GCC 10)
