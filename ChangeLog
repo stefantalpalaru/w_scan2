@@ -1,7 +1,8 @@
 ChangeLog:
 --------------------
-[1.0.10]
+[1.0.10] 2021-03-05
 - generate initial tuning data output for dvbv5-scan
+- updated "satellites.dat" file
 
 [1.0.9] 2020-05-16
 - support compilation with -fno-common (default in GCC 10)
