@@ -1,5 +1,7 @@
 ChangeLog:
 --------------------
+[1.0.11]
+
 [1.0.10] 2021-03-05
 - generate initial tuning data output for dvbv5-scan
 - updated "satellites.dat" file
