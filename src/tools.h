@@ -86,7 +86,14 @@ const char *hierarchy_name(int hierarchy);
 const char *interleaving_name(int interleaving);
 const char *delivery_system_name(int delsys);
 const char *property_name(int property);
+const char *ofdm_symbol_duration_name(fe_ofdm_symbol_duration_t ofdm_symbol_duration);
+const char *rolloff_name(fe_rolloff_t rolloff);
+const char *pilot_name(fe_pilot_t pilot);
+const char *frequency_type_name(fe_frequency_type_t frequency_type);
+const char *west_east_flag_name(fe_west_east_flag_t west_east_flag);
+const char *polarization_name(fe_polarization_t polarization);
 const char *bool_name(bool t);
+
 uint32_t freq_scale(uint32_t freq, double scale);
 
 const char *alpha_name(int alpha);	/* somehow missing. */

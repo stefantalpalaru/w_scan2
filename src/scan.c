@@ -3713,7 +3713,7 @@ static void dump_lists(int adapter, int frontend)
 		vlc_xspf_prolog(dest, adapter, frontend, &flags, &this_lnb);
 		break;
 	case OUTPUT_XML:
-		xml_dump(dest, scanned_transponders);
+		xml_dump(dest, scanned_transponders, &flags);
 		break;
 	default:;
 	}

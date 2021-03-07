@@ -66,7 +66,7 @@ typedef struct section_buf {
 
 #define AUDIO_CHAN_MAX    (32)
 #define AC3_CHAN_MAX      (32)
-#define CA_SYSTEM_ID_MAX  (16)
+#define CA_SYSTEM_ID_MAX  (32)
 #define SUBTITLES_MAX     (32)
 
 struct transponder;
