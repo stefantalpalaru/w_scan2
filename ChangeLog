@@ -1,7 +1,8 @@
 ChangeLog:
 --------------------
-[1.0.11]
+[1.0.11] 2021-03-11
 - work around iconv on FreeBSD not knowing about ISO-6397-2
+- better XML tunning and channel data generation
 
 [1.0.10] 2021-03-05
 - generate initial tuning data output for dvbv5-scan
