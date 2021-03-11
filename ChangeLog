@@ -1,5 +1,7 @@
 ChangeLog:
 --------------------
+[1.0.12]
+
 [1.0.11] 2021-03-11
 - work around iconv on FreeBSD not knowing about ISO-6397-2
 - better XML tunning and channel data generation
