@@ -26,7 +26,7 @@
 #include <time.h>		// link with -lrt
 
 /*******************************************************************************
-/* common typedefs && logging.
+ * common typedefs && logging.
  ******************************************************************************/
 #ifndef bool
 typedef int bool;
@@ -43,13 +43,13 @@ typedef int bool;
 extern int verbosity;
 
 #define dprintf(level, fmt...)   \
-   do {                          \
-      if (level <= verbosity) {  \
-         fprintf(stderr, fmt); } \
-   } while (0)
+	do {                          \
+		if (level <= verbosity) {  \
+			fprintf(stderr, fmt); } \
+	} while (0)
 
 #define dpprintf(level, fmt, args...) \
-        dprintf(level, "%s:%d: " fmt, __FUNCTION__, __LINE__ , ##args)
+	dprintf(level, "%s:%d: " fmt, __FUNCTION__, __LINE__ , ##args)
 
 #define fatal(fmt, args...)  do { dpprintf(-1, "FATAL: " fmt , ##args); exit(1); } while(0)
 #define error(msg...)         dprintf(0, "\nERROR: " msg)
@@ -62,7 +62,7 @@ extern int verbosity;
 #define verbosedebug(msg...) dpprintf(6, msg)
 
 /*******************************************************************************
-/* time functions.
+ * time functions.
  ******************************************************************************/
 
 double elapsed(struct timespec *from, struct timespec *to);
@@ -71,7 +71,7 @@ void set_timeout(uint16_t msec, struct timespec *dest);
 int timeout_expired(struct timespec *src);
 
 /*******************************************************************************
-/* debug helpers.
+ * debug helpers.
  ******************************************************************************/
 void run_time_init();
 const char *run_time();
@@ -100,7 +100,7 @@ const char *alpha_name(int alpha);	/* somehow missing. */
 const char *interleaver_name(int i);	/* somehow missing. */
 
 /*******************************************************************************
-/* double linked list.
+ * double linked list.
  ******************************************************************************/
 
 typedef int (*cmp_func) (void *a, void *b);
@@ -132,7 +132,7 @@ void *GetItem(pList list, uint32_t index);
 bool IsMember(pList list, void *item);
 
 /*******************************************************************************
-/* fuzzy bit error recovery.
+ * fuzzy bit error recovery.
  ******************************************************************************/
 
 bool fuzzy_section(void *s);
