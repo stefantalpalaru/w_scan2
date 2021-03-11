@@ -24,7 +24,9 @@
 /* 20140628 --wk */
 #include <stdio.h>
 #include "tools.h"
+#include "scan.h"
 
-void xml_dump(FILE * dest, pList transponders);
+
+void xml_dump(FILE * dest, pList transponders, struct w_scan_flags *flags);
 
 #endif
