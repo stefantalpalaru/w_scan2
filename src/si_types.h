@@ -35,7 +35,7 @@
 #define SECTION_FLAG_FREE     (1U) << 2
 #define SECTION_BUF_SIZE      4096
 
-typedef struct section_buf {
+struct section_buf {
   /*----------------------------*/
 	void *prev;
 	void *next;
@@ -61,12 +61,12 @@ typedef struct section_buf {
 };
 
 /*******************************************************************************
-/* service type.
+ * service type.
  ******************************************************************************/
 
 #define AUDIO_CHAN_MAX    (32)
 #define AC3_CHAN_MAX      (32)
-#define CA_SYSTEM_ID_MAX  (16)
+#define CA_SYSTEM_ID_MAX  (32)
 #define SUBTITLES_MAX     (32)
 
 struct transponder;
