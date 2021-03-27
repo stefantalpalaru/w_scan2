@@ -70,6 +70,14 @@ struct init_item terr_mod_list[] = {
 	{"AUTO", QAM_AUTO}
 };
 
+struct init_item terr_mod_list_v5[] = {
+	{"QPSK", QPSK},
+	{"QAM/16", QAM_16},
+	{"QAM/64", QAM_64},
+	{"QAM/256", QAM_256},
+	{"QAM/AUTO", QAM_AUTO}
+};
+
 struct init_item terr_transmission_list[] = {
 	{"2k", TRANSMISSION_MODE_2K},
 	{"8k", TRANSMISSION_MODE_8K},
@@ -193,6 +201,16 @@ const char *terr_mod_to_txt(int id)
 	return "AUTO";		// fallback. should never happen.
 }
 
+const char *terr_mod_to_txt_v5(int id)
+{
+	unsigned int i;
+
+	for (i = 0; i < STRUCT_COUNT(terr_mod_list_v5); i++)
+		if (id == terr_mod_list_v5[i].id)
+			return terr_mod_list_v5[i].name;
+	return "QAM/AUTO";		// fallback. should never happen.
+}
+
 const char *terr_transmission_to_txt(int id)
 {
 	unsigned int i;
@@ -255,6 +273,19 @@ struct init_item cable_mod_list[] = {
 #endif
 };
 
+struct init_item cable_mod_list_v5[] = {
+	{"QAM/16", QAM_16},
+	{"QAM/32", QAM_32},
+	{"QAM/64", QAM_64},
+	{"QAM/128", QAM_128},
+	{"QAM/256", QAM_256},
+#ifdef   SYS_DVBC2		//currently not supported by Linux DVB API
+	{"QAM/512", QAM_512},
+	{"QAM/1024", QAM_1024},
+	{"QAM/4096", QAM_4096},
+#endif
+};
+
 /* convert text to identifiers */
 
 int txt_to_cable_fec(const char *txt)
@@ -299,6 +330,16 @@ const char *cable_mod_to_txt(int id)
 	return "AUTO";		// fallback. should never happen.
 }
 
+const char *cable_mod_to_txt_v5(int id)
+{
+	unsigned int i;
+
+	for (i = 0; i < STRUCT_COUNT(cable_mod_list_v5); i++)
+		if (id == cable_mod_list_v5[i].id)
+			return cable_mod_list_v5[i].name;
+	return "QAM/AUTO";		// fallback. should never happen.
+}
+
 /********************************************************************
  * ATSC
  ********************************************************************/
@@ -308,6 +349,13 @@ struct init_item atsc_mod_list[] = {
 	{"QAM256", QAM_256},
 	{"8VSB", VSB_8},
 	{"16VSB", VSB_16},
+};
+
+struct init_item atsc_mod_list_v5[] = {
+	{"QAM/64", QAM_64},
+	{"QAM/256", QAM_256},
+	{"VSB/8", VSB_8},
+	{"VSB/16", VSB_16},
 };
 
 /* convert text to identifiers */
@@ -332,6 +380,16 @@ const char *atsc_mod_to_txt(int id)
 		if (id == atsc_mod_list[i].id)
 			return atsc_mod_list[i].name;
 	return "AUTO";		// fallback. should never happen.
+}
+
+const char *atsc_mod_to_txt_v5(int id)
+{
+	unsigned int i;
+
+	for (i = 0; i < STRUCT_COUNT(atsc_mod_list_v5); i++)
+		if (id == atsc_mod_list_v5[i].id)
+			return atsc_mod_list_v5[i].name;
+	return "QAM/AUTO";		// fallback. should never happen.
 }
 
 /********************************************************************

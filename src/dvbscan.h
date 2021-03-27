@@ -46,6 +46,7 @@ int txt_to_terr_hierarchy(const char *txt);
 const char *terr_bw_to_txt(int id);
 const char *terr_fec_to_txt(int id);
 const char *terr_mod_to_txt(int id);
+const char *terr_mod_to_txt_v5(int id);
 const char *terr_transmission_to_txt(int id);
 const char *terr_guard_to_txt(int id);
 const char *terr_hierarchy_to_txt(int id);
@@ -62,6 +63,7 @@ int txt_to_cable_mod(const char *txt);
 /*convert identifier to text */
 const char *cable_fec_to_txt(int id);
 const char *cable_mod_to_txt(int id);
+const char *cable_mod_to_txt_v5(int id);
 
 /********************************************************************
  * ATSC
@@ -73,6 +75,7 @@ int txt_to_atsc_mod(const char *txt);
 
 /*convert identifier to text */
 const char *atsc_mod_to_txt(int id);
+const char *atsc_mod_to_txt_v5(int id);
 
 /********************************************************************
  * DVB-S
