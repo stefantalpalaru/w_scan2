@@ -4091,6 +4091,7 @@ static struct option long_options[] = {
 	{"scr", required_argument, NULL, 'u'},
 	{"use-pat", required_argument, NULL, 'P'},
 	{"delete-duplicate-transponders", no_argument, NULL, 'd'},
+	{"version", no_argument, NULL, 'V'},
 	{NULL, 0, NULL, 0},
 };
 
@@ -4154,9 +4155,9 @@ int main(int argc, char **argv)
 
 	run_time_init();
 
-	for (opt = 0; opt < argc; opt++)
-		info("%s ", argv[opt]);
-	info("%s", "\n");
+	info("\n%s-%s (compiled for DVB API %d.%d)\n%s\n\n", PACKAGE_NAME,
+	     PACKAGE_VERSION, DVB_API_VERSION, DVB_API_VERSION_MINOR,
+	     PACKAGE_URL);
 
 	while ((opt =
 		getopt_long(argc, argv,
@@ -4370,8 +4371,7 @@ int main(int argc, char **argv)
 					break;
 				default:
 					fatal
-					    ("undefined SCR satellite pos: '%c'",
-					     c);
+					    ("undefined SCR satellite pos: '%c'" ,c);
 				}
 			}
 			break;
@@ -4386,7 +4386,7 @@ int main(int argc, char **argv)
 			break;
 		case '5':	//dvbv5scan output
 			output_format = OUTPUT_DVBV5SCAN_TUNING_DATA;
-			break;	
+			break;
 		case 'A':	//ATSC type
 			ATSC_type = strtoul(optarg, NULL, 0);
 			switch (ATSC_type) {
@@ -4512,13 +4512,9 @@ int main(int argc, char **argv)
 		}
 	}
 	if (retVersion) {
-		info("%s", PACKAGE_VERSION);
 		cleanup();
 		return 0;
 	}
-	info("%s version %s (compiled for DVB API %d.%d)\n",
-	     PACKAGE_NAME, PACKAGE_VERSION, DVB_API_VERSION,
-	     DVB_API_VERSION_MINOR);
 	if (NULL == initdata) {
 		if ((NULL == country) && (scantype != SCAN_SATELLITE)) {
 			country =
@@ -4657,7 +4653,7 @@ int main(int argc, char **argv)
 		break;
 	case OUTPUT_DVBV5SCAN_TUNING_DATA:
 		info("output format initial tuning data (dvbv5scan)\n");
-		break;	
+		break;
 	case OUTPUT_PIDS:
 		info("output format PIDs only\n");
 		break;

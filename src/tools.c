@@ -27,7 +27,7 @@
 #include "tools.h"
 
 /*******************************************************************************
-/* common typedefs && logging.
+ * common typedefs && logging.
  ******************************************************************************/
 int verbosity = 2;		// need signed -> use of fatal()
 
@@ -45,7 +45,7 @@ void report(pList list)
 {
 	dbg("--------------------------------------------------------------\n");
 	dbg("list '%s'@%p: count=%u; first=%p; last=%p\n",
-	    list->name, list, list->count, list->first, list->last);
+		list->name, list, list->count, list->first, list->last);
 
 	pItem p = list->first;
 	while (p != NULL) {
@@ -127,7 +127,7 @@ void *GetItem(pList list, uint32_t index)
 	pItem p;
 	for (p = list->first; p; p = p->next) {
 		dbg("    item%.2u: (prev=%p, p=%p, next=%p)\n", p->index,
-		    p->prev, p, p->next);
+			p->prev, p, p->next);
 		if (p->index == index)
 			return p;
 	}
@@ -142,7 +142,7 @@ void AddItem(pList list, void *item)
 	list->lock = true;
 
 	dbg("%s %d: list:'%s' add item: (prev=%p, p=%p, next=%p)\n",
-	    __FUNCTION__, __LINE__, list->name, p->prev, p, p->next);
+		__FUNCTION__, __LINE__, list->name, p->prev, p, p->next);
 
 	p->index = list->count;
 	p->prev = list->last;
@@ -169,7 +169,7 @@ void InsertItem(pList list, void *item, uint32_t index)
 	list->lock = true;
 
 	dbg("%s %d: list:'%s' item=%p, index=%u\n",
-	    __FUNCTION__, __LINE__, list->name, item, index);
+		__FUNCTION__, __LINE__, list->name, item, index);
 
 	pItem prev, next, p = item;
 	p->index = 0;
@@ -221,7 +221,7 @@ void UnlinkItem(pList list, void *item, bool freemem)
 	pItem prev, next, p = item;
 
 	dbg("%s %d: list:'%s' item=%p, freemem = %d\n",
-	    __FUNCTION__, __LINE__, list->name, item, freemem);
+		__FUNCTION__, __LINE__, list->name, item, freemem);
 	if (IsMember(list, item) == false) {
 		warning("Cannot %s: item %p is not member of list %s.\n",
 			freemem ? "delete" : "unlink", item, list->name);
@@ -274,7 +274,7 @@ void UnlinkItem(pList list, void *item, bool freemem)
 void DeleteItem(pList list, void *item)
 {
 	dbg("%s %d: list:'%s' item=%p\n", __FUNCTION__, __LINE__, list->name,
-	    index);
+		index);
 	UnlinkItem(list, item, true);
 }
 
@@ -400,13 +400,13 @@ int timeout_expired(struct timespec *src)
 	clock_gettime(CLK_SPEC, &t);
 
 	expired = (t.tv_sec > src->tv_sec) ||
-	    ((t.tv_sec == src->tv_sec) && (t.tv_nsec > src->tv_nsec));
+		((t.tv_sec == src->tv_sec) && (t.tv_nsec > src->tv_nsec));
 //dbg("now = %ld.%.9li; expired=%d\n", t.tv_sec, t.tv_nsec, expired);
 	return expired;
 }
 
 /*******************************************************************************
-/* debug helpers.
+ * debug helpers.
  ******************************************************************************/
 struct timespec starttime = { 0, 0 };
 
@@ -828,80 +828,80 @@ const char *property_name(int property)
 }
 
 const char *ofdm_symbol_duration_name(fe_ofdm_symbol_duration_t ofdm_symbol_duration) {
-  switch (ofdm_symbol_duration) {
-  case FFT_4K_8MHZ:
-    return "FFT_4K_8MHZ";
-  case FFT_4K_6MHZ:
-    return "FFT_4K_6MHZ";  
-  default:
-		return "(unknown ofdm symbol duration)";  
+	switch (ofdm_symbol_duration) {
+	case FFT_4K_8MHZ:
+		return "FFT_4K_8MHZ";
+	case FFT_4K_6MHZ:
+		return "FFT_4K_6MHZ";
+	default:
+		return "(unknown ofdm symbol duration)";
 	}
 }
 
 const char *rolloff_name(fe_rolloff_t rolloff) {
-  switch (rolloff) {
-  case ROLLOFF_35:
-    return "ROLLOFF_35";
-  case ROLLOFF_25:
-    return "ROLLOFF_25";  
-  case ROLLOFF_20:
-    return "ROLLOFF_20";  
-  case ROLLOFF_AUTO:
-    return "ROLLOFF_AUTO";  
-  default:
-		return "(unknown rolloff)";  
+	switch (rolloff) {
+	case ROLLOFF_35:
+		return "ROLLOFF_35";
+	case ROLLOFF_25:
+		return "ROLLOFF_25";
+	case ROLLOFF_20:
+		return "ROLLOFF_20";
+	case ROLLOFF_AUTO:
+		return "ROLLOFF_AUTO";
+	default:
+		return "(unknown rolloff)";
 	}
 }
 
 const char *pilot_name(fe_pilot_t pilot) {
-  switch (pilot) {
-  case PILOT_ON:
-    return "PILOT_ON";
-  case PILOT_OFF:
-    return "PILOT_OFF";  
-  case PILOT_AUTO:
-    return "PILOT_AUTO";  
-  default:
-		return "(unknown pilot)";  
+	switch (pilot) {
+	case PILOT_ON:
+		return "PILOT_ON";
+	case PILOT_OFF:
+		return "PILOT_OFF";
+	case PILOT_AUTO:
+		return "PILOT_AUTO";
+	default:
+		return "(unknown pilot)";
 	}
 }
 
 const char *frequency_type_name(fe_frequency_type_t frequency_type) {
-  switch (frequency_type) {
-  case DATA_SLICE_TUNING_FREQUENCY:
-    return "DATA_SLICE_TUNING_FREQUENCY";
-  case C2_SYSTEM_CENTER_FREQUENCY:
-    return "C2_SYSTEM_CENTER_FREQUENCY";  
-  case INITIAL_TUNING_FOR_STATIC_DATA_SLICE:
-    return "INITIAL_TUNING_FOR_STATIC_DATA_SLICE";  
-  default:
-		return "(unknown frequency type)";  
+	switch (frequency_type) {
+	case DATA_SLICE_TUNING_FREQUENCY:
+		return "DATA_SLICE_TUNING_FREQUENCY";
+	case C2_SYSTEM_CENTER_FREQUENCY:
+		return "C2_SYSTEM_CENTER_FREQUENCY";
+	case INITIAL_TUNING_FOR_STATIC_DATA_SLICE:
+		return "INITIAL_TUNING_FOR_STATIC_DATA_SLICE";
+	default:
+		return "(unknown frequency type)";
 	}
 }
 
 const char *west_east_flag_name(fe_west_east_flag_t west_east_flag) {
-  switch (west_east_flag) {
-  case EAST_FLAG:
-    return "E";
-  case WEST_FLAG:
-    return "W";  
-  default:
-		return "(unknown west east flag)";  
+	switch (west_east_flag) {
+	case EAST_FLAG:
+		return "E";
+	case WEST_FLAG:
+		return "W";
+	default:
+		return "(unknown west east flag)";
 	}
 }
 
 const char *polarization_name(fe_polarization_t polarization) {
-  switch (polarization) {
-  case POLARIZATION_HORIZONTAL:
-    return "HORIZONTAL";
-  case POLARIZATION_VERTICAL:
-    return "VERTICAL";  
-  case POLARIZATION_CIRCULAR_LEFT:
-    return "CIRCULAR_LEFT";
-  case POLARIZATION_CIRCULAR_RIGHT:
-    return "CIRCULAR_RIGHT";  
-  default:
-		return "(unknown polarization)";  
+	switch (polarization) {
+	case POLARIZATION_HORIZONTAL:
+		return "HORIZONTAL";
+	case POLARIZATION_VERTICAL:
+		return "VERTICAL";
+	case POLARIZATION_CIRCULAR_LEFT:
+		return "CIRCULAR_LEFT";
+	case POLARIZATION_CIRCULAR_RIGHT:
+		return "CIRCULAR_RIGHT";
+	default:
+		return "(unknown polarization)";
 	}
 }
 
@@ -944,7 +944,7 @@ const char *interleaver_name(int i)
 }
 
 /*******************************************************************************
-/* fuzzy bit error recovery.
+ * fuzzy bit error recovery.
  ******************************************************************************/
 #include "si_types.h"
 

@@ -50,16 +50,16 @@ const xml_param xml_params[] = {
 			SYS_ATSC, SYS_ATSCMH,
 			SYS_DTMB, SYS_CMMB, SYS_DAB, 0}, QAM_AUTO},
 	{"coderate", {SYS_DVBT, SYS_DVBT2,
-		      SYS_DVBS, SYS_DVBS2, SYS_DSS, SYS_TURBO,
-		      SYS_DVBC_ANNEX_A, SYS_DVBC_ANNEX_B, SYS_DVBC_ANNEX_C,
-		      SYS_DTMB, 0}, FEC_AUTO},
+		SYS_DVBS, SYS_DVBS2, SYS_DSS, SYS_TURBO,
+		SYS_DVBC_ANNEX_A, SYS_DVBC_ANNEX_B, SYS_DVBC_ANNEX_C,
+		SYS_DTMB, 0}, FEC_AUTO},
 	{"inversion", {SYS_DVBT, SYS_DVBT2,
-		       SYS_DVBS, SYS_DVBS2, SYS_DSS, SYS_TURBO,
-		       SYS_DVBC_ANNEX_A, SYS_DVBC_ANNEX_B, SYS_DVBC_ANNEX_C,
-		       SYS_ISDBT, SYS_DTMB, 0}, INVERSION_AUTO},
+		SYS_DVBS, SYS_DVBS2, SYS_DSS, SYS_TURBO,
+		SYS_DVBC_ANNEX_A, SYS_DVBC_ANNEX_B, SYS_DVBC_ANNEX_C,
+		SYS_ISDBT, SYS_DTMB, 0}, INVERSION_AUTO},
 	{"bandwidth",
-	 {SYS_DVBT, SYS_DVBT2, SYS_ISDBT, SYS_ATSC, SYS_ATSCMH, SYS_DTMB, 0},
-	 NO_AUTO},
+		{SYS_DVBT, SYS_DVBT2, SYS_ISDBT, SYS_ATSC, SYS_ATSCMH, SYS_DTMB, 0},
+		NO_AUTO},
 	{"priority", {SYS_DVBT, SYS_DVBT2, 0}, true},
 	{"time_slicing", {SYS_DVBT, 0}, false},	// EN 301 192
 	{"mpe_fec", {SYS_DVBT, SYS_DVBT2, 0}, false},
@@ -69,9 +69,9 @@ const xml_param xml_params[] = {
 	{"terr_interleaver", {SYS_DVBT, SYS_DVBT2, 0}, INTERLEAVE_AUTO},	//Table 46: Signalling format for the avalues and the used interleaver
 	{"coderate_LP", {SYS_DVBT, SYS_DVBT2, 0}, FEC_NONE},
 	{"guard", {SYS_DVBT, SYS_DVBT2, SYS_ISDBT, SYS_DTMB, 0},
-	 GUARD_INTERVAL_AUTO},
+		GUARD_INTERVAL_AUTO},
 	{"transmission", {SYS_DVBT, SYS_DVBT2, SYS_ISDBT, SYS_DTMB, 0},
-	 TRANSMISSION_MODE_AUTO},
+		TRANSMISSION_MODE_AUTO},
 	{"other_frequency_flag", {SYS_DVBT, SYS_DVBT2, 0}, 0},
 	{"plp_id", {SYS_DVBT2, SYS_DVBC2, 0}, 0},
 	{"system_id", {SYS_DVBT2, SYS_DVBC2, 0}, 0},
@@ -79,7 +79,7 @@ const xml_param xml_params[] = {
 	{"SISO_MISO", {SYS_DVBT2, 0}, 0},
 	{"tfs_flag", {SYS_DVBT2, 0}, 0},
 	{"orbital_position", {SYS_DVBS, SYS_DVBS2, SYS_DSS, SYS_TURBO, 0},
-	 0x0192},
+		0x0192},
 	{"west_east_flag", {SYS_DVBS, SYS_DVBS2, SYS_DSS, SYS_TURBO, 0}, 'E'},
 	{"polarization", {SYS_DVBS, SYS_DVBS2, SYS_DSS, SYS_TURBO, 0}, NO_AUTO},
 	{"rolloff", {SYS_DVBS2, 0}, ROLLOFF_AUTO},
@@ -93,7 +93,7 @@ const xml_param xml_params[] = {
 	{"pilot", {SYS_DVBS2, 0}, PILOT_AUTO},
 	{"data_slice_id", {SYS_DVBC2, 0}, 0},
 	{"C2_tuning_frequency_type", {SYS_DVBC2, 0},
-	 C2_SYSTEM_CENTER_FREQUENCY},
+		C2_SYSTEM_CENTER_FREQUENCY},
 	{"active_OFDM_symbol_duration", {SYS_DVBC2, 0}, FFT_4K_8MHZ},
 	{"", {0}, NO_AUTO},
 };
@@ -209,127 +209,86 @@ char *StreamName(int id)
 	switch (id) {
 	case 1:
 		return "ISO/IEC 11172-2 Video | MPEG 1 - H.261";
-		break;
 	case 2:
 		return "ISO/IEC 13818-2 Video | MPEG-2 - H.262";
-		break;
 	case 16:
 		return "ISO/IEC 14496-2 Visual | MPEG-4 - H.263";
-		break;
 	case 27:
 		return "ISO/IEC 14496-10 Video | H.264";
-		break;
 	case 36:
 		return "ISO/IEC 23008-2 Video | H.265";
-		break;
 	case 3:
 		return "ISO/IEC 11172 Audio | MPEG-1";
-		break;
 	case 4:
 		return "ISO/IEC 13818-3 Audio | MPEG-2";
-		break;
 	case 15:
 		return "ISO/IEC 13818-7 Audio | ADTS AAC";
-		break;
 	case 17:
 		return "ISO/IEC 14496-3 Audio (LATM) | AAC LC";
-		break;
 	case 6:
 		return "ISO/IEC 13818-1 PES private data";
-		break;
 	case 5:
 		return "ISO/IEC 13818-1 | HBBTV";
-		break;
 	case 7:
 		return "ISO/IEC 13522 (MHEG)";
-		break;
 	case 8:
 		return "ITU-T Rec. H.222 and ISO/IEC 13818-1 DSM CC";
-		break;
 	case 9:
 		return "ITU-T Rec. H.222 and ISO/IEC 13818-1/11172-1 auxiliary data";
-		break;
 	case 10:
 		return "ISO/IEC 13818-6 DSM CC multiprotocol encapsulation";
-		break;
 	case 11:
 		return "ISO/IEC 13818-6 DSM CC U-N messages";
-		break;
 	case 12:
 		return "ISO/IEC 13818-6 DSM CC stream descriptors";
-		break;
 	case 13:
 		return "ISO/IEC 13818-6 DSM CC tabled data";
-		break;
 	case 14:
 		return "ISO/IEC 13818-1 auxiliary data";
-		break;
 	case 20:
 		return "ISO/IEC 13818-6 DSM CC synchronized download protocol";
-		break;
 	case 21:
 		return "Packetized metadata";
-		break;
 	case 22:
 		return "Sectioned metadata";
-		break;
 	case 23:
 		return "ISO/IEC 13818-6 DSM CC Data Carousel metadata";
-		break;
 	case 24:
 		return "ISO/IEC 13818-6 DSM CC Object Carousel metadata";
-		break;
 	case 25:
 		return "ISO/IEC 13818-6 Synchronized Download Protocol metadata";
-		break;
 	case 26:
 		return "ISO/IEC 13818-11 IPMP";
-		break;
 	case 28:
 		return "ISO/IEC 14496-3 | AAC";
-		break;
 	case 29:
 		return "ISO/IEC 14496-17 (MPEG-4 text)";
-		break;
 	case 30:
 		return "ISO/IEC 23002-3 (MPEG-4 auxiliary video)";
-		break;
 	case 31:
 		return "ISO/IEC 14496-10 SVC (MPEG-4 AVC sub-bitstream)";
-		break;
 	case 32:
 		return "ISO/IEC 14496-10 MVC (MPEG-4 AVC sub-bitstream)";
-		break;
 	case 66:
 		return "Chinese Video Standard";
-		break;
 	case 127:
 		return "ISO/IEC 13818-11 IPMP (DRM)";
-		break;
 	case 135:
 		return "Dolby Digital Plus (enhanced AC-3)";
-		break;
 	case 145:
 		return "ATSC DSM CC Network Resources table";
-		break;
 	case 193:
 		return "Dolby Digital (AC-3) up to six channel audio with AES-128-CBC data encryption";
-		break;
 	case 194:
 		return "ATSC DSM CC synchronous data or Dolby Digital Plus audio with AES-128-CBC data encryption";
-		break;
 	case 207:
 		return "ISO/IEC 13818-7 ADTS AAC with AES-128-CBC frame encryption";
-		break;
 	case 209:
 		return "BBC Dirac (Ultra HD video)";
-		break;
 	case 219:
 		return "ITU-T Rec. H.264 and ISO/IEC 14496-10 with AES-128-CBC slice encryption";
-		break;
 	default:
 		return "UNKNOWN";
-		break;
 	}
 }
 
@@ -549,108 +508,90 @@ void xml_dump(FILE * dest, pList transponders, struct w_scan_flags *flags)
 			(double)t->frequency / 1e6);
 		indent++;
 
-		if needs_param
-			(modulation)
-			    fprintf(dest,
-				    "%s<param modulation=\"%s\"/>\n",
-				    get_indent(indent),
-				    modulation_name(t->modulation));
-		if needs_param
-			(bandwidth)
-			    fprintf(dest,
-				    "%s<param bandwidth=\"%.3f\"/>\n",
-				    get_indent(indent),
-				    (double)t->bandwidth / 1e6);
-		if needs_param
-			(coderate)
-			    fprintf(dest,
-				    "%s<param coderate=\"%s\"/>\n",
-				    get_indent(indent),
-				    coderate_name(t->coderate));
-		if needs_param
-			(transmission)
-			    fprintf(dest,
-				    "%s<param transmission=\"%s\"/>\n",
-				    get_indent(indent),
-				    transmission_mode_name(t->transmission));
-		if needs_param
-			(guard)
-			    fprintf(dest,
-				    "%s<param guard=\"%s\"/>\n",
-				    get_indent(indent),
-				    guard_interval_name(t->guard));
+		if needs_param(modulation)
+			fprintf(dest,
+				"%s<param modulation=\"%s\"/>\n",
+				get_indent(indent),
+				modulation_name(t->modulation));
+		if needs_param(bandwidth)
+			fprintf(dest,
+				"%s<param bandwidth=\"%.3f\"/>\n",
+				get_indent(indent),
+				(double)t->bandwidth / 1e6);
+		if needs_param(coderate)
+			fprintf(dest,
+				"%s<param coderate=\"%s\"/>\n",
+				get_indent(indent),
+				coderate_name(t->coderate));
+		if needs_param(transmission)
+			fprintf(dest,
+				"%s<param transmission=\"%s\"/>\n",
+				get_indent(indent),
+				transmission_mode_name(t->transmission));
+		if needs_param(guard)
+			fprintf(dest,
+				"%s<param guard=\"%s\"/>\n",
+				get_indent(indent),
+				guard_interval_name(t->guard));
 		if (t->hierarchy != HIERARCHY_NONE) {
 			// print those only if hierarchy is used.
-			if needs_param
-				(hierarchy)
-				    fprintf(dest,
-					    "%s<param hierarchy=\"%s\"/>\n",
-					    get_indent(indent),
-					    hierarchy_name(t->hierarchy));
-			if needs_param
-				(alpha)
-				    fprintf(dest,
-					    "%s<param alpha=\"%s\"/>\n",
-					    get_indent(indent),
-					    alpha_name(t->alpha));
-			if needs_param
-				(terr_interleaver)
-				    fprintf(dest,
-					    "%s<param terr_interleaver=\"%s\"/>\n",
-					    get_indent(indent),
-					    interleaver_name(t->
-							     terr_interleaver));
-			if needs_param
-				(coderate_LP)
-				    fprintf(dest,
-					    "%s<param coderate_LP=\"%s\"/>\n",
-					    get_indent(indent),
-					    coderate_name(t->coderate_LP));
-			if needs_param
-				(priority)
-				    fprintf(dest,
-					    "%s<param priority=\"%s\"/>\n",
-					    get_indent(indent),
-					    bool_name(t->priority));
+			if needs_param(hierarchy)
+				fprintf(dest,
+					"%s<param hierarchy=\"%s\"/>\n",
+					get_indent(indent),
+					hierarchy_name(t->hierarchy));
+			if needs_param(alpha)
+				fprintf(dest,
+					"%s<param alpha=\"%s\"/>\n",
+					get_indent(indent),
+					alpha_name(t->alpha));
+			if needs_param(terr_interleaver)
+				fprintf(dest,
+					"%s<param terr_interleaver=\"%s\"/>\n",
+					get_indent(indent),
+					interleaver_name(t->terr_interleaver));
+			if needs_param(coderate_LP)
+				fprintf(dest,
+					"%s<param coderate_LP=\"%s\"/>\n",
+					get_indent(indent),
+					coderate_name(t->coderate_LP));
+			if needs_param(priority)
+				fprintf(dest,
+					"%s<param priority=\"%s\"/>\n",
+					get_indent(indent),
+					bool_name(t->priority));
 		}
-		if needs_param
-			(mpe_fec)
-			    fprintf(dest,
-				    "%s<param mpe_fec=\"%s\"/>\n",
-				    get_indent(indent), bool_name(t->mpe_fec));
-		if needs_param
-			(time_slicing)
-			    fprintf(dest,
-				    "%s<param time_slicing=\"%s\"/>\n",
-				    get_indent(indent),
-				    bool_name(t->time_slicing));
-		if needs_param
-			(plp_id)
-			    fprintf(dest,
-				    "%s<param plp_id=\"%u\"/>\n",
-				    get_indent(indent), t->plp_id);
-		if needs_param
-			(system_id)
-			    fprintf(dest,
-				    "%s<param system_id=\"%d\"/>\n",
-				    get_indent(indent), t->system_id);
-		if needs_param
-			(extended_info)
-			    fprintf(dest,
-				    "%s<param extended_info=\"%s\"/>\n",
-				    get_indent(indent),
-				    bool_name(t->extended_info));
-		if needs_param
-			(SISO_MISO)
-			    fprintf(dest,
-				    "%s<param SISO_MISO=\"%s\"/>\n",
-				    get_indent(indent),
-				    bool_name(t->SISO_MISO));
+		if needs_param(mpe_fec)
+			fprintf(dest,
+				"%s<param mpe_fec=\"%s\"/>\n",
+				get_indent(indent), bool_name(t->mpe_fec));
+		if needs_param(time_slicing)
+			fprintf(dest,
+				"%s<param time_slicing=\"%s\"/>\n",
+				get_indent(indent),
+				bool_name(t->time_slicing));
+		if needs_param(plp_id)
+			fprintf(dest,
+				"%s<param plp_id=\"%u\"/>\n",
+				get_indent(indent), t->plp_id);
+		if needs_param(system_id)
+			fprintf(dest,
+				"%s<param system_id=\"%d\"/>\n",
+				get_indent(indent), t->system_id);
+		if needs_param(extended_info)
+			fprintf(dest,
+				"%s<param extended_info=\"%s\"/>\n",
+				get_indent(indent),
+				bool_name(t->extended_info));
+		if needs_param(SISO_MISO)
+			fprintf(dest,
+				"%s<param SISO_MISO=\"%s\"/>\n",
+				get_indent(indent),
+				bool_name(t->SISO_MISO));
 		if ((t->other_frequency_flag != false)
-		    && ((t->cells)->count > 0)) {
+			&& ((t->cells)->count > 0)) {
 			struct cell *f;
-			if needs_param
-				(other_frequency_flag) {
+			if needs_param(other_frequency_flag) {
 				fprintf(dest,
 					"%s<param other_frequency_flag=\"%s\"/>\n",
 					get_indent(indent), bool_name(true));
@@ -670,14 +611,12 @@ void xml_dump(FILE * dest, pList transponders, struct w_scan_flags *flags)
 					get_indent(indent));
 				}
 		}
-		if needs_param
-			(polarization)
-			    fprintf(dest,
-				    "%s<param polarization=\"%s\"/>\n",
-				    get_indent(indent),
-				    polarization_name(t->polarization));
-		if (needs_param(orbital_position)
-		    && needs_param(west_east_flag)) {
+		if needs_param(polarization)
+			fprintf(dest,
+				"%s<param polarization=\"%s\"/>\n",
+				get_indent(indent),
+				polarization_name(t->polarization));
+		if (needs_param(orbital_position) && needs_param(west_east_flag)) {
 			if (t->orbital_position && t->west_east_flag) {
 				fprintf(dest,
 					"%s<param orbital_position=\"0x%04x\"/>\n",
@@ -689,70 +628,59 @@ void xml_dump(FILE * dest, pList transponders, struct w_scan_flags *flags)
 					west_east_flag_name(t->west_east_flag));
 			}
 		}
-		if needs_param
-			(symbolrate)
-			    fprintf(dest,
-				    "%s<param symbolrate=\"%.3f\"/>\n",
-				    get_indent(indent),
-				    ((double)t->symbolrate / 1e6));
+		if needs_param(symbolrate)
+			fprintf(dest,
+				"%s<param symbolrate=\"%.3f\"/>\n",
+				get_indent(indent),
+				((double)t->symbolrate / 1e6));
 //    if needs_param                            // not yet part of the transponder struct
 //          (input_stream_id)
 //              fprintf(dest,
 //                "%s<param inputs_stream_id=\"%u\"/>\n", get_indent(indent),
 //                t->input_stream_id);
-		if needs_param
-			(pilot)
-			    fprintf(dest,
-				    "%s<param pilot=\"%s\"/>\n",
-				    get_indent(indent), pilot_name(t->pilot));
-		if needs_param
-			(rolloff)
-			    fprintf(dest,
-				    "%s<param rolloff=\"%s\"/>\n",
-				    get_indent(indent),
-				    rolloff_name(t->rolloff));
+		if needs_param(pilot)
+			fprintf(dest,
+				"%s<param pilot=\"%s\"/>\n",
+				get_indent(indent), pilot_name(t->pilot));
+		if needs_param(rolloff)
+			fprintf(dest,
+				"%s<param rolloff=\"%s\"/>\n",
+				get_indent(indent),
+				rolloff_name(t->rolloff));
 //    if needs_param                            // not yet part of the transponder struct
 //          (interleave)
 //              fprintf(dest,
 //                "%s<param interleave=\"%s\"/>\n", get_indent(indent),
 //                interleaver_name(t->interleave));
-		if needs_param
-			(multiple_input_stream_flag)
-			    fprintf(dest,
-				    "%s<param multiple_input_stream_flag=\"%s\"/>\n",
-				    get_indent(indent),
-				    bool_name(t->multiple_input_stream_flag));
-		if needs_param
-			(scrambling_sequence_selector)
-			    fprintf(dest,
-				    "%s<param scrambling_sequence_selector=\"%s\"/>\n",
-				    get_indent(indent),
-				    bool_name(t->scrambling_sequence_selector));
-		if needs_param
-			(scrambling_sequence_index)
-			    fprintf(dest,
-				    "%s<param scrambling_sequence_index=\"%u\"/>\n",
-				    get_indent(indent),
-				    t->scrambling_sequence_index);
-		if needs_param
-			(data_slice_id)
-			    fprintf(dest,
-				    "%s<param data_slice_id=\"%u\"/>\n",
-				    get_indent(indent), t->data_slice_id);
-		if needs_param
-			(C2_tuning_frequency_type)
-			    fprintf(dest,
-				    "%s<param C2_System_tuning_frequency_type=\"%s\"/>\n",
-				    get_indent(indent),
-				    frequency_type_name(t->
-							C2_tuning_frequency_type));
-		if needs_param
-			(active_OFDM_symbol_duration)
-			    fprintf(dest,
-				    "%s<param active_OFDM_symbol_duration=\"%s\"/>\n",
-				    get_indent(indent),
-				    ofdm_symbol_duration_name(t->
-							      active_OFDM_symbol_duration));
+		if needs_param(multiple_input_stream_flag)
+			fprintf(dest,
+				"%s<param multiple_input_stream_flag=\"%s\"/>\n",
+				get_indent(indent),
+				bool_name(t->multiple_input_stream_flag));
+		if needs_param(scrambling_sequence_selector)
+			fprintf(dest,
+				"%s<param scrambling_sequence_selector=\"%s\"/>\n",
+				get_indent(indent),
+				bool_name(t->scrambling_sequence_selector));
+		if needs_param(scrambling_sequence_index)
+			fprintf(dest,
+				"%s<param scrambling_sequence_index=\"%u\"/>\n",
+				get_indent(indent),
+				t->scrambling_sequence_index);
+		if needs_param(data_slice_id)
+			fprintf(dest,
+				"%s<param data_slice_id=\"%u\"/>\n",
+				get_indent(indent), t->data_slice_id);
+		if needs_param(C2_tuning_frequency_type)
+			fprintf(dest,
+				"%s<param C2_System_tuning_frequency_type=\"%s\"/>\n",
+				get_indent(indent),
+				frequency_type_name(t->C2_tuning_frequency_type));
+		if needs_param(active_OFDM_symbol_duration)
+			fprintf(dest,
+				"%s<param active_OFDM_symbol_duration=\"%s\"/>\n",
+				get_indent(indent),
+				ofdm_symbol_duration_name(t->active_OFDM_symbol_duration));
 		indent--;
 		fprintf(dest, "%s</params>\n", get_indent(indent));
 		indent--;
@@ -766,7 +694,7 @@ void xml_dump(FILE * dest, pList transponders, struct w_scan_flags *flags)
 	for (t = transponders->first; t; t = t->next) {
 		for (s = (t->services)->first; s; s = s->next) {
 			if ((s->video_pid || s->audio_pid[0])
-			    && (flags->ca_select || !s->scrambled)) {
+				&& (flags->ca_select || !s->scrambled)) {
 				indent++;
 				fprintf(dest,
 					"%s<service ONID=\"%u\" TSID=\"%u\" SID=\"%u\">\n",
@@ -778,11 +706,11 @@ void xml_dump(FILE * dest, pList transponders, struct w_scan_flags *flags)
 				fprintf(dest, "%s<name char256=\"%s\"/>\n",
 					get_indent(indent),
 					safe_xml(s->service_name,
-						 (char *)&buffer));
+						(char *)&buffer));
 				fprintf(dest, "%s<provider char256=\"%s\"/>\n",
 					get_indent(indent),
 					safe_xml(s->provider_name,
-						 (char *)&buffer));
+						(char *)&buffer));
 				fprintf(dest, "%s<pcr pid=\"%u\"/>\n",
 					get_indent(indent), s->pcr_pid);
 				fprintf(dest, "%s<streams>\n",
@@ -797,8 +725,7 @@ void xml_dump(FILE * dest, pList transponders, struct w_scan_flags *flags)
 					fprintf(dest, " pid=\"%u\"",
 						s->video_pid);
 					fprintf(dest, " description=\"%s\"",
-						StreamName(s->
-							   video_stream_type));
+						StreamName(s->video_stream_type));
 					fprintf(dest, "/>\n");
 				}
 				// audio streams characteristics
@@ -812,17 +739,12 @@ void xml_dump(FILE * dest, pList transponders, struct w_scan_flags *flags)
 					fprintf(dest, " pid=\"%u\"",
 						s->audio_pid[i]);
 					fprintf(dest, " description=\"%s\"",
-						StreamName(s->
-							   audio_stream_type
-							   [i]));
-					if (s->audio_lang
-					    && s->audio_lang[i][0])
+						StreamName(s->audio_stream_type[i]));
+					if (s->audio_lang && s->audio_lang[i][0])
 						fprintf(dest,
 							" language_code=\"%s\"",
-							safe_xml(s->
-								 audio_lang[i],
-								 (char *)
-								 &buffer));
+							safe_xml(s->audio_lang[i],
+								(char *) &buffer));
 					fprintf(dest, "/>\n");
 				}
 				if (s->ac3_num) {
@@ -835,16 +757,11 @@ void xml_dump(FILE * dest, pList transponders, struct w_scan_flags *flags)
 							s->ac3_pid[i]);
 						fprintf(dest,
 							" description=\"AC3 audio\"");
-						if (s->ac3_lang
-						    && s->ac3_lang[i][0])
+						if (s->ac3_lang && s->ac3_lang[i][0])
 							fprintf(dest,
 								" language_code=\"%s\"",
-								safe_xml(s->
-									 ac3_lang
-									 [i],
-									 (char
-									  *)
-									 &buffer));
+								safe_xml(s->ac3_lang[i],
+									(char *) &buffer));
 						fprintf(dest, "/>\n");
 					}
 				}
@@ -865,16 +782,11 @@ void xml_dump(FILE * dest, pList transponders, struct w_scan_flags *flags)
 							s->subtitling_pid[i]);
 						fprintf(dest,
 							" description=\"subtitling\"");
-						if (s->subtitling_lang
-						    && s->subtitling_lang[i][0])
+						if (s->subtitling_lang && s->subtitling_lang[i][0])
 							fprintf(dest,
 								" language_code=\"%s\"",
-								safe_xml(s->
-									 subtitling_lang
-									 [i],
-									 (char
-									  *)
-									 &buffer));
+								safe_xml(s->subtitling_lang[i],
+									(char *) &buffer));
 						fprintf(dest, "/>\n");
 					}
 				}

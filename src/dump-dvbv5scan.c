@@ -32,12 +32,12 @@
 #include "satellites.h"
 
 /******************************************************************************
- * print initial tuning data for dvbv5scan. 
+ * print initial tuning data for dvbv5scan.
  *****************************************************************************/
 
 void dvbv5scan_dump_tuningdata(FILE * f,
-			     struct transponder *t,
-			     uint16_t index, struct w_scan_flags *flags)
+	struct transponder *t,
+	uint16_t index, struct w_scan_flags *flags)
 {
 	const char *network_name = t->network_name;
 	if (index == 0) {
@@ -82,11 +82,11 @@ void dvbv5scan_dump_tuningdata(FILE * f,
 	case SCAN_TERRCABLE_ATSC:
 		fprintf(f, "\tDELIVERY_SYSTEM = ATSC\n");
 		fprintf(f, "\tFREQUENCY = %u\n", t->frequency);
-		fprintf(f, "\tMODULATION = %s\n", atsc_mod_to_txt(t->modulation));
+		fprintf(f, "\tMODULATION = %s\n", atsc_mod_to_txt_v5(t->modulation));
 		break;
 	case SCAN_CABLE:
 		if (t->delsys == SYS_DVBC2) {
-		  fprintf(f, "\tDELIVERY_SYSTEM = DVBC2\n");
+			fprintf(f, "\tDELIVERY_SYSTEM = DVBC2\n");
 			fprintf(f, "\tPLP_ID = %u\n", t->plp_id);
 			fprintf(f, "\tDATA_SLICE_ID = %u\n", t->data_slice_id);
 			fprintf(f, "\tSYSTEM_ID = %u\n", t->system_id);
@@ -97,13 +97,13 @@ void dvbv5scan_dump_tuningdata(FILE * f,
 		fprintf(f, "\tFREQUENCY = %u\n", t->frequency);
 		fprintf(f, "\tSYMBOL_RATE = %u\n", t->symbolrate);
 		fprintf(f, "\tINNER_FEC = %s\n", sat_fec_to_txt(t->mpe_fec));
-		fprintf(f, "\tMODULATION = %s\n", cable_mod_to_txt(t->modulation));
+		fprintf(f, "\tMODULATION = %s\n", cable_mod_to_txt_v5(t->modulation));
 		break;
 	case SCAN_TERRESTRIAL:
 		fprintf(f, "\tDELIVERY_SYSTEM = %s\n", t->delsys == SYS_DVBT2 ? "DVBT2" : "DVBT");
 		fprintf(f, "\tFREQUENCY = %u\n", t->frequency);
 		fprintf(f, "\tBANDWIDTH_HZ = %u\n", t->bandwidth);
-		fprintf(f, "#\tMODULATION = %s\n", terr_mod_to_txt(t->modulation));
+		fprintf(f, "\tMODULATION = %s\n", terr_mod_to_txt_v5(t->modulation));
 		fprintf(f, "\tTRANSMISSION_MODE = %s\n", terr_transmission_to_txt(t->transmission));
 		fprintf(f, "\tGUARD_INTERVAL = %s\n", terr_guard_to_txt(t->guard));
 		fprintf(f, "\tHIERARCHY = %s\n", terr_hierarchy_to_txt(t->hierarchy));

@@ -27,7 +27,7 @@
 #include "tools.h"
 
 /*******************************************************************************
-/* section buffer
+ * section buffer
  ******************************************************************************/
 
 #define SECTION_FLAG_DEFAULT  (1U) << 0
@@ -35,12 +35,12 @@
 #define SECTION_FLAG_FREE     (1U) << 2
 #define SECTION_BUF_SIZE      4096
 
-typedef struct section_buf {
-  /*----------------------------*/
+struct section_buf {
+	/*----------------------------*/
 	void *prev;
 	void *next;
 	uint32_t index;
-  /*----------------------------*/
+	/*----------------------------*/
 	const char *dmx_devname;
 	unsigned int run_once:1;
 	unsigned int segmented:1;	// segmented by table_id_ext
@@ -61,7 +61,7 @@ typedef struct section_buf {
 };
 
 /*******************************************************************************
-/* service type.
+ * service type.
  ******************************************************************************/
 
 #define AUDIO_CHAN_MAX    (32)
@@ -71,11 +71,11 @@ typedef struct section_buf {
 
 struct transponder;
 struct service {
-  /*----------------------------*/
+	/*----------------------------*/
 	void *prev;
 	void *next;
 	uint32_t index;
-  /*----------------------------*/
+	/*----------------------------*/
 	struct transponder *transponder;
 	uint16_t transport_stream_id;
 	uint16_t service_id;
@@ -122,11 +122,11 @@ struct transposer {
 };
 
 struct cell {
-  /*----------------------------*/
+	/*----------------------------*/
 	void *prev;
 	void *next;
 	uint32_t index;
-  /*----------------------------*/
+	/*----------------------------*/
 	uint16_t cell_id;
 
 	// if TFS: up to 6 RF freqs.
@@ -138,7 +138,7 @@ struct cell {
 };
 
 struct transponder {
-  /*----------------------------*/
+	/*----------------------------*/
 	void *prev;
 	void *next;
 	uint32_t index;
@@ -146,7 +146,7 @@ struct transponder {
 	cList _services;
 	pList cells;		/* DVB-T/T2 */
 	cList _cells;
-  /*----------------------------- starting from here copied by 'copy_fe_params' ------------------------------------------*/
+	/*----------------------------- starting from here copied by 'copy_fe_params' ------------------------------------------*/
 	/* NOTE: 'frequency' needs to be first item - dont touch!                                                               */
 	uint32_t frequency;	/* unit Hz, except satellite: kHz                      1..4  */
 	fe_spectral_inversion_t inversion:8;	/*                                                     5     */
@@ -187,14 +187,14 @@ struct transponder {
 	uint16_t system_id;	/* DVB-C2, DVB-T2 system_id                            33..34 */
 	uint8_t plp_id;		/* DVB-C2, DVB-T2                                      35    */
 	uint8_t data_slice_id;	/* DVB-C2                                              36    */
-  /*---------------------------- below is not copied by 'copy_fe_params' -------------------------------------------------*/
+	/*---------------------------- below is not copied by 'copy_fe_params' -------------------------------------------------*/
 	uint8_t private_from_here;
-  /*----------------------------*/
+	/*----------------------------*/
 	uint16_t network_PID;	// which PID contains NIT ? (0x0010..0x1FFE)
 	uint16_t network_id;
 	uint16_t original_network_id;
 	uint16_t transport_stream_id;
-  /*----------------------------*/
+	/*----------------------------*/
 	char *network_name;
 	network_change_t network_change;
 };
