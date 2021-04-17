@@ -1,6 +1,7 @@
 ChangeLog:
 --------------------
 [1.0.13]
+- add satellite data from fastsatfinder.com
 
 [1.0.12] 2021-03-29
 - modulation strings for the dvbv5 output
