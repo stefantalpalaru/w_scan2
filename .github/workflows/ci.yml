@@ -48,7 +48,6 @@ jobs:
 
       - name: Run tests
         run: |
-          ./autogen.sh
           ./configure
           make -j $(nproc)
           ./w_scan2 --version

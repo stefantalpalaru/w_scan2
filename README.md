@@ -29,10 +29,11 @@ It's based on the old "scan" tool from linuxtv-dvb-apps-1.1.0. The differences a
 ## build
 
 ```sh
-./autogen.sh
 ./configure
 make
 ```
+
+(developers making changes to "configure.ac" and "Makefile.am" also need to run `./autogen.sh`)
 
 ## distro support
 

@@ -1,5 +1,7 @@
 AC_INIT([w_scan2], [1.0.14], [stefantalpalaru@yahoo.com], [w_scan2], [https://github.com/stefantalpalaru/w_scan2])
 AM_INIT_AUTOMAKE([foreign subdir-objects])
+# work around Git's lack of preserved timestamps
+AM_MAINTAINER_MODE
 
 AC_PROG_CC
 
