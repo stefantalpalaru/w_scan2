@@ -26,7 +26,6 @@ w_scan2_SOURCES	= src/atsc_psip_section.c src/atsc_psip_section.h \
 
 dist_man_MANS = doc/w_scan2.1
 EXTRA_DIST = doc \
-	     .ycm_extra_conf.py \
 	     autogen.sh \
 	     README.md
 AM_LDFLAGS = -lrt
