@@ -33,6 +33,7 @@ int get_codepage_index(const char *codepage);
  * *inbuf && *outbuf will point to *different* memory afterwards.
  */
 void char_coding(char **inbuf, size_t * inbytesleft, char **outbuf,
-		 size_t * outbytesleft, unsigned user_charset_id);
+		 size_t * outbytesleft, const char *fallback_input_charset,
+		 unsigned int user_charset_id);
 
 #endif
