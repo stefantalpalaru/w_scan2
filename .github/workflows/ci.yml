@@ -48,4 +48,6 @@ jobs:
 
       - name: Run tests
         run: |
+          ./autogen.sh
+          ./configure
           make -j $(nproc)
