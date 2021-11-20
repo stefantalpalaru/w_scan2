@@ -140,7 +140,8 @@ int repetition_rate(scantype_t scan_type, enum table_id table)
  *****************************************************************************/
 
 void parse_service_descriptor(const unsigned char *buf, struct service *s,
-			      unsigned user_charset_id)
+			      const char *fallback_input_charset,
+			      unsigned int user_charset_id)
 {
 	unsigned char len;
 	uint i, full_len, short_len, isUtf8;
@@ -263,7 +264,7 @@ void parse_service_descriptor(const unsigned char *buf, struct service *s,
 		inbuf = provider_name;
 		outbuf = s->provider_name;
 		char_coding(&inbuf, &inbytesleft, &outbuf, &outbytesleft,
-			    user_charset_id);
+			    fallback_input_charset, user_charset_id);
 	}
 
 	free(provider_name);
@@ -275,7 +276,7 @@ void parse_service_descriptor(const unsigned char *buf, struct service *s,
 		inbuf = provider_short_name;
 		outbuf = s->provider_short_name;
 		char_coding(&inbuf, &inbytesleft, &outbuf, &outbytesleft,
-			    user_charset_id);
+			    fallback_input_charset, user_charset_id);
 	}
 
 	free(provider_short_name);
@@ -382,7 +383,7 @@ void parse_service_descriptor(const unsigned char *buf, struct service *s,
 		inbuf = service_name;
 		outbuf = s->service_name;
 		char_coding(&inbuf, &inbytesleft, &outbuf, &outbytesleft,
-			    user_charset_id);
+			    fallback_input_charset, user_charset_id);
 	}
 
 	free(service_name);
@@ -394,7 +395,7 @@ void parse_service_descriptor(const unsigned char *buf, struct service *s,
 		inbuf = service_short_name;
 		outbuf = s->service_short_name;
 		char_coding(&inbuf, &inbytesleft, &outbuf, &outbytesleft,
-			    user_charset_id);
+			    fallback_input_charset, user_charset_id);
 	}
 
 	free(service_short_name);

@@ -45,7 +45,8 @@
  * ISO/EN 300 468 annex A
  */
 void char_coding(char **inbuf, size_t * inbytesleft, char **outbuf,
-		 size_t * outbytesleft, unsigned user_charset_id)
+		 size_t * outbytesleft, const char *fallback_input_charset,
+		 unsigned int user_charset_id)
 {
 	unsigned dvb_charset_id = 9999;
 	const char *psrc = *inbuf;
@@ -230,47 +231,48 @@ void char_coding(char **inbuf, size_t * inbytesleft, char **outbuf,
 		}
 	}
 	if (dvb_charset_id > iconv_codes_count()) {
-		// no special character coding applied: use iso6937-2 w. euro add-on
-		char *pEuro;
-		DVBCHARSET("ISO69372");
+		// no special character coding applied: use a fallback one.
+		DVBCHARSET(fallback_input_charset);
+		if(strcmp(fallback_input_charset, "ISO69372") == 0) {
+			char *pEuro;
+			while (**inbuf && (pEuro = strchr(*inbuf, 0xA4))) {
+				// handle the euro add-on
+				char *ebuf = calloc(3, 1);
+				char *pi = ebuf;
+				char *po = *outbuf;
+				size_t inbytes = pEuro - *inbuf;
 
-		while (**inbuf && (pEuro = strchr(*inbuf, 0xA4))) {
-			// handle the euro add-on
-			char *ebuf = calloc(3, 1);
-			char *pi = ebuf;
-			char *po = *outbuf;
-			size_t inbytes = pEuro - *inbuf;
+				*(pi++) = 0x0B;
+				*(pi++) = 0xA4;
 
-			*(pi++) = 0x0B;
-			*(pi++) = 0xA4;
+				verbose("\t\t%s: euro char in iso-6937-2\n",
+					__FUNCTION__);
+				if (inbytes) {
+					char *ibuf = calloc(inbytes + 1, 1);
+					strncpy(ibuf, *inbuf, inbytes);
 
-			verbose("\t\t%s: euro char in iso-6937-2\n",
-				__FUNCTION__);
-			if (inbytes) {
-				char *ibuf = calloc(inbytes + 1, 1);
-				strncpy(ibuf, *inbuf, inbytes);
+					// translate *inbuf up to euro sign
+					pi = ibuf;
+					*inbuf += inbytes;
+					*inbytesleft -= inbytes;
+					char_coding(&pi, &inbytes, &po, outbytesleft,
+						    fallback_input_charset, user_charset_id);
+					*outbuf = *outbuf + strlen(*outbuf);
+					free(ibuf);
+				}
+				// skip over euro sign in *inbuf
+				*inbuf += 1;
+				*inbytesleft -= 1;
 
-				// translate *inbuf up to euro sign
-				pi = ibuf;
-				*inbuf += inbytes;
-				*inbytesleft -= inbytes;
+				// translate euro sign to users charset and add it to *outbuf
+				inbytes = 2;
+				pi = ebuf;
+				po = *outbuf;
 				char_coding(&pi, &inbytes, &po, outbytesleft,
-					    user_charset_id);
+					    fallback_input_charset, user_charset_id);
 				*outbuf = *outbuf + strlen(*outbuf);
-				free(ibuf);
+				free(ebuf);
 			}
-			// skip over euro sign in *inbuf
-			*inbuf += 1;
-			*inbytesleft -= 1;
-
-			// translate euro sign to users charset and add it to *outbuf
-			inbytes = 2;
-			pi = ebuf;
-			po = *outbuf;
-			char_coding(&pi, &inbytes, &po, outbytesleft,
-				    user_charset_id);
-			*outbuf = *outbuf + strlen(*outbuf);
-			free(ebuf);
 		}
 	}
 

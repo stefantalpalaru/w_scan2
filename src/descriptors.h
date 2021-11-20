@@ -321,7 +321,8 @@ typedef struct {
 
 int repetition_rate(scantype_t scan_type, enum table_id table);
 void parse_service_descriptor(const unsigned char *buf, struct service *s,
-			      unsigned user_charset_id);
+			      const char *fallback_input_charset,
+			      unsigned int user_charset_id);
 void parse_ca_identifier_descriptor(const unsigned char *buf,
 				    struct service *s);
 void parse_ca_descriptor(const unsigned char *buf, struct service *s);

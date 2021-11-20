@@ -108,6 +108,7 @@ struct w_scan_flags flags = {
 	0,			// emulate
 	0,			// delete duplicate transponders
 	SYS_UNDEFINED, // delivery system not defined
+	"ISO69372",		// fallback input charset
 };
 
 static unsigned int delsys_min = 0;	// initialization of delsys loop. 0 = delsys legacy.
@@ -1018,6 +1019,7 @@ static void parse_descriptors(enum table_id t, const unsigned char *buf,
 			if ((t == TABLE_SDT_ACT)
 			    || (t == TABLE_SDT_OTH))
 				parse_service_descriptor(buf, data,
+							 flags.fallback_input_charset,
 							 flags.codepage);
 			break;
 		case country_availability_descriptor:
@@ -3915,6 +3917,9 @@ static const char *usage = "\n"
 
 static const char *ext_opts = "%s expert help\n"
     ".................General.................\n"
+    "       --input-charset <charset>\n"
+    "               set fallback input charset in case the input charset couldn't\n"
+    "               be detected automatically. [default: ISO69372]\n"
     "       -C <charset>, --charset <charset>\n"
     "               convert to charset, i.e. 'UTF-8', 'ISO-8859-15'\n"
     "               use 'iconv --list' for full list of charsets.\n"
@@ -4068,6 +4073,7 @@ static struct option long_options[] = {
 	//---
 	{"extended-help", no_argument, NULL, 'H'},
 	{"charset", required_argument, NULL, 'C'},
+	{"input-charset", required_argument, NULL, 0},
 	{"initial", required_argument, NULL, 'I'},
 	{"verbose", no_argument, NULL, 'v'},
 	{"debug", no_argument, NULL, '!'},
@@ -4409,6 +4415,9 @@ int main(int argc, char **argv)
 			break;
 		case 'C':	// charset
 			codepage = strdup(optarg);
+			break;
+		case 0:		// input-charset (long-only)
+			flags.fallback_input_charset = optarg;
 			break;
 		case 'D':	//DiSEqC committed/uncommitted switch
 			sscanf(optarg, "%u%c", &i, &sw_type);
