@@ -1,6 +1,8 @@
 ChangeLog:
 --------------------
 [1.0.14]
+- include the PMT and teletext PIDs next to the video PID in the Mplayer
+  output (Robert Bartel <r.bartel@gmx.net>)
 
 [1.0.13] 2021-11-20
 - add satellite data from fastsatfinder.com

@@ -37,7 +37,14 @@ void mplayer_dump_service_parameter_set(FILE * f,
 
 	fprintf(f, "%s:", s->service_name);
 	xine_dump_dvb_parameters(f, t, flags);
-	fprintf(f, ":%i:", s->video_pid);
+	fprintf(f, ":%i", s->pmt_pid);
+    if (s->video_pid) {
+        fprintf(f, "+%i", s->video_pid);
+    }
+    if (s->teletext_pid) {
+        fprintf(f, "+%i", s->teletext_pid);
+    }
+    fprintf(f, ":");
 
 	// build '+' separated list of mpeg audio and ac3 audio pids
 	if (s->audio_pid[0] || s->ac3_pid[0]) {
