@@ -305,7 +305,7 @@ static int is_nearly_same_frequency(uint32_t f1, uint32_t f2, scantype_t type)
 		break;
 	default:
 		// 750kHz
-		if (diff < 750000) {
+		if (diff < 750) {
 			debug
 			    ("f1 = %u is same TP as f2 = %u (diff=%d)\n",
 			     f1, f2, diff);
