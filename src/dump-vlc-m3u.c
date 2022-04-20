@@ -486,7 +486,13 @@ void vlc_dump_service_parameter_set_as_xspf(FILE * f, struct service *s,
 	buf[j++] = 0;
 
 	fprintf_tab2("<track>\n");
-	fprintf(f, "%s%s%d:%d %s%s\n", T3, "<title>", (s->logical_channel_number >> 10), (s->logical_channel_number % (2^10)), buf, "</title>");
+
+	// Limit output of logical channel number to DVB-S/S2
+	if (s->logical_channel_number != 0) {
+		fprintf(f, "%s%s%d:%d %s%s\n", T3, "<title>", (s->logical_channel_number >> 10), (s->logical_channel_number % (2^10)), buf, "</title>");
+	} else {
+		fprintf(f, "%s%s%.4d. %s%s\n", T3, "<title>", idx++, buf, "</title>");
+	}
 
 	vlc_dump_dvb_parameters_as_xspf(f, t, flags, lnbp);
 
