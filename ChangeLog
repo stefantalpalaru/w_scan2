@@ -1,6 +1,7 @@
 ChangeLog:
 --------------------
 [1.0.15]
+- VLC output: include virtual channel numbers in titles, when available
 
 [1.0.14] 2022-02-10
 - include the PMT and teletext PIDs next to the video PID in the Mplayer
