@@ -3898,8 +3898,6 @@ static const char *usage = "\n"
     "                       S19E2, S13E0, S15W0, ..\n"
     "                       ? for list\n"
     "               ---output switches---\n"
-    "       -G, --output-dvbsrc\n"
-    "               generate channels.conf for dvbsrc plugin\n"
     "       -L, --output-VLC\n"
     "               generate VLC xspf playlist (experimental)\n"
     "       -M, --output-mplayer\n"
@@ -4062,7 +4060,6 @@ static struct option long_options[] = {
 	{"country", required_argument, NULL, 'c'},
 	{"satellite", required_argument, NULL, 's'},
 	//---
-	{"output-dvbsrc", no_argument, NULL, 'G'},
 	{"output-VLC", no_argument, NULL, 'L'},
 	{"output-mplayer", no_argument, NULL, 'M'},
 	{"output-xine", no_argument, NULL, 'X'},
