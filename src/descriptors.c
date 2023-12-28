@@ -206,6 +206,7 @@ void parse_service_descriptor(const unsigned char *buf, struct service *s,
 				default:;
 				}
 			}
+			__attribute__ ((fallthrough));
 		default:
 			if (emphasis_on)
 				short_len++;
@@ -250,6 +251,7 @@ void parse_service_descriptor(const unsigned char *buf, struct service *s,
 				default:;
 				}
 			}
+			__attribute__ ((fallthrough));
 		default:
 			if (emphasis_on)
 				provider_short_name[short_len++] = *(buf + i);
@@ -325,6 +327,7 @@ void parse_service_descriptor(const unsigned char *buf, struct service *s,
 				default:;
 				}
 			}
+			__attribute__ ((fallthrough));
 		default:
 			if (emphasis_on)
 				short_len++;
@@ -369,6 +372,7 @@ void parse_service_descriptor(const unsigned char *buf, struct service *s,
 				default:;
 				}
 			}
+			__attribute__ ((fallthrough));
 		default:
 			if (emphasis_on)
 				service_short_name[short_len++] = *(buf + i);
@@ -1428,8 +1432,10 @@ void parse_T2_delivery_system_descriptor(const unsigned char *buf,
 void parse_logical_channel_descriptor(const unsigned char *buf,
 				      struct transponder *t)
 {
-	if (t == NULL)
+	if (t == NULL) {
+		info("%s: transponder == NULL\n", __FUNCTION__);
 		return;
+	}
 	hd(buf);
 
 	uint8_t descriptor_length = buf[1];	// descriptor_length        8 uimsbf
@@ -1443,14 +1449,15 @@ void parse_logical_channel_descriptor(const unsigned char *buf,
 		     __FUNCTION__, __LINE__);
 		return;
 	}
-	while (descriptor_length > 3) {	//
+	while (descriptor_length > 3) {
 		service_id = (buf[p] << 8) | buf[p + 1];	// service_id              16 uimsbf
-		s = find_service(t, service_id);	//
-		if (s == NULL)	//
-			return;	//
-		//
+		s = find_service(t, service_id);
+		if (s == NULL) {
+			s = alloc_service(t, service_id);
+		}
 		s->visible_service = (buf[p + 2] & 0x80) > 0;	// visible_service_flag     1 bslbf, reserved NorDig: 1bslbf: Australia: 5 bslbf
-		s->logical_channel_number = (buf[p + 2] & 0x3F) << 8 | buf[p + 3];	// logical_channel_number   NorDig: 14uimbsf; Australia: 10 uimsbf
+		s->logical_channel_number = (buf[p + 2] & 0x3) << 8 | buf[p + 3];	// logical_channel_number   NorDig: 14uimbsf; Australia: 10 uimsbf
+		/*info("(sid=%d,vis=0x%x,lcn=%d)\n", service_id, s->visible_service, s->logical_channel_number);*/
 		descriptor_length -= 4;
 		p += 4;
 	}
