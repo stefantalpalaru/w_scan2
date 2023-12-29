@@ -1,7 +1,8 @@
 ChangeLog:
 --------------------
 [1.0.15]
-- VLC output: include virtual channel numbers in titles, when available
+- VLC output: include logical channel numbers (LCN) in titles, when available
+- DVB-T/T2: fix LCN parsing
 - remove unused -G/--output-dvbsrc option
 
 [1.0.14] 2022-02-10

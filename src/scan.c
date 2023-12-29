@@ -1155,7 +1155,7 @@ static void parse_descriptors(enum table_id t, const unsigned char *buf,
 		case logical_channel_descriptor:
 			if ((t == TABLE_NIT_ACT)
 			    || (t == TABLE_NIT_OTH))
-				parse_logical_channel_descriptor(buf, data);
+				parse_logical_channel_descriptor(buf, current_tp);
 			break;
 		case 0xF2:	// 0xF2 Private DVB Descriptor  Premiere.de, Content Transmission Descriptor
 			break;
@@ -2068,7 +2068,7 @@ static int parse_section(struct section_buf *s)
 
 		switch (table_id) {
 		case TABLE_PAT:
-			//verbose("PAT for transport_stream_id %d (0x%04x)\n", table_id_ext, table_id_ext);
+			verbose("PAT for transport_stream_id %d (0x%04x)\n", table_id_ext, table_id_ext);
 			parse_pat(buf, section_length, table_id_ext, s->flags);
 			break;
 		case TABLE_PMT:
@@ -2079,8 +2079,8 @@ static int parse_section(struct section_buf *s)
 			break;
 		case TABLE_NIT_ACT:
 		case TABLE_NIT_OTH:
-			//verbose("NIT(%s TS, network_id %d (0x%04x) )\n", table_id == 0x40 ? "actual":"other",
-			//       table_id_ext, table_id_ext);
+			verbose("NIT(%s TS, network_id %d (0x%04x) )\n", table_id == 0x40 ? "actual":"other",
+			      table_id_ext, table_id_ext);
 			parse_nit(buf, section_length, table_id,
 				  table_id_ext);
 			break;
@@ -3496,7 +3496,7 @@ static int initial_tune(int frontend_fd, int tuning_data)
 		}
 	}
 	/* we should now have here a list of well known transponders. Iterate a second time
-	 * and scan it's PAT, PMT, SDT for services. In parallel NIT actual and NIT other.
+	 * and scan its PAT, PMT, SDT for services. In parallel NIT actual and NIT other.
 	 */
 	return tune_to_next_transponder(frontend_fd);
 }
