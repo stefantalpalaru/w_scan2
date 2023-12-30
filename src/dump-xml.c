@@ -132,6 +132,8 @@ char *CaName(int id)
 		return "Codicrypt";
 	else if (major == 0x26)
 		return "BISS";
+	else if (id == 0x1010)
+		return "Tandberg Director";
 	else if (id == 0x0464)
 		return "EuroDec";
 	else if (id == 0x2719)
@@ -178,6 +180,8 @@ char *CaName(int id)
 		return "Cryptoguard";
 	else if (id == 0x4AEB)
 		return "Abel Quintic";
+	else if (id == 0x4AEE)
+		return "Bulcrypt";
 	else if (id == 0x4AF0)
 		return "ABV CAS";
 	else if (id == 0x4AFC)
@@ -192,8 +196,14 @@ char *CaName(int id)
 		return "Gospell VisionCrypt";
 	else if (id == 0x5501)
 		return "Greif";
+	else if (id == 0x5508)
+		return "Griffin";
 	else if (id == 0x5581)
 		return "Bulcrypt";
+	else if (id == 0x5601)
+		return "Verimatrix";
+	else if (id == 0x5602)
+		return "Verimatrix";
 	else if (id == 0x7BE1)
 		return "DRE-Crypt";
 	else if (id == 0xA101)
