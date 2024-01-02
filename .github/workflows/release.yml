@@ -10,9 +10,6 @@ jobs:
     name: Prepare release draft
     runs-on: ubuntu-22.04
     steps:
-      - name: Download artefacts
-        uses: actions/download-artifact@v3
-
       - name: Create release notes
         run: |
           cat > release_notes.md <<EOF
