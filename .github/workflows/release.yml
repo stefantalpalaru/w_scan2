@@ -1,0 +1,31 @@
+name: Create release draft
+on:
+  push:
+    tags:
+      - '*'
+  workflow_dispatch:
+
+jobs:
+  prepare-release:
+    name: Prepare release draft
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Download artefacts
+        uses: actions/download-artifact@v3
+
+      - name: Create release notes
+        run: |
+          cat > release_notes.md <<EOF
+          ## Release notes
+
+
+          EOF
+
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          draft: true
+          prerelease: false
+          body_path: release_notes.md
