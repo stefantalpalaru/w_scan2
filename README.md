@@ -40,7 +40,8 @@ make
 #### Gentoo
 
 ```sh
-layman -a stefantalpalaru
+eselect repository enable stefantalpalaru
+emaint sync --repo stefantalpalaru
 emerge w_scan2
 ```
 
