@@ -92,7 +92,7 @@ struct w_scan_flags flags = {
 	ATSC_VSB,		// default for ATSC scan
 	0,			// need 2nd generation frontend
 	DE,			// country index or sat index
-	1,			// tuning speed {1 = fast, 2 = medium, 3 = slow}
+	2,			// tuning speed {1 = fast, 2 = medium, 3 = slow}
 	0,			// filter timeout {0 = default, 1 = long}
 	1,			// get_other_nits, atm always
 	1,			// add_frequencies, atm always
@@ -3957,8 +3957,8 @@ static const char *ext_opts = "%s expert help\n"
     "               use long filter timeout\n"
     "       -t N, --lock-timeout N\n"
     "               tuning timeout\n"
-    "               1 = fastest [default]\n"
-    "               2 = medium\n"
+    "               1 = fastest\n"
+    "               2 = medium [default]\n"
     "               3 = slowest\n"
     ".................DVB-C...................\n"
     "       -i N, --inversion N\n"
