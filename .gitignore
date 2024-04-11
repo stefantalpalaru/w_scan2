@@ -50,6 +50,7 @@ Makefile
 # other
 *.pyc
 /tags
+*.ini
 
 # output files
 *.xspf

@@ -3,6 +3,7 @@ ChangeLog:
 
 [next]
 - increase default tuning timeout to "-t2"
+- update satellites.dat
 
 [1.0.15] 2024-01-02
 - VLC output: include logical channel numbers (LCN) in titles, when available

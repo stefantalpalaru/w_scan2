@@ -15,6 +15,7 @@
 0282.ini,Astra 2E/2F/2G
 0305.ini,Arabsat 5A
 0308.ini,Eutelsat 31A
+0310.ini,Turksat 5A
 0315.ini,Astra 5B
 0330.ini,Intelsat 28 / Eutelsat 33E
 0360.ini,Express AMU1 / Eutelsat 36B
@@ -146,6 +147,7 @@
 3169.ini,Intelsat 11 / Sky Brasil 1
 3195.ini,SES 6
 3225.ini,NSS10 / Telstar 11N
+3235.ini,Eutelsat 48D
 3240.ini,Eutelsat 36 West A
 3255.ini,Intelsat 35e
 3285.ini,Intelsat 25
@@ -158,10 +160,13 @@
 3450.ini,Telstar 12 Vantage
 3460.ini,Express AM8
 3475.ini,Eutelsat 12 West B
+3480.ini,Eutelsat 10A
 3490.ini,Express AM44
+3509.ini,Eutelsat 5 West A
 3520.ini,Eutelsat 8 West B
 3530.ini,Eutelsat 7 West A / Nilesat 201
 3550.ini,Eutelsat 5 West A
 3560.ini,Amos 3 / Amos 7
 3570.ini,ABS 3A
 3592.ini,Intelsat 10-02 / Thor 5/6/7
+3594.ini,Astra 2B
