@@ -4,6 +4,10 @@ ChangeLog:
 [next]
 - increase default tuning timeout to "-t2"
 - update satellites.dat
+- VLC output: satellite DiSEqC switch number now starts from 1.
+  A value of 0 means there is no switch, according to
+  https://wiki.videolan.org/Documentation:Modules/dtv/Linux_options/.
+  (Martin Wagner - https://github.com/martin-wagner)
 
 [1.0.15] 2024-01-02
 - VLC output: include logical channel numbers (LCN) in titles, when available
