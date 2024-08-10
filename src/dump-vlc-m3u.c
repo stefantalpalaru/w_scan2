@@ -400,7 +400,7 @@ void vlc_dump_dvb_parameters_as_xspf(FILE * f, struct transponder *t,
 
 		if ((flags->sw_pos & 0xF) < 0xF)
 			fprintf(f, "%s<vlc:option>dvb-satno=%i</vlc:option>\n",
-				T4, flags->sw_pos & 0xF);
+				T4, (flags->sw_pos & 0xF) + 1);
 		break;
 
 	default:
