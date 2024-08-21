@@ -24,9 +24,8 @@
 
 #include <stdint.h>
 
-int dvbscan_parse_tuningdata(const char *tuningdata,
-			     struct w_scan_flags *flags);
+int dvbscan_parse_tuningdata(char const *tuningdata, struct w_scan_flags *flags);
 
-int dvbscan_parse_rotor_positions(const char *positiondata);
+int dvbscan_parse_rotor_positions(char const *positiondata);
 
 #endif

@@ -23,7 +23,7 @@
 #define __CHAR_CODING_H__
 
 int get_user_codepage(void);
-int get_codepage_index(const char *codepage);
+int get_codepage_index(char const *codepage);
 
 /*
  * handle character set correctly (via libiconv),
@@ -32,8 +32,12 @@ int get_codepage_index(const char *codepage);
  * WARNING: do NOT pass pointers to temporarly allocated memory here, which should be freed afterwards.
  * *inbuf && *outbuf will point to *different* memory afterwards.
  */
-void char_coding(char **inbuf, size_t * inbytesleft, char **outbuf,
-		 size_t * outbytesleft, const char *fallback_input_charset,
-		 unsigned int user_charset_id);
+void char_coding(
+    char **inbuf,
+    size_t *inbytesleft,
+    char **outbuf,
+    size_t *outbytesleft,
+    char const *fallback_input_charset,
+    unsigned int user_charset_id);
 
 #endif

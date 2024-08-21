@@ -40,13 +40,14 @@
  *
  *****************************************************************************/
 
-int txt_to_satellite(const char *id)
+int
+txt_to_satellite(char const *id)
 {
-	unsigned int i;
-	for (i = 0; i < SAT_COUNT(sat_list); i++)
-		if (!strcasecmp(id, sat_list[i].short_name))
-			return sat_list[i].id;
-	return -1;
+    unsigned int i;
+    for (i = 0; i < SAT_COUNT(sat_list); i++)
+        if (!strcasecmp(id, sat_list[i].short_name))
+            return sat_list[i].id;
+    return -1;
 }
 
 /******************************************************************************
@@ -55,9 +56,10 @@ int txt_to_satellite(const char *id)
  *
  *****************************************************************************/
 
-int sat_count()
+int
+sat_count()
 {
-	return SAT_COUNT(sat_list);
+    return SAT_COUNT(sat_list);
 }
 
 /******************************************************************************
@@ -66,13 +68,14 @@ int sat_count()
  *
  *****************************************************************************/
 
-const char *satellite_to_short_name(int idx)
+char const *
+satellite_to_short_name(int idx)
 {
-	unsigned int i;
-	for (i = 0; i < SAT_COUNT(sat_list); i++)
-		if (idx == sat_list[i].id)
-			return sat_list[i].short_name;
-	return "??";
+    unsigned int i;
+    for (i = 0; i < SAT_COUNT(sat_list); i++)
+        if (idx == sat_list[i].id)
+            return sat_list[i].short_name;
+    return "??";
 }
 
 /******************************************************************************
@@ -81,16 +84,16 @@ const char *satellite_to_short_name(int idx)
  *
  *****************************************************************************/
 
-const char *satellite_to_full_name(int idx)
+char const *
+satellite_to_full_name(int idx)
 {
-	unsigned int i;
-	for (i = 0; i < SAT_COUNT(sat_list); i++)
-		if (idx == sat_list[i].id)
-			return sat_list[i].full_name;
-	warning
-	    ("SATELLITE CODE NOT DEFINED. PLEASE RE-CHECK WETHER YOU TYPED CORRECTLY.\n");
-	usleep(5000000);
-	return "??";
+    unsigned int i;
+    for (i = 0; i < SAT_COUNT(sat_list); i++)
+        if (idx == sat_list[i].id)
+            return sat_list[i].full_name;
+    warning("SATELLITE CODE NOT DEFINED. PLEASE RE-CHECK WETHER YOU TYPED CORRECTLY.\n");
+    usleep(5000000);
+    return "??";
 }
 
 /******************************************************************************
@@ -98,13 +101,14 @@ const char *satellite_to_full_name(int idx)
  * from rotor position
  *
  *****************************************************************************/
-int rotor_position_to_sat_list_index(int rotor_position)
+int
+rotor_position_to_sat_list_index(int rotor_position)
 {
-	unsigned int i;
-	for (i = 0; i < SAT_COUNT(sat_list); i++)
-		if (rotor_position == sat_list[i].rotor_position)
-			return i;
-	return 0;
+    unsigned int i;
+    for (i = 0; i < SAT_COUNT(sat_list); i++)
+        if (rotor_position == sat_list[i].rotor_position)
+            return i;
+    return 0;
 }
 
 /******************************************************************************
@@ -113,50 +117,50 @@ int rotor_position_to_sat_list_index(int rotor_position)
  *
  *****************************************************************************/
 
-void print_satellites(void)
+void
+print_satellites(void)
 {
-	unsigned int i;
-	for (i = 0; i < SAT_COUNT(sat_list); i++)
-		info("\t%s\t\t%s\n", sat_list[i].short_name,
-		     sat_list[i].full_name);
+    unsigned int i;
+    for (i = 0; i < SAT_COUNT(sat_list); i++)
+        info("\t%s\t\t%s\n", sat_list[i].short_name, sat_list[i].full_name);
 }
 
 /******************************************************************************
  * get transponder data
  *
  *****************************************************************************/
-//int get_frontend_param(uint16_t satellite, uint16_t table_index, struct tuning_parameters * param) {
-//unsigned int i;
+// int get_frontend_param(uint16_t satellite, uint16_t table_index, struct tuning_parameters * param) {
+// unsigned int i;
 //
-//for (i = 0; i < SAT_COUNT(sat_list); i++)
-//    if (satellite == sat_list[i].id) {
-//        if (table_index >= sat_list[i].item_count)
-//            return 0; //error
-//        memset(param, 0, sizeof(struct tuning_parameters));
-//        param->frequency = sat_list[i].items[table_index].intermediate_frequency;
-//        param->inversion = INVERSION_AUTO;
-//        param->sat.modulation_system = sat_list[i].items[table_index].modulation_system;
-//        param->sat.polarization      = sat_list[i].items[table_index].polarization;
-//        param->sat.symbol_rate       = sat_list[i].items[table_index].symbol_rate;
-//        param->sat.fec_inner         = sat_list[i].items[table_index].fec_inner;
-//        param->sat.rolloff           = sat_list[i].items[table_index].rolloff;
-//        param->sat.modulation_type   = sat_list[i].items[table_index].modulation_type;
-//        return 1;
-//        }
-//return 0; // error
-//}
+// for (i = 0; i < SAT_COUNT(sat_list); i++)
+//     if (satellite == sat_list[i].id) {
+//         if (table_index >= sat_list[i].item_count)
+//             return 0; //error
+//         memset(param, 0, sizeof(struct tuning_parameters));
+//         param->frequency = sat_list[i].items[table_index].intermediate_frequency;
+//         param->inversion = INVERSION_AUTO;
+//         param->sat.modulation_system = sat_list[i].items[table_index].modulation_system;
+//         param->sat.polarization      = sat_list[i].items[table_index].polarization;
+//         param->sat.symbol_rate       = sat_list[i].items[table_index].symbol_rate;
+//         param->sat.fec_inner         = sat_list[i].items[table_index].fec_inner;
+//         param->sat.rolloff           = sat_list[i].items[table_index].rolloff;
+//         param->sat.modulation_type   = sat_list[i].items[table_index].modulation_type;
+//         return 1;
+//         }
+// return 0; // error
+// }
 
-int choose_satellite(const char *satellite, int *channellist)
+int
+choose_satellite(char const *satellite, int *channellist)
 {
-	int retval = 0;
-	*channellist = txt_to_satellite(satellite);
-	if (*channellist < 0) {
-		*channellist = S19E2;
-		warning
-		    ("\n\nSATELLITE CODE IS NOT DEFINED. FALLING BACK TO \"S19E2\"\n\n");
-		sleep(10);
-		retval = -1;
-	}
-	info("using settings for %s\n", satellite_to_full_name(*channellist));
-	return retval;
+    int retval = 0;
+    *channellist = txt_to_satellite(satellite);
+    if (*channellist < 0) {
+        *channellist = S19E2;
+        warning("\n\nSATELLITE CODE IS NOT DEFINED. FALLING BACK TO \"S19E2\"\n\n");
+        sleep(10);
+        retval = -1;
+    }
+    info("using settings for %s\n", satellite_to_full_name(*channellist));
+    return retval;
 }

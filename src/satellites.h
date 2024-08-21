@@ -30,42 +30,42 @@
 #include <stdint.h>
 #include <unistd.h>
 
-int choose_satellite(const char *satellite, int *channellist);
-int txt_to_satellite(const char *id);
+int choose_satellite(char const *satellite, int *channellist);
+int txt_to_satellite(char const *id);
 int sat_count();
-const char *satellite_to_short_name(int idx);
-const char *satellite_to_full_name(int idx);
+char const *satellite_to_short_name(int idx);
+char const *satellite_to_full_name(int idx);
 int rotor_position_to_sat_list_index(int rotor_position);
 void print_satellites(void);
-//int get_frontend_param(uint16_t satellite, uint16_t table_index,
-//                       struct tuning_parameters * param);
+// int get_frontend_param(uint16_t satellite, uint16_t table_index,
+//                        struct tuning_parameters * param);
 
 /******************************************************************************
  * only used for storage of data
  *
  *****************************************************************************/
 struct __sat_transponder {
-	fe_delivery_system_t modulation_system;
-	uint32_t intermediate_frequency;
-	fe_polarization_t polarization;
-	uint32_t symbol_rate;
-	fe_code_rate_t fec_inner;
-	fe_rolloff_t rolloff;
-	fe_modulation_t modulation_type;
+    fe_delivery_system_t modulation_system;
+    uint32_t intermediate_frequency;
+    fe_polarization_t polarization;
+    uint32_t symbol_rate;
+    fe_code_rate_t fec_inner;
+    fe_rolloff_t rolloff;
+    fe_modulation_t modulation_type;
 };
 #define SAT_TRANSPONDER_COUNT(x) (sizeof(x)/sizeof(struct __sat_transponder))
 
 struct cSat {
-	const char *short_name;
-	const int id;
-	const char *full_name;
-	const struct __sat_transponder *items;
-	const int item_count;
-	const fe_west_east_flag_t west_east_flag;
-	const uint16_t orbital_position;
-	int rotor_position;	// Note: *not* const
-	const char *source_id;	// VDR sources.conf
-	const int skew;
+    char const *short_name;
+    int const id;
+    char const *full_name;
+    const struct __sat_transponder *items;
+    int const item_count;
+    fe_west_east_flag_t const west_east_flag;
+    uint16_t const orbital_position;
+    int rotor_position; // Note: *not* const
+    char const *source_id; // VDR sources.conf
+    int const skew;
 };
 #define SAT_COUNT(x) (sizeof(x)/sizeof(struct cSat))
 

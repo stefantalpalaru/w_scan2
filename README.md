@@ -108,6 +108,29 @@ NOTE: see ```./w_scan2 -s?``` for list of satellites.
 
 For more sophisticated scan options see ```./w_scan2 -h``` and ```./w_scan2 -H```.
 
+## development
+
+### code formatting
+
+We are using `clang-format` through the wrapper script `code_style.sh` (`make format` also works).
+
+Vim integration, using [vim-clang-format](https://github.com/rhysd/vim-clang-format):
+
+```vimrc
+" in your ~/.vimrc
+autocmd defgroup BufNewFile,BufRead /path/to/w_scan2/*.{c,h} setlocal shiftwidth=4 softtabstop=4 expandtab
+autocmd defgroup BufNewFile,BufRead /path/to/w_scan2/*.{c,h} ClangFormatAutoEnable
+```
+
+Git integration, using a ".git/hooks/pre-commit" with executable permissions:
+
+```bash
+#!/bin/sh
+
+root="$(git rev-parse --show-toplevel)"
+"${root}/code_style.sh" --check
+```
+
 ## credits
 
 - "wirbel" Winfried Koehler <w_scan AT gmx-topmail DOT de> - the original author

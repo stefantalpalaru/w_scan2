@@ -31,3 +31,11 @@ EXTRA_DIST = doc \
 AM_LDFLAGS = -lrt
 AM_CFLAGS = -Wall -Wextra -Wno-comment -Wswitch-default -Wno-unused-parameter
 
+# Code formatting.
+.PHONY: check-format
+check-format:
+	"$(srcdir)/code_style.sh" --check
+
+.PHONY: format
+format:
+	"$(srcdir)/code_style.sh"

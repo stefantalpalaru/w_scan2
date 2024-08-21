@@ -8,6 +8,7 @@ ChangeLog:
   A value of 0 means there is no switch, according to
   https://wiki.videolan.org/Documentation:Modules/dtv/Linux_options/.
   (Martin Wagner - https://github.com/martin-wagner)
+- change code formatting again, this time using "clang-format"
 
 [1.0.15] 2024-01-02
 - VLC output: include logical channel numbers (LCN) in titles, when available
