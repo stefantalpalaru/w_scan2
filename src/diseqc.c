@@ -97,7 +97,7 @@
 #define CMD_LO_HIGH                             0x53
 #define CMD_WR_FREQ                             0x58
 #define CMD_WR_CHAN_NO                          0x59
-						/* 0x5A .. 0x5C -> SCR */
+/* 0x5A .. 0x5C -> SCR */
 #define CMD_HALT                                0x60
 #define CMD_LIMITS_OFF                          0x63
 #define CMD_RD_POS_STATUS                       0x64
@@ -115,73 +115,41 @@
  *
  ******************************************************************************/
 struct diseqc_cmd committed_switch_cmds[] = {
-	{{{MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N0_COMMITTED, 0xf0,
-	   0x00, 0x00}, 4}, 20},
-	{{{MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N0_COMMITTED, 0xf2,
-	   0x00, 0x00}, 4}, 20},
-	{{{MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N0_COMMITTED, 0xf1,
-	   0x00, 0x00}, 4}, 20},
-	{{{MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N0_COMMITTED, 0xf3,
-	   0x00, 0x00}, 4}, 20},
-	{{{MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N0_COMMITTED, 0xf4,
-	   0x00, 0x00}, 4}, 20},
-	{{{MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N0_COMMITTED, 0xf6,
-	   0x00, 0x00}, 4}, 20},
-	{{{MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N0_COMMITTED, 0xf5,
-	   0x00, 0x00}, 4}, 20},
-	{{{MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N0_COMMITTED, 0xf7,
-	   0x00, 0x00}, 4}, 20},
-	{{{MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N0_COMMITTED, 0xf8,
-	   0x00, 0x00}, 4}, 20},
-	{{{MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N0_COMMITTED, 0xfa,
-	   0x00, 0x00}, 4}, 20},
-	{{{MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N0_COMMITTED, 0xf9,
-	   0x00, 0x00}, 4}, 20},
-	{{{MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N0_COMMITTED, 0xfb,
-	   0x00, 0x00}, 4}, 20},
-	{{{MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N0_COMMITTED, 0xfc,
-	   0x00, 0x00}, 4}, 20},
-	{{{MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N0_COMMITTED, 0xfe,
-	   0x00, 0x00}, 4}, 20},
-	{{{MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N0_COMMITTED, 0xfd,
-	   0x00, 0x00}, 4}, 20},
-	{{{MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N0_COMMITTED, 0xff,
-	   0x00, 0x00}, 4}, 20}
+    { { { MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N0_COMMITTED, 0xf0, 0x00, 0x00 }, 4 }, 20 },
+    { { { MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N0_COMMITTED, 0xf2, 0x00, 0x00 }, 4 }, 20 },
+    { { { MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N0_COMMITTED, 0xf1, 0x00, 0x00 }, 4 }, 20 },
+    { { { MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N0_COMMITTED, 0xf3, 0x00, 0x00 }, 4 }, 20 },
+    { { { MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N0_COMMITTED, 0xf4, 0x00, 0x00 }, 4 }, 20 },
+    { { { MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N0_COMMITTED, 0xf6, 0x00, 0x00 }, 4 }, 20 },
+    { { { MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N0_COMMITTED, 0xf5, 0x00, 0x00 }, 4 }, 20 },
+    { { { MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N0_COMMITTED, 0xf7, 0x00, 0x00 }, 4 }, 20 },
+    { { { MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N0_COMMITTED, 0xf8, 0x00, 0x00 }, 4 }, 20 },
+    { { { MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N0_COMMITTED, 0xfa, 0x00, 0x00 }, 4 }, 20 },
+    { { { MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N0_COMMITTED, 0xf9, 0x00, 0x00 }, 4 }, 20 },
+    { { { MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N0_COMMITTED, 0xfb, 0x00, 0x00 }, 4 }, 20 },
+    { { { MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N0_COMMITTED, 0xfc, 0x00, 0x00 }, 4 }, 20 },
+    { { { MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N0_COMMITTED, 0xfe, 0x00, 0x00 }, 4 }, 20 },
+    { { { MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N0_COMMITTED, 0xfd, 0x00, 0x00 }, 4 }, 20 },
+    { { { MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N0_COMMITTED, 0xff, 0x00, 0x00 }, 4 }, 20 }
 };
 
 struct diseqc_cmd uncommitted_switch_cmds[] = {
-	{{{MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N1_UNCOMMITTED, 0xf0,
-	   0x00, 0x00}, 4}, 20},
-	{{{MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N1_UNCOMMITTED, 0xf1,
-	   0x00, 0x00}, 4}, 20},
-	{{{MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N1_UNCOMMITTED, 0xf2,
-	   0x00, 0x00}, 4}, 20},
-	{{{MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N1_UNCOMMITTED, 0xf3,
-	   0x00, 0x00}, 4}, 20},
-	{{{MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N1_UNCOMMITTED, 0xf4,
-	   0x00, 0x00}, 4}, 20},
-	{{{MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N1_UNCOMMITTED, 0xf5,
-	   0x00, 0x00}, 4}, 20},
-	{{{MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N1_UNCOMMITTED, 0xf6,
-	   0x00, 0x00}, 4}, 20},
-	{{{MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N1_UNCOMMITTED, 0xf7,
-	   0x00, 0x00}, 4}, 20},
-	{{{MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N1_UNCOMMITTED, 0xf8,
-	   0x00, 0x00}, 4}, 20},
-	{{{MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N1_UNCOMMITTED, 0xf9,
-	   0x00, 0x00}, 4}, 20},
-	{{{MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N1_UNCOMMITTED, 0xfa,
-	   0x00, 0x00}, 4}, 20},
-	{{{MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N1_UNCOMMITTED, 0xfb,
-	   0x00, 0x00}, 4}, 20},
-	{{{MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N1_UNCOMMITTED, 0xfc,
-	   0x00, 0x00}, 4}, 20},
-	{{{MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N1_UNCOMMITTED, 0xfd,
-	   0x00, 0x00}, 4}, 20},
-	{{{MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N1_UNCOMMITTED, 0xfe,
-	   0x00, 0x00}, 4}, 20},
-	{{{MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N1_UNCOMMITTED, 0xff,
-	   0x00, 0x00}, 4}, 20}
+    { { { MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N1_UNCOMMITTED, 0xf0, 0x00, 0x00 }, 4 }, 20 },
+    { { { MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N1_UNCOMMITTED, 0xf1, 0x00, 0x00 }, 4 }, 20 },
+    { { { MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N1_UNCOMMITTED, 0xf2, 0x00, 0x00 }, 4 }, 20 },
+    { { { MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N1_UNCOMMITTED, 0xf3, 0x00, 0x00 }, 4 }, 20 },
+    { { { MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N1_UNCOMMITTED, 0xf4, 0x00, 0x00 }, 4 }, 20 },
+    { { { MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N1_UNCOMMITTED, 0xf5, 0x00, 0x00 }, 4 }, 20 },
+    { { { MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N1_UNCOMMITTED, 0xf6, 0x00, 0x00 }, 4 }, 20 },
+    { { { MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N1_UNCOMMITTED, 0xf7, 0x00, 0x00 }, 4 }, 20 },
+    { { { MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N1_UNCOMMITTED, 0xf8, 0x00, 0x00 }, 4 }, 20 },
+    { { { MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N1_UNCOMMITTED, 0xf9, 0x00, 0x00 }, 4 }, 20 },
+    { { { MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N1_UNCOMMITTED, 0xfa, 0x00, 0x00 }, 4 }, 20 },
+    { { { MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N1_UNCOMMITTED, 0xfb, 0x00, 0x00 }, 4 }, 20 },
+    { { { MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N1_UNCOMMITTED, 0xfc, 0x00, 0x00 }, 4 }, 20 },
+    { { { MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N1_UNCOMMITTED, 0xfd, 0x00, 0x00 }, 4 }, 20 },
+    { { { MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N1_UNCOMMITTED, 0xfe, 0x00, 0x00 }, 4 }, 20 },
+    { { { MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N1_UNCOMMITTED, 0xff, 0x00, 0x00 }, 4 }, 20 }
 };
 
 /******************************************************************************
@@ -204,56 +172,62 @@ struct diseqc_cmd uncommitted_switch_cmds[] = {
 #define ROTOR_CMD_GOTO_ANGLE            12
 #define ROTOR_CMD_WR_COMMITTED          13
 
-int diseqc_2_x_error = 0;	// do 2.x cmds only once.
+int diseqc_2_x_error = 0; // do 2.x cmds only once.
 
 /*****************************************************************************/
 
-int rotor_command(int frontend_fd, int cmd, int n1, int n2, int n3)
+int
+rotor_command(int frontend_fd, int cmd, int n1, int n2, int n3)
 {
-	int i, err = 0;
-	struct dvb_diseqc_master_cmd cmds[] = {
-		{{MASTER_CMD_NO_RESPONSE, ADDR_POSITIONER_POLAR_AZIMUT, CMD_HALT, 0x00, 0x00, 0x00}, 3},	// 0 Stop Positioner movement
-		{{MASTER_CMD_NO_RESPONSE, ADDR_POSITIONER_POLAR_AZIMUT, CMD_LIMITS_OFF, 0x00, 0x00, 0x00}, 3},	// 1 Disable Limits
-		{{MASTER_CMD_NO_RESPONSE, ADDR_POSITIONER_POLAR_AZIMUT, CMD_LIMIT_EAST, 0x00, 0x00, 0x00}, 3},	// 2 Set East Limit
-		{{MASTER_CMD_NO_RESPONSE, ADDR_POSITIONER_POLAR_AZIMUT, CMD_LIMIT_WEST, 0x00, 0x00, 0x00}, 3},	// 3 Set West Limit
-		{{MASTER_CMD_NO_RESPONSE, ADDR_POSITIONER_POLAR_AZIMUT, CMD_DRIVE_EAST, 0x00, 0x00, 0x00}, 4},	// 4 Drive Motor East continously
-		{{MASTER_CMD_NO_RESPONSE, ADDR_POSITIONER_POLAR_AZIMUT, CMD_DRIVE_EAST, 256 - n1, 0x00, 0x00}, 4},	// 5 Drive Motor East nn steps
-		{{MASTER_CMD_NO_RESPONSE, ADDR_POSITIONER_POLAR_AZIMUT, CMD_DRIVE_WEST, 256 - n1, 0x00, 0x00}, 4},	// 6 Drive Motor West nn steps
-		{{MASTER_CMD_NO_RESPONSE, ADDR_POSITIONER_POLAR_AZIMUT, CMD_DRIVE_WEST, 0x00, 0x00, 0x00}, 4},	// 7 Drive Motor West continously
-		{{MASTER_CMD_NO_RESPONSE, ADDR_POSITIONER_POLAR_AZIMUT, CMD_STORE_SAT_POS, n1, 0x00, 0x00}, 4},	// 8 Store nn
-		{{MASTER_CMD_NO_RESPONSE, ADDR_POSITIONER_POLAR_AZIMUT, CMD_GOTO_SAT_POS_NN, n1, 0x00, 0x00}, 4},	// 9 Goto nn
-		{{MASTER_CMD_NO_RESPONSE, ADDR_POSITIONER_POLAR_AZIMUT, CMD_SET_POSNS, n1, n2, n3}, 4},	//10 Recalculate Position
-		{{MASTER_CMD_NO_RESPONSE, ADDR_POSITIONER_POLAR_AZIMUT, CMD_STORE_SAT_POS, 0x00, 0x00, 0x00}, 4},	//11 Enable Limits
-		{{MASTER_CMD_NO_RESPONSE, ADDR_POSITIONER_POLAR_AZIMUT, CMD_GOTO_ANGLE_NN_N, n1, n2, 0x00}, 5},	//12 Gotoxx
-		{{MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N0_COMMITTED, 0xF4, 0x00, 0x00}, 4},	//13 User
-	};
+    int i, err = 0;
+    struct dvb_diseqc_master_cmd cmds[] = {
+        { { MASTER_CMD_NO_RESPONSE, ADDR_POSITIONER_POLAR_AZIMUT, CMD_HALT, 0x00, 0x00, 0x00 }, 3 }, // 0 Stop Positioner
+                                                                                                     // movement
+        { { MASTER_CMD_NO_RESPONSE, ADDR_POSITIONER_POLAR_AZIMUT, CMD_LIMITS_OFF, 0x00, 0x00, 0x00 }, 3 }, // 1 Disable Limits
+        { { MASTER_CMD_NO_RESPONSE, ADDR_POSITIONER_POLAR_AZIMUT, CMD_LIMIT_EAST, 0x00, 0x00, 0x00 }, 3 }, // 2 Set East Limit
+        { { MASTER_CMD_NO_RESPONSE, ADDR_POSITIONER_POLAR_AZIMUT, CMD_LIMIT_WEST, 0x00, 0x00, 0x00 }, 3 }, // 3 Set West Limit
+        { { MASTER_CMD_NO_RESPONSE, ADDR_POSITIONER_POLAR_AZIMUT, CMD_DRIVE_EAST, 0x00, 0x00, 0x00 }, 4 }, // 4 Drive Motor East
+                                                                                                           // continously
+        { { MASTER_CMD_NO_RESPONSE, ADDR_POSITIONER_POLAR_AZIMUT, CMD_DRIVE_EAST, 256 - n1, 0x00, 0x00 }, 4 }, // 5 Drive Motor
+                                                                                                               // East nn steps
+        { { MASTER_CMD_NO_RESPONSE, ADDR_POSITIONER_POLAR_AZIMUT, CMD_DRIVE_WEST, 256 - n1, 0x00, 0x00 }, 4 }, // 6 Drive Motor
+                                                                                                               // West nn steps
+        { { MASTER_CMD_NO_RESPONSE, ADDR_POSITIONER_POLAR_AZIMUT, CMD_DRIVE_WEST, 0x00, 0x00, 0x00 }, 4 }, // 7 Drive Motor West
+                                                                                                           // continously
+        { { MASTER_CMD_NO_RESPONSE, ADDR_POSITIONER_POLAR_AZIMUT, CMD_STORE_SAT_POS, n1, 0x00, 0x00 }, 4 }, // 8 Store nn
+        { { MASTER_CMD_NO_RESPONSE, ADDR_POSITIONER_POLAR_AZIMUT, CMD_GOTO_SAT_POS_NN, n1, 0x00, 0x00 }, 4 }, // 9 Goto nn
+        { { MASTER_CMD_NO_RESPONSE, ADDR_POSITIONER_POLAR_AZIMUT, CMD_SET_POSNS, n1, n2, n3 }, 4 }, // 10 Recalculate Position
+        { { MASTER_CMD_NO_RESPONSE, ADDR_POSITIONER_POLAR_AZIMUT, CMD_STORE_SAT_POS, 0x00, 0x00, 0x00 }, 4 }, // 11 Enable
+                                                                                                              // Limits
+        { { MASTER_CMD_NO_RESPONSE, ADDR_POSITIONER_POLAR_AZIMUT, CMD_GOTO_ANGLE_NN_N, n1, n2, 0x00 }, 5 }, // 12 Gotoxx
+        { { MASTER_CMD_NO_RESPONSE, ADDR_ANY_LNB, CMD_WR_N0_COMMITTED, 0xF4, 0x00, 0x00 }, 4 }, // 13 User
+    };
 
-	for (i = 0; i < DISEQC_X; ++i) {
-		usleep(15 * 1000);
-		if ((err =
-		     ioctl(frontend_fd, FE_DISEQC_SEND_MASTER_CMD,
-			   &cmds[cmd])) < 0) {
-			error("FE_DISEQC_SEND_MASTER_CMD failed, err %i\n",
-			      err);
-			break;
-		}
-	}
-	return err;
+    for (i = 0; i < DISEQC_X; ++i) {
+        usleep(15 * 1000);
+        if ((err = ioctl(frontend_fd, FE_DISEQC_SEND_MASTER_CMD, &cmds[cmd])) < 0) {
+            error("FE_DISEQC_SEND_MASTER_CMD failed, err %i\n", err);
+            break;
+        }
+    }
+    return err;
 }
 
-static inline void msleep(uint32_t msec)
+static inline void
+msleep(uint32_t msec)
 {
-	struct timespec req = { msec / 1000, 1000000 * (msec % 1000) };
-	while (nanosleep(&req, &req)) ;
+    struct timespec req = { msec / 1000, 1000000 * (msec % 1000) };
+    while (nanosleep(&req, &req))
+        ;
 }
 
-static float hex_to_float(const int bin_val)
+static float
+hex_to_float(int const bin_val)
 {
-	int b0 = (bin_val & 0xFF00);
-	int b1 = (bin_val & 0x00FF);
+    int b0 = (bin_val & 0xFF00);
+    int b1 = (bin_val & 0x00FF);
 
-	return (float)(((b0 >> 4) & 0x0f) * 1000 + (b0 & 0x0f) * 100 +
-		       ((b1 >> 4) & 0x0f) * 10 + (b1 & 0x0f));
+    return (float)(((b0 >> 4) & 0x0f) * 1000 + (b0 & 0x0f) * 100 + ((b1 >> 4) & 0x0f) * 10 + (b1 & 0x0f));
 }
 
 /******************************************************************************
@@ -262,20 +236,19 @@ static float hex_to_float(const int bin_val)
  *
  ******************************************************************************/
 
-float rotor_angle(uint16_t channellist)
+float
+rotor_angle(uint16_t channellist)
 {
 
-	if (channellist >= sat_count()) {
-		info("invalid satellite index %d\n", channellist);
-		return 0;
-	}
+    if (channellist >= sat_count()) {
+        info("invalid satellite index %d\n", channellist);
+        return 0;
+    }
 
-	if (sat_list[channellist].west_east_flag == WEST_FLAG)
-		return 360.00 -
-		    (hex_to_float(sat_list[channellist].orbital_position) / 10);
-	else
-		return (hex_to_float(sat_list[channellist].orbital_position) /
-			10);
+    if (sat_list[channellist].west_east_flag == WEST_FLAG)
+        return 360.00 - (hex_to_float(sat_list[channellist].orbital_position) / 10);
+    else
+        return (hex_to_float(sat_list[channellist].orbital_position) / 10);
 }
 
 /******************************************************************************
@@ -302,351 +275,340 @@ float rotor_angle(uint16_t channellist)
  * --wirbel 20090322
  ******************************************************************************/
 
-int get_positioner_status(int frontend_fd, int *data)
+int
+get_positioner_status(int frontend_fd, int *data)
 {
-	int err = 0;
+    int err = 0;
 
-	struct dvb_diseqc_master_cmd GetPosStat = { {
-						     MASTER_CMD_WITH_RESPONSE,
-						     ADDR_POSITIONER_POLAR_AZIMUT,
-						     CMD_RD_POS_STATUS, 0, 0,
-						     0}, 3
-	};
+    struct dvb_diseqc_master_cmd GetPosStat = {
+        { MASTER_CMD_WITH_RESPONSE, ADDR_POSITIONER_POLAR_AZIMUT, CMD_RD_POS_STATUS, 0, 0, 0 },
+        3
+    };
 
-	struct dvb_diseqc_slave_reply PosStat = { {
-						   0, 0, 0, 0}, 0, 150
-	};
+    struct dvb_diseqc_slave_reply PosStat = { { 0, 0, 0, 0 }, 0, 150 };
 
-	if ((err =
-	     ioctl(frontend_fd, FE_DISEQC_SEND_MASTER_CMD, &GetPosStat)) != 0) {
-		verbose
-		    ("%s: DiSEqC-2.2 cmd RD_POS_STATUS fails - disabling DiSEqC-2.2.\n"
-		     "(this is expected, if using DiSEqC-1.2 equipment)\n",
-		     __FUNCTION__);
-		return err;	// any DiSEqC-1.x is expected to fail
-	}
-	if ((err =
-	     ioctl(frontend_fd, FE_DISEQC_RECV_SLAVE_REPLY, &PosStat)) != 0) {
-		verbose
-		    ("%s: DiSEqC-2.2 read slave reply fails - disabling DiSEqC-2.2.\n"
-		     "(this is expected, if using DiSEqC-1.2 equipment)\n",
-		     __FUNCTION__);
-		return err;	// nowhere described.
-	}
-	if (PosStat.msg[0] == SLAVE_REPLY_OK) {
-		if (PosStat.msg_len > 1) {
-			*data = PosStat.msg[1];
-			return 0;
-		}
-	}
-	info("%s: unknown error.\n", __FUNCTION__);
-	return -1;		//unknown error
+    if ((err = ioctl(frontend_fd, FE_DISEQC_SEND_MASTER_CMD, &GetPosStat)) != 0) {
+        verbose(
+            "%s: DiSEqC-2.2 cmd RD_POS_STATUS fails - disabling DiSEqC-2.2.\n"
+            "(this is expected, if using DiSEqC-1.2 equipment)\n",
+            __FUNCTION__);
+        return err; // any DiSEqC-1.x is expected to fail
+    }
+    if ((err = ioctl(frontend_fd, FE_DISEQC_RECV_SLAVE_REPLY, &PosStat)) != 0) {
+        verbose(
+            "%s: DiSEqC-2.2 read slave reply fails - disabling DiSEqC-2.2.\n"
+            "(this is expected, if using DiSEqC-1.2 equipment)\n",
+            __FUNCTION__);
+        return err; // nowhere described.
+    }
+    if (PosStat.msg[0] == SLAVE_REPLY_OK) {
+        if (PosStat.msg_len > 1) {
+            *data = PosStat.msg[1];
+            return 0;
+        }
+    }
+    info("%s: unknown error.\n", __FUNCTION__);
+    return -1; // unknown error
 }
 
-#define speed_13V       1.5	//degrees per second
-#define speed_18V       2.4	//degrees per second
+#define speed_13V       1.5 // degrees per second
+#define speed_18V       2.4 // degrees per second
 
 /******************************************************************************
  * Rotate a DiSEqC 1.2 rotor from position 'from_rotor_pos' to position 'to_rotor_pos',
  * from and to are assigned to sat_list[channellist].rotor_position
  ******************************************************************************/
 
-extern int rotate_rotor(int frontend_fd, int *from, int to, uint8_t voltage_18,
-			uint8_t hiband)
+extern int
+rotate_rotor(int frontend_fd, int *from, int to, uint8_t voltage_18, uint8_t hiband)
 {
 
-	float rotor_positioning_time;	//seconds
-	float rotation_angle;
-	int from_satlist_index, to_satlist_index;
+    float rotor_positioning_time; // seconds
+    float rotation_angle;
+    int from_satlist_index, to_satlist_index;
 
-	//convert rotor position to sat_list index
-	to_satlist_index = rotor_position_to_sat_list_index(to);
+    // convert rotor position to sat_list index
+    to_satlist_index = rotor_position_to_sat_list_index(to);
 
-	if (to > -1) {
-		if (*from != to) {
-			if (*from < 0) {
-				/* starting from unknown position, therefore
-				 * assuming worst case: 180°
-				 * diseqc-2.2 rotor should stop earlier
-				 */
-				rotation_angle = 180;
-				info("Initializing rotor to %s (rotor position %d)\n", satellite_to_short_name(to_satlist_index), sat_list[to_satlist_index].rotor_position);
-			} else {
-				//convert rotor position to sat_list index
-				from_satlist_index =
-				    rotor_position_to_sat_list_index(*from);
+    if (to > -1) {
+        if (*from != to) {
+            if (*from < 0) {
+                /* starting from unknown position, therefore
+                 * assuming worst case: 180°
+                 * diseqc-2.2 rotor should stop earlier
+                 */
+                rotation_angle = 180;
+                info(
+                    "Initializing rotor to %s (rotor position %d)\n",
+                    satellite_to_short_name(to_satlist_index),
+                    sat_list[to_satlist_index].rotor_position);
+            } else {
+                // convert rotor position to sat_list index
+                from_satlist_index = rotor_position_to_sat_list_index(*from);
 
-				info("moving rotor from %s (rotor position %d) to %s (rotor position %d)\n", satellite_to_short_name(from_satlist_index), sat_list[from_satlist_index].rotor_position, satellite_to_short_name(to_satlist_index), sat_list[to_satlist_index].rotor_position);
+                info(
+                    "moving rotor from %s (rotor position %d) to %s (rotor position %d)\n",
+                    satellite_to_short_name(from_satlist_index),
+                    sat_list[from_satlist_index].rotor_position,
+                    satellite_to_short_name(to_satlist_index),
+                    sat_list[to_satlist_index].rotor_position);
 
-				rotation_angle =
-				    abs(rotor_angle(to_satlist_index) -
-					rotor_angle(from_satlist_index));
-				if (rotation_angle > 180)
-					rotation_angle = 360.0 - rotation_angle;
-			}
+                rotation_angle = abs(rotor_angle(to_satlist_index) - rotor_angle(from_satlist_index));
+                if (rotation_angle > 180)
+                    rotation_angle = 360.0 - rotation_angle;
+            }
 
-			rotor_positioning_time = rotation_angle / speed_18V;
-			info("expected rotation %.2fdeg (%.1f sec)\n",
-			     rotation_angle, rotor_positioning_time);
-			//switch tone off
-			if (ioctl(frontend_fd, FE_SET_TONE, SEC_TONE_OFF) < 0) {
-				info("%s: SEC_TONE_OFF failed.\n",
-				     __FUNCTION__);
-				return -1;
-			}
-			msleep(15);
-			// high voltage for high speed rotation
-			if (ioctl(frontend_fd, FE_SET_VOLTAGE, SEC_VOLTAGE_18) <
-			    0) {
-				info("%s: SEC_VOLTAGE_18 failed.\n",
-				     __FUNCTION__);
-				return -1;
-			}
-			msleep(15);
-			if (rotor_command
-			    (frontend_fd, ROTOR_CMD_GOTO_SAT_POS_NN, to, 0,
-			     0)) {
-				info("%s: ROTOR_CMD_GOTO_SAT_POS_NN failed.\n",
-				     __FUNCTION__);
-				return -1;
-			} else {
-				int i, status;
-				info("Rotating");
-				for (i = 0;
-				     i < (int)(rotor_positioning_time + 0.5);
-				     i++) {
-					if ((i % 32) == 0)
-						info("\n\t");
-					if (diseqc_2_x_error == 0) {
-						usleep(1000000 - 82500);
-						if (!
-						    (diseqc_2_x_error =
-						     get_positioner_status
-						     (frontend_fd, &status))) {
-							if (status &
-							    MOVEMENT_COMPLETE)
-								break;
-							if (status &
-							    HARD_LIMIT_REACHED)
-								break;
-							if ((status &
-							     MOTOR_RUNNING) !=
-							    MOTOR_RUNNING)
-								break;
-						}
-					} else
-						usleep(1000000);
-					info("%d ",
-					     (int)rotor_positioning_time - i);
-				}
-				info(" completed.\n");
-			}
-			*from = to;
-		}
-		// correct tone and voltage
-		if (ioctl
-		    (frontend_fd, FE_SET_TONE,
-		     hiband ? SEC_TONE_ON : SEC_TONE_OFF)) {
-			info("%s: FE_SET_TONE failed.\n", __FUNCTION__);
-			return -1;
-		}
-		msleep(15);
-		if (ioctl(frontend_fd, FE_SET_VOLTAGE, voltage_18)) {
-			info("%s: FE_SET_VOLTAGE failed.\n", __FUNCTION__);
-			return -1;
-		}
-		msleep(15);
-	} else
-		info("warn: to position < 0, ignored.\n");
-	return 0;
+            rotor_positioning_time = rotation_angle / speed_18V;
+            info("expected rotation %.2fdeg (%.1f sec)\n", rotation_angle, rotor_positioning_time);
+            // switch tone off
+            if (ioctl(frontend_fd, FE_SET_TONE, SEC_TONE_OFF) < 0) {
+                info("%s: SEC_TONE_OFF failed.\n", __FUNCTION__);
+                return -1;
+            }
+            msleep(15);
+            // high voltage for high speed rotation
+            if (ioctl(frontend_fd, FE_SET_VOLTAGE, SEC_VOLTAGE_18) < 0) {
+                info("%s: SEC_VOLTAGE_18 failed.\n", __FUNCTION__);
+                return -1;
+            }
+            msleep(15);
+            if (rotor_command(frontend_fd, ROTOR_CMD_GOTO_SAT_POS_NN, to, 0, 0)) {
+                info("%s: ROTOR_CMD_GOTO_SAT_POS_NN failed.\n", __FUNCTION__);
+                return -1;
+            } else {
+                int i, status;
+                info("Rotating");
+                for (i = 0; i < (int)(rotor_positioning_time + 0.5); i++) {
+                    if ((i % 32) == 0)
+                        info("\n\t");
+                    if (diseqc_2_x_error == 0) {
+                        usleep(1000000 - 82500);
+                        if (!(diseqc_2_x_error = get_positioner_status(frontend_fd, &status))) {
+                            if (status & MOVEMENT_COMPLETE)
+                                break;
+                            if (status & HARD_LIMIT_REACHED)
+                                break;
+                            if ((status & MOTOR_RUNNING) != MOTOR_RUNNING)
+                                break;
+                        }
+                    } else
+                        usleep(1000000);
+                    info("%d ", (int)rotor_positioning_time - i);
+                }
+                info(" completed.\n");
+            }
+            *from = to;
+        }
+        // correct tone and voltage
+        if (ioctl(frontend_fd, FE_SET_TONE, hiband ? SEC_TONE_ON : SEC_TONE_OFF)) {
+            info("%s: FE_SET_TONE failed.\n", __FUNCTION__);
+            return -1;
+        }
+        msleep(15);
+        if (ioctl(frontend_fd, FE_SET_VOLTAGE, voltage_18)) {
+            info("%s: FE_SET_VOLTAGE failed.\n", __FUNCTION__);
+            return -1;
+        }
+        msleep(15);
+    } else
+        info("warn: to position < 0, ignored.\n");
+    return 0;
 }
 
-int diseqc_send_msg(int fd, fe_sec_voltage_t v, struct diseqc_cmd **cmd,
-		    fe_sec_tone_mode_t t, fe_sec_mini_cmd_t b)
+int
+diseqc_send_msg(int fd, fe_sec_voltage_t v, struct diseqc_cmd **cmd, fe_sec_tone_mode_t t, fe_sec_mini_cmd_t b)
 {
-	int err;
+    int err;
 
-	if ((err = ioctl(fd, FE_SET_TONE, SEC_TONE_OFF))) {
-		info("%s: SEC_TONE_OFF failed.\n", __FUNCTION__);
-		return err;
-	}
-	if ((err = ioctl(fd, FE_SET_VOLTAGE, v))) {
-		info("%s: FE_SET_VOLTAGE failed.\n", __FUNCTION__);
-		return err;
-	}
-	msleep(15);
+    if ((err = ioctl(fd, FE_SET_TONE, SEC_TONE_OFF))) {
+        info("%s: SEC_TONE_OFF failed.\n", __FUNCTION__);
+        return err;
+    }
+    if ((err = ioctl(fd, FE_SET_VOLTAGE, v))) {
+        info("%s: FE_SET_VOLTAGE failed.\n", __FUNCTION__);
+        return err;
+    }
+    msleep(15);
 
-	while (*cmd) {
-		debug("DiSEqC: %02x %02x %02x %02x %02x %02x\n",
-		      (*cmd)->cmd.msg[0], (*cmd)->cmd.msg[1],
-		      (*cmd)->cmd.msg[2], (*cmd)->cmd.msg[3],
-		      (*cmd)->cmd.msg[4], (*cmd)->cmd.msg[5]);
+    while (*cmd) {
+        debug(
+            "DiSEqC: %02x %02x %02x %02x %02x %02x\n",
+            (*cmd)->cmd.msg[0],
+            (*cmd)->cmd.msg[1],
+            (*cmd)->cmd.msg[2],
+            (*cmd)->cmd.msg[3],
+            (*cmd)->cmd.msg[4],
+            (*cmd)->cmd.msg[5]);
 
-		if ((err = ioctl(fd, FE_DISEQC_SEND_MASTER_CMD, &(*cmd)->cmd))) {
-			info("%s: FE_DISEQC_SEND_MASTER_CMD failed.\n",
-			     __FUNCTION__);
-			return err;
-		}
-		cmd++;
-	}
+        if ((err = ioctl(fd, FE_DISEQC_SEND_MASTER_CMD, &(*cmd)->cmd))) {
+            info("%s: FE_DISEQC_SEND_MASTER_CMD failed.\n", __FUNCTION__);
+            return err;
+        }
+        cmd++;
+    }
 
-	msleep(15);
+    msleep(15);
 
-	if ((err = ioctl(fd, FE_DISEQC_SEND_BURST, b))) {
-		info("%s: FE_DISEQC_SEND_MASTER_CMD failed.\n", __FUNCTION__);
-		return err;
-	}
-	msleep(15);
+    if ((err = ioctl(fd, FE_DISEQC_SEND_BURST, b))) {
+        info("%s: FE_DISEQC_SEND_MASTER_CMD failed.\n", __FUNCTION__);
+        return err;
+    }
+    msleep(15);
 
-	if ((err = ioctl(fd, FE_SET_TONE, t))) {
-		info("%s: FE_SET_TONE failed.\n", __FUNCTION__);
-		return err;
-	}
-	msleep(15);
+    if ((err = ioctl(fd, FE_SET_TONE, t))) {
+        info("%s: FE_SET_TONE failed.\n", __FUNCTION__);
+        return err;
+    }
+    msleep(15);
 
-	return err;
+    return err;
 }
 
-int setup_switch(int frontend_fd, int switch_pos, int voltage_18, int hiband,
-		 int uncommitted_switch_pos)
+int
+setup_switch(int frontend_fd, int switch_pos, int voltage_18, int hiband, int uncommitted_switch_pos)
 {
-	int i;
-	int err;
-	struct diseqc_cmd *cmd[2] = { NULL, NULL };
+    int i;
+    int err;
+    struct diseqc_cmd *cmd[2] = { NULL, NULL };
 
-	i = uncommitted_switch_pos;
+    i = uncommitted_switch_pos;
 
-	verbose("DiSEqC: uncommitted switch pos %i\n", uncommitted_switch_pos);
-	if (i < 0
-	    || i >=
-	    (int)(sizeof(uncommitted_switch_cmds) / sizeof(struct diseqc_cmd)))
-		return -EINVAL;
+    verbose("DiSEqC: uncommitted switch pos %i\n", uncommitted_switch_pos);
+    if (i < 0 || i >= (int)(sizeof(uncommitted_switch_cmds) / sizeof(struct diseqc_cmd)))
+        return -EINVAL;
 
-	cmd[0] = &uncommitted_switch_cmds[i];
+    cmd[0] = &uncommitted_switch_cmds[i];
 
-	if ((err = diseqc_send_msg(frontend_fd,
-				   voltage_18 ? SEC_VOLTAGE_18 : SEC_VOLTAGE_13,
-				   cmd,
-				   hiband ? SEC_TONE_ON : SEC_TONE_OFF,
-				   switch_pos % 2 ? SEC_MINI_B : SEC_MINI_A))) {
-		return err;
-	}
+    if ((err = diseqc_send_msg(
+             frontend_fd,
+             voltage_18 ? SEC_VOLTAGE_18 : SEC_VOLTAGE_13,
+             cmd,
+             hiband ? SEC_TONE_ON : SEC_TONE_OFF,
+             switch_pos % 2 ? SEC_MINI_B : SEC_MINI_A))) {
+        return err;
+    }
 
-	i = 4 * switch_pos + 2 * hiband + (voltage_18 ? 1 : 0);
+    i = 4 * switch_pos + 2 * hiband + (voltage_18 ? 1 : 0);
 
-	verbose("DiSEqC: switch pos %i, %sV, %sband (index %d)\n",
-		switch_pos, voltage_18 ? "18" : "13", hiband ? "hi" : "lo", i);
+    verbose("DiSEqC: switch pos %i, %sV, %sband (index %d)\n", switch_pos, voltage_18 ? "18" : "13", hiband ? "hi" : "lo", i);
 
-	if (i < 0
-	    || i >=
-	    (int)(sizeof(committed_switch_cmds) / sizeof(struct diseqc_cmd)))
-		return -EINVAL;
+    if (i < 0 || i >= (int)(sizeof(committed_switch_cmds) / sizeof(struct diseqc_cmd)))
+        return -EINVAL;
 
-	cmd[0] = &committed_switch_cmds[i];
+    cmd[0] = &committed_switch_cmds[i];
 
-	err = diseqc_send_msg(frontend_fd,
-			      voltage_18 ? SEC_VOLTAGE_18 : SEC_VOLTAGE_13,
-			      cmd,
-			      hiband ? SEC_TONE_ON : SEC_TONE_OFF,
-			      switch_pos % 2 ? SEC_MINI_B : SEC_MINI_A);
+    err = diseqc_send_msg(
+        frontend_fd,
+        voltage_18 ? SEC_VOLTAGE_18 : SEC_VOLTAGE_13,
+        cmd,
+        hiband ? SEC_TONE_ON : SEC_TONE_OFF,
+        switch_pos % 2 ? SEC_MINI_B : SEC_MINI_A);
 
-	return err;
+    return err;
 }
 
 //------------------------------------------------------------------------------
 #define ROUND(x) ( 0.5 + x )
 
-static int scr_cmd(int frontend_fd, struct dvb_diseqc_master_cmd *diseqc)
+static int
+scr_cmd(int frontend_fd, struct dvb_diseqc_master_cmd *diseqc)
 {
-	int err = 0;
+    int err = 0;
 
-	if ((err = ioctl(frontend_fd, FE_SET_TONE, SEC_TONE_OFF))) {
-		info("%s:%d: SEC_TONE_OFF failed.\n", __FUNCTION__, __LINE__);
-		return err;
-	}
+    if ((err = ioctl(frontend_fd, FE_SET_TONE, SEC_TONE_OFF))) {
+        info("%s:%d: SEC_TONE_OFF failed.\n", __FUNCTION__, __LINE__);
+        return err;
+    }
 
-	if ((err = ioctl(frontend_fd, FE_SET_VOLTAGE, SEC_VOLTAGE_18))) {
-		info("%s:%d: FE_SET_VOLTAGE failed.\n", __FUNCTION__, __LINE__);
-		return err;
-	}
-	msleep(5);		// AN2056: "more than 4ms" after 13V -> 18V; EN50494: 4..22ms
+    if ((err = ioctl(frontend_fd, FE_SET_VOLTAGE, SEC_VOLTAGE_18))) {
+        info("%s:%d: FE_SET_VOLTAGE failed.\n", __FUNCTION__, __LINE__);
+        return err;
+    }
+    msleep(5); // AN2056: "more than 4ms" after 13V -> 18V; EN50494: 4..22ms
 
-	if ((err = ioctl(frontend_fd, FE_DISEQC_SEND_MASTER_CMD, diseqc))) {
-		info("%s:%d: FE_DISEQC_SEND_MASTER_CMD failed.\n", __FUNCTION__,
-		     __LINE__);
-		return err;
-	}
-	msleep(5);		// no data in AN2056; i guess any value (2..50)msec should be okay.
+    if ((err = ioctl(frontend_fd, FE_DISEQC_SEND_MASTER_CMD, diseqc))) {
+        info("%s:%d: FE_DISEQC_SEND_MASTER_CMD failed.\n", __FUNCTION__, __LINE__);
+        return err;
+    }
+    msleep(5); // no data in AN2056; i guess any value (2..50)msec should be okay.
 
-	if ((err = ioctl(frontend_fd, FE_SET_VOLTAGE, SEC_VOLTAGE_13))) {
-		info("%s:%d: FE_SET_VOLTAGE failed.\n", __FUNCTION__, __LINE__);
-		return err;
-	}
+    if ((err = ioctl(frontend_fd, FE_SET_VOLTAGE, SEC_VOLTAGE_13))) {
+        info("%s:%d: FE_SET_VOLTAGE failed.\n", __FUNCTION__, __LINE__);
+        return err;
+    }
 
-	return 0;
+    return 0;
 }
 
-static void scr_prepare_tune_EN50607(uint16_t fIF, struct scr *config,
-				     uint8_t hiband, uint8_t horizontal,
-				     struct dvb_diseqc_master_cmd *diseqc)
+static void
+scr_prepare_tune_EN50607(
+    uint16_t fIF,
+    struct scr *config,
+    uint8_t hiband,
+    uint8_t horizontal,
+    struct dvb_diseqc_master_cmd *diseqc)
 {
-	uint16_t TuningWord = 0;
+    uint16_t TuningWord = 0;
 
-	diseqc->msg[0] = 0x70;
-	diseqc->msg_len = 4;
+    diseqc->msg[0] = 0x70;
+    diseqc->msg_len = 4;
 
-	if (config->pin < 256) {
-		// a pin for user channel was supplied.
-		diseqc->msg_len = 5;
-		diseqc->msg[0] = 0x71;
-		diseqc->msg[4] = config->pin;
-	}
+    if (config->pin < 256) {
+        // a pin for user channel was supplied.
+        diseqc->msg_len = 5;
+        diseqc->msg[0] = 0x71;
+        diseqc->msg[4] = config->pin;
+    }
 
-	if ((950U <= fIF) && (fIF <= 2150U)) {
-		TuningWord = fIF - 100U;
-		if (TuningWord > 0x7FF)
-			TuningWord = 0x7FF;
-	}
+    if ((950U <= fIF) && (fIF <= 2150U)) {
+        TuningWord = fIF - 100U;
+        if (TuningWord > 0x7FF)
+            TuningWord = 0x7FF;
+    }
 
-	diseqc->msg[1] = (config->slot << 3) |	// slot             is D0 bit 7..3
-	    ((TuningWord >> 8) & 0x7);	// tuning word      is D0 bit 2..0
-	diseqc->msg[2] = (TuningWord & 0xFF);	//                 and D1 bit 7..0
-	diseqc->msg[3] = config->pos |	// uncommitted/committed pos + option
-	    (hiband << 0) |	// committed sw band   is D2 bit 0
-	    (horizontal << 1) |	// committed sw pol    is D2 bit 1
-	    (hiband << 4) |	// uncommitted sw band is D2 bit 5
-	    (horizontal << 5);	// uncommitted sw pol  is D2 bit 6
+    diseqc->msg[1] = (config->slot << 3) | // slot             is D0 bit 7..3
+        ((TuningWord >> 8) & 0x7); // tuning word      is D0 bit 2..0
+    diseqc->msg[2] = (TuningWord & 0xFF); //                 and D1 bit 7..0
+    diseqc->msg[3] = config->pos | // uncommitted/committed pos + option
+        (hiband << 0) | // committed sw band   is D2 bit 0
+        (horizontal << 1) | // committed sw pol    is D2 bit 1
+        (hiband << 4) | // uncommitted sw band is D2 bit 5
+        (horizontal << 5); // uncommitted sw pol  is D2 bit 6
 
-	config->offset = 0;	// no offset.
+    config->offset = 0; // no offset.
 }
 
-static void scr_prepare_tune_EN50494(uint16_t fIF, struct scr *config,
-				     uint8_t hiband, uint8_t horizontal,
-				     struct dvb_diseqc_master_cmd *diseqc)
+static void
+scr_prepare_tune_EN50494(
+    uint16_t fIF,
+    struct scr *config,
+    uint8_t hiband,
+    uint8_t horizontal,
+    struct dvb_diseqc_master_cmd *diseqc)
 {
-	uint16_t fVCO = 1400;	// fVCO = 1900MHz .. 4300MHz. 1400 = OFF.
-	uint16_t TuningWord;
+    uint16_t fVCO = 1400; // fVCO = 1900MHz .. 4300MHz. 1400 = OFF.
+    uint16_t TuningWord;
 
-	if ((950U <= fIF) && (fIF <= 2150U))
-		fVCO = fIF + config->user_frequency;
+    if ((950U <= fIF) && (fIF <= 2150U))
+        fVCO = fIF + config->user_frequency;
 
-	if (config->pin < 256) {
-		// a pin for user channel was supplied.
-		diseqc->msg_len = 6;
-		diseqc->msg[2] = 0x5C;
-		diseqc->msg[5] = config->pin;
-	}
-	diseqc->msg[3] = (config->slot << 5) |	// slot        is D0 bit 7..5
-	    (hiband << 2) |	// hi/lo band  is D0 bit 2
-	    (horizontal << 3) |	// polariz     is D0 bit 3
-	    (config->pos << 4);	// sat pos A/B is D0 bit 4
+    if (config->pin < 256) {
+        // a pin for user channel was supplied.
+        diseqc->msg_len = 6;
+        diseqc->msg[2] = 0x5C;
+        diseqc->msg[5] = config->pin;
+    }
+    diseqc->msg[3] = (config->slot << 5) | // slot        is D0 bit 7..5
+        (hiband << 2) | // hi/lo band  is D0 bit 2
+        (horizontal << 3) | // polariz     is D0 bit 3
+        (config->pos << 4); // sat pos A/B is D0 bit 4
 
-	TuningWord = ROUND(fVCO / 4.0 - 350.0);
-	diseqc->msg[3] |= (TuningWord >> 8) & 0x03;	// tuning word is D0 bit 1..0
-	diseqc->msg[4] |= (TuningWord) & 0xFF;	//            and D1 bit 7..0
+    TuningWord = ROUND(fVCO / 4.0 - 350.0);
+    diseqc->msg[3] |= (TuningWord >> 8) & 0x03; // tuning word is D0 bit 1..0
+    diseqc->msg[4] |= (TuningWord) & 0xFF; //            and D1 bit 7..0
 
-	// offset between fVCO goal value and programmed fVCO in 4MHz stepping
-	config->offset = (TuningWord + 350) * 4 - fVCO;
+    // offset between fVCO goal value and programmed fVCO in 4MHz stepping
+    config->offset = (TuningWord + 350) * 4 - fVCO;
 }
 
 /* Programmes SCR LNB/Switch via diseqc.
@@ -658,69 +620,65 @@ static void scr_prepare_tune_EN50494(uint16_t fIF, struct scr *config,
  * As EN50494 is not available to me, i collected known details here:
  *  - http://www.vdr-wiki.de/wiki/index.php/SCR_Satellite_Channel_Routing
  */
-int setup_scr(int frontend_fd, struct transponder *t, struct lnb_types_st *lnb,
-	      struct scr *config)
+int
+setup_scr(int frontend_fd, struct transponder *t, struct lnb_types_st *lnb, struct scr *config)
 {
 
-	uint8_t hiband = (lnb->high_val > 0)
-	    && (t->frequency >= lnb->switch_val) ? 1 : 0;
-	uint8_t horiz = t->polarization == POLARIZATION_HORIZONTAL ? 1 : 0;
-	uint32_t fLO = hiband > 0 ? lnb->high_val : lnb->low_val;
-	uint16_t fIF = ROUND(abs(t->frequency - fLO) / 1000.0);	// 950..2150MHz
+    uint8_t hiband = (lnb->high_val > 0) && (t->frequency >= lnb->switch_val) ? 1 : 0;
+    uint8_t horiz = t->polarization == POLARIZATION_HORIZONTAL ? 1 : 0;
+    uint32_t fLO = hiband > 0 ? lnb->high_val : lnb->low_val;
+    uint16_t fIF = ROUND(abs(t->frequency - fLO) / 1000.0); // 950..2150MHz
 
-	struct dvb_diseqc_master_cmd diseqc = {
-		{0xE0, 0x10, 0x5A, 0x00, 0x00, 0x00}, 5
-	};
+    struct dvb_diseqc_master_cmd diseqc = { { 0xE0, 0x10, 0x5A, 0x00, 0x00, 0x00 }, 5 };
 
-	// fill struct dvb_diseqc_master_cmd 'diseqc'
-	switch (config->norm) {
-	case 1:
-		scr_prepare_tune_EN50494(fIF, config, hiband, horiz, &diseqc);
-		break;
-	case 2:
-		scr_prepare_tune_EN50607(fIF, config, hiband, horiz, &diseqc);
-		break;
-	default:
-		fatal("%s:%d: unknown SCR norm '%d'\n",
-		      __FUNCTION__, __LINE__, config->norm);
-	}
+    // fill struct dvb_diseqc_master_cmd 'diseqc'
+    switch (config->norm) {
+    case 1:
+        scr_prepare_tune_EN50494(fIF, config, hiband, horiz, &diseqc);
+        break;
+    case 2:
+        scr_prepare_tune_EN50607(fIF, config, hiband, horiz, &diseqc);
+        break;
+    default:
+        fatal("%s:%d: unknown SCR norm '%d'\n", __FUNCTION__, __LINE__, config->norm);
+    }
 
-	return scr_cmd(frontend_fd, &diseqc);
+    return scr_cmd(frontend_fd, &diseqc);
 }
 
-int scr_poweroff(int frontend_fd, struct scr *config)
+int
+scr_poweroff(int frontend_fd, struct scr *config)
 {
-	struct dvb_diseqc_master_cmd diseqc;
+    struct dvb_diseqc_master_cmd diseqc;
 
-	switch (config->norm) {
-	case 1:
-		diseqc.msg_len = 5;
-		diseqc.msg[0] = 0xE0;
-		diseqc.msg[1] = 0x10;
-		diseqc.msg[2] = 0x5A;
-		diseqc.msg[3] = config->slot << 5;
-		diseqc.msg[4] = 0;
-		if (config->pin < 256) {
-			diseqc.msg_len = 6;
-			diseqc.msg[2] = 0x5C;
-			diseqc.msg[5] = config->pin;
-		}
-		break;
-	case 2:
-		diseqc.msg_len = 4;
-		diseqc.msg[0] = 0x70;
-		diseqc.msg[1] = config->slot << 3;
-		diseqc.msg[2] = 0;
-		diseqc.msg[3] = config->pos;
-		if (config->pin < 256) {
-			diseqc.msg_len = 5;
-			diseqc.msg[0] = 0x71;
-			diseqc.msg[4] = config->pin;
-		}
-		break;
-	default:
-		fatal("%s:%d: unknown SCR norm '%d'\n",
-		      __FUNCTION__, __LINE__, config->norm);
-	}
-	return scr_cmd(frontend_fd, &diseqc);
+    switch (config->norm) {
+    case 1:
+        diseqc.msg_len = 5;
+        diseqc.msg[0] = 0xE0;
+        diseqc.msg[1] = 0x10;
+        diseqc.msg[2] = 0x5A;
+        diseqc.msg[3] = config->slot << 5;
+        diseqc.msg[4] = 0;
+        if (config->pin < 256) {
+            diseqc.msg_len = 6;
+            diseqc.msg[2] = 0x5C;
+            diseqc.msg[5] = config->pin;
+        }
+        break;
+    case 2:
+        diseqc.msg_len = 4;
+        diseqc.msg[0] = 0x70;
+        diseqc.msg[1] = config->slot << 3;
+        diseqc.msg[2] = 0;
+        diseqc.msg[3] = config->pos;
+        if (config->pin < 256) {
+            diseqc.msg_len = 5;
+            diseqc.msg[0] = 0x71;
+            diseqc.msg[4] = config->pin;
+        }
+        break;
+    default:
+        fatal("%s:%d: unknown SCR norm '%d'\n", __FUNCTION__, __LINE__, config->norm);
+    }
+    return scr_cmd(frontend_fd, &diseqc);
 }

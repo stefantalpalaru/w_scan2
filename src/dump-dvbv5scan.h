@@ -26,8 +26,6 @@
 #include "extended_frontend.h"
 #include "scan.h"
 
-extern void dvbv5scan_dump_tuningdata(FILE * f,
-				    struct transponder *t,
-				    uint16_t index, struct w_scan_flags *flags);
+extern void dvbv5scan_dump_tuningdata(FILE *f, struct transponder *t, uint16_t index, struct w_scan_flags *flags);
 
 #endif

@@ -29,19 +29,16 @@
 #include "extended_frontend.h"
 #include "si_types.h"
 
-const char *vdr_inversion_name(int inversion);
-const char *vdr_fec_name(int fec);
-const char *vdr17_modulation_name(int modulation);
-const char *vdr_modulation_name(int modulation);
-const char *vdr_bandwidth_name(int bandwidth);
-const char *vdr_transmission_mode_name(int transmission_mode);
-const char *vdr_guard_name(int guard_interval);
-const char *vdr_hierarchy_name(int hierarchy);
-const char *vdr_name_to_short_name(const char *satname);
+char const *vdr_inversion_name(int inversion);
+char const *vdr_fec_name(int fec);
+char const *vdr17_modulation_name(int modulation);
+char const *vdr_modulation_name(int modulation);
+char const *vdr_bandwidth_name(int bandwidth);
+char const *vdr_transmission_mode_name(int transmission_mode);
+char const *vdr_guard_name(int guard_interval);
+char const *vdr_hierarchy_name(int hierarchy);
+char const *vdr_name_to_short_name(char const *satname);
 
-void vdr_dump_service_parameter_set(FILE * f,
-				    struct service *s,
-				    struct transponder *t,
-				    struct w_scan_flags *flags);
+void vdr_dump_service_parameter_set(FILE *f, struct service *s, struct transponder *t, struct w_scan_flags *flags);
 
 #endif

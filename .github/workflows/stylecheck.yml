@@ -1,0 +1,54 @@
+name: stylecheck
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  style-check:
+    name: Style check
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Environment variables
+        shell: bash
+        run: |
+          echo "DEBIAN_FRONTEND=noninteractive" >> ${GITHUB_ENV}
+          echo "TZ=Etc/UTC" >> ${GITHUB_ENV}
+
+      - name: Install build dependencies
+        run: |
+          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+          sudo add-apt-repository "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-18 main"
+          sudo -E apt-get update -qq
+          sudo -E eatmydata apt-get install --no-install-recommends -yq clang-format-18
+
+      - name: Check for style diffs
+        id: check-for-diffs
+        run: |
+          ./code_style.sh
+          set +e
+          git diff --exit-code > style.diff
+          echo "differs=$?" >> $GITHUB_OUTPUT
+          cat style.diff
+          set -e
+
+      - name: Upload diffs
+        uses: actions/upload-artifact@v4
+        if: ${{ steps.check-for-diffs.outputs.differs == '1' }}
+        with:
+          name: code-style.diff
+          path: 'style.diff'
+
+      - name: Fail if diffs exist
+        if: ${{ steps.check-for-diffs.outputs.differs == '1' }}
+        run: |
+          echo "Code style does not match expected:"
+          cat style.diff
+          echo "When CI is done, the above patch will be uploaded as 'code-style.diff' to https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/ ."
+          exit 1
+

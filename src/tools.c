@@ -29,7 +29,7 @@
 /*******************************************************************************
  * common typedefs && logging.
  ******************************************************************************/
-int verbosity = 2;		// need signed -> use of fatal()
+int verbosity = 2; // need signed -> use of fatal()
 
 /*******************************************************************************
  * new implementation of double linked list since 20140118.
@@ -41,19 +41,18 @@ int verbosity = 2;		// need signed -> use of fatal()
 #define dbg(s...) info(s)
 
 // debugging purposes only. do not use in distributed versions.
-void report(pList list)
+void
+report(pList list)
 {
-	dbg("--------------------------------------------------------------\n");
-	dbg("list '%s'@%p: count=%u; first=%p; last=%p\n",
-		list->name, list, list->count, list->first, list->last);
+    dbg("--------------------------------------------------------------\n");
+    dbg("list '%s'@%p: count=%u; first=%p; last=%p\n", list->name, list, list->count, list->first, list->last);
 
-	pItem p = list->first;
-	while (p != NULL) {
-		verbose("    item%.2u: prev = %p, ptr = %p: next = %p\n",
-			p->index, p->prev, p, p->next);
-		p = p->next;
-	}
-	dbg("--------------------------------------------------------------\n");
+    pItem p = list->first;
+    while (p != NULL) {
+        verbose("    item%.2u: prev = %p, ptr = %p: next = %p\n", p->index, p->prev, p, p->next);
+        p = p->next;
+    }
+    dbg("--------------------------------------------------------------\n");
 }
 #else
 #define dbg(s...)
@@ -75,277 +74,296 @@ int alphabetically(void *a, void *b, int ascending)
 #endif
 
 // initializes a list before first use
-void NewList(pList const list, const char *name)
+void
+NewList(pList const list, char const *name)
 {
-	dbg("%s %d: list:'%s'\n", __FUNCTION__, __LINE__, name);
-	list->first = NULL;
-	list->last = NULL;
-	list->count = 0;
-	list->name = calloc(1, strlen(name) + 1);
-	sprintf(list->name, "%s", name);
-	report(list);
+    dbg("%s %d: list:'%s'\n", __FUNCTION__, __LINE__, name);
+    list->first = NULL;
+    list->last = NULL;
+    list->count = 0;
+    list->name = calloc(1, strlen(name) + 1);
+    sprintf(list->name, "%s", name);
+    report(list);
 }
 
 // returns true, if a pointer is part of list.
-bool IsMember(pList list, void *item)
+bool
+IsMember(pList list, void *item)
 {
-	pItem p;
-	for (p = list->first; p; p = p->next) {
-		if (p == item) {
-			return true;
-		}
-	}
-	return false;
+    pItem p;
+    for (p = list->first; p; p = p->next) {
+        if (p == item) {
+            return true;
+        }
+    }
+    return false;
 }
 
 // remove all items from list && free allocated memory.
-void ClearList(pList list)
+void
+ClearList(pList list)
 {
-	while (list->lock) ;
-	list->lock = true;
-	dbg("%s %d: list:'%s'\n", __FUNCTION__, __LINE__, list->name);
-	pItem p = list->last;
+    while (list->lock)
+        ;
+    list->lock = true;
+    dbg("%s %d: list:'%s'\n", __FUNCTION__, __LINE__, list->name);
+    pItem p = list->last;
 
-	while (p != NULL) {
-		list->last = p->prev;
-		free(p);
-		p = list->last;
-		if (p != NULL) {
-			p->next = NULL;
-		}
-	}
-	list->first = NULL;
-	list->count = 0;
-	list->lock = false;
-	report(list);
+    while (p != NULL) {
+        list->last = p->prev;
+        free(p);
+        p = list->last;
+        if (p != NULL) {
+            p->next = NULL;
+        }
+    }
+    list->first = NULL;
+    list->count = 0;
+    list->lock = false;
+    report(list);
 }
 
 // returns item specified by zero-based index.
-void *GetItem(pList list, uint32_t index)
+void *
+GetItem(pList list, uint32_t index)
 {
-	dbg("%s %d: list:'%s'\n", __FUNCTION__, __LINE__, list->name);
-	pItem p;
-	for (p = list->first; p; p = p->next) {
-		dbg("    item%.2u: (prev=%p, p=%p, next=%p)\n", p->index,
-			p->prev, p, p->next);
-		if (p->index == index)
-			return p;
-	}
-	return NULL;
+    dbg("%s %d: list:'%s'\n", __FUNCTION__, __LINE__, list->name);
+    pItem p;
+    for (p = list->first; p; p = p->next) {
+        dbg("    item%.2u: (prev=%p, p=%p, next=%p)\n", p->index, p->prev, p, p->next);
+        if (p->index == index)
+            return p;
+    }
+    return NULL;
 }
 
 // append item at end of list.
-void AddItem(pList list, void *item)
+void
+AddItem(pList list, void *item)
 {
-	pItem p = item;
-	while (list->lock) ;
-	list->lock = true;
+    pItem p = item;
+    while (list->lock)
+        ;
+    list->lock = true;
 
-	dbg("%s %d: list:'%s' add item: (prev=%p, p=%p, next=%p)\n",
-		__FUNCTION__, __LINE__, list->name, p->prev, p, p->next);
+    dbg("%s %d: list:'%s' add item: (prev=%p, p=%p, next=%p)\n", __FUNCTION__, __LINE__, list->name, p->prev, p, p->next);
 
-	p->index = list->count;
-	p->prev = list->last;
-	p->next = NULL;
+    p->index = list->count;
+    p->prev = list->last;
+    p->next = NULL;
 
-	if (list->count == 0) {
-		list->first = p;
-	} else {
-		p = list->last;
-		p->next = item;
-	}
+    if (list->count == 0) {
+        list->first = p;
+    } else {
+        p = list->last;
+        p->next = item;
+    }
 
-	list->last = item;
-	list->count++;
-	list->lock = false;
-	report(list);
+    list->last = item;
+    list->count++;
+    list->lock = false;
+    report(list);
 }
 
 // insert item to list. index is zero-based pos of new item.
 // if index greater as (list.count-1), item will be appended instead.
-void InsertItem(pList list, void *item, uint32_t index)
+void
+InsertItem(pList list, void *item, uint32_t index)
 {
-	while (list->lock) ;
-	list->lock = true;
+    while (list->lock)
+        ;
+    list->lock = true;
 
-	dbg("%s %d: list:'%s' item=%p, index=%u\n",
-		__FUNCTION__, __LINE__, list->name, item, index);
+    dbg("%s %d: list:'%s' item=%p, index=%u\n", __FUNCTION__, __LINE__, list->name, item, index);
 
-	pItem prev, next, p = item;
-	p->index = 0;
-	p->prev = NULL;
-	p->next = NULL;
+    pItem prev, next, p = item;
+    p->index = 0;
+    p->prev = NULL;
+    p->next = NULL;
 
-	if (index >= list->count) {
-		dbg("insert at end of list.\n");
-		AddItem(list, item);
-	} else if (index == 0) {
-		dbg("insert at begin of list.\n");
-		p->prev = NULL;
-		p->next = list->first;
-		p->index = 0;
-		next = list->first;
-		next->prev = p;
-		p = list->first;
-		while (p != NULL) {
-			p->index++;
-			p = p->next;
-		}
-		list->first = item;
-		list->count++;
-	} else {
-		dbg("insert somewhere in the middle.\n");
-		next = GetItem(list, index);
-		prev = next->prev;
-		prev->next = p;
-		next->prev = p;
-		p->prev = prev;
-		p->next = next;
-		p->index = prev->index;
-		list->count++;
-		while (p != NULL) {
-			p->index++;
-			p = p->next;
-		}
-	}
-	list->lock = false;
-	report(list);
+    if (index >= list->count) {
+        dbg("insert at end of list.\n");
+        AddItem(list, item);
+    } else if (index == 0) {
+        dbg("insert at begin of list.\n");
+        p->prev = NULL;
+        p->next = list->first;
+        p->index = 0;
+        next = list->first;
+        next->prev = p;
+        p = list->first;
+        while (p != NULL) {
+            p->index++;
+            p = p->next;
+        }
+        list->first = item;
+        list->count++;
+    } else {
+        dbg("insert somewhere in the middle.\n");
+        next = GetItem(list, index);
+        prev = next->prev;
+        prev->next = p;
+        next->prev = p;
+        p->prev = prev;
+        p->next = next;
+        p->index = prev->index;
+        list->count++;
+        while (p != NULL) {
+            p->index++;
+            p = p->next;
+        }
+    }
+    list->lock = false;
+    report(list);
 }
 
 // remove item from list. free allocated memory if release_mem non-zero.
-void UnlinkItem(pList list, void *item, bool freemem)
+void
+UnlinkItem(pList list, void *item, bool freemem)
 {
-	while (list->lock) ;
-	list->lock = true;
+    while (list->lock)
+        ;
+    list->lock = true;
 
-	pItem prev, next, p = item;
+    pItem prev, next, p = item;
 
-	dbg("%s %d: list:'%s' item=%p, freemem = %d\n",
-		__FUNCTION__, __LINE__, list->name, item, freemem);
-	if (IsMember(list, item) == false) {
-		warning("Cannot %s: item %p is not member of list %s.\n",
-			freemem ? "delete" : "unlink", item, list->name);
-		return;
-	} else if (item == list->first) {
-		dbg("delete at begin of list.\n");
-		list->first = p->next;
-		list->count--;
-		if (freemem) {
-			free(p);
-		}
-		p = list->first;
-		if (p != NULL)
-			p->prev = NULL;
-		while (p != NULL) {
-			p->index--;
-			p = p->next;
-		}
-	} else if (item == list->last) {
-		dbg("delete at end of list.\n");
-		list->last = p->prev;
-		list->count--;
-		if (freemem) {
-			free(p);
-		}
-		p = list->last;
-		if (p != NULL) {
-			p->next = NULL;
-		}
-	} else {
-		dbg("delete somewhere in the middle.\n");
-		prev = p->prev;
-		next = p->next;
-		prev->next = next;
-		next->prev = prev;
-		list->count--;
-		if (freemem) {
-			free(p);
-		}
-		p = next;
-		while (p != NULL) {
-			p->index--;
-			p = p->next;
-		}
-	}
-	list->lock = false;
+    dbg("%s %d: list:'%s' item=%p, freemem = %d\n", __FUNCTION__, __LINE__, list->name, item, freemem);
+    if (IsMember(list, item) == false) {
+        warning("Cannot %s: item %p is not member of list %s.\n", freemem ? "delete" : "unlink", item, list->name);
+        return;
+    } else if (item == list->first) {
+        dbg("delete at begin of list.\n");
+        list->first = p->next;
+        list->count--;
+        if (freemem) {
+            free(p);
+        }
+        p = list->first;
+        if (p != NULL)
+            p->prev = NULL;
+        while (p != NULL) {
+            p->index--;
+            p = p->next;
+        }
+    } else if (item == list->last) {
+        dbg("delete at end of list.\n");
+        list->last = p->prev;
+        list->count--;
+        if (freemem) {
+            free(p);
+        }
+        p = list->last;
+        if (p != NULL) {
+            p->next = NULL;
+        }
+    } else {
+        dbg("delete somewhere in the middle.\n");
+        prev = p->prev;
+        next = p->next;
+        prev->next = next;
+        next->prev = prev;
+        list->count--;
+        if (freemem) {
+            free(p);
+        }
+        p = next;
+        while (p != NULL) {
+            p->index--;
+            p = p->next;
+        }
+    }
+    list->lock = false;
 }
 
 // remove item from list and free allocated memory.
-void DeleteItem(pList list, void *item)
+void
+DeleteItem(pList list, void *item)
 {
-	dbg("%s %d: list:'%s' item=%p\n", __FUNCTION__, __LINE__, list->name,
-		index);
-	UnlinkItem(list, item, true);
+    dbg("%s %d: list:'%s' item=%p\n", __FUNCTION__, __LINE__, list->name, index);
+    UnlinkItem(list, item, true);
 }
 
 // exchange two items in list.
-void SwapItem(pList list, pItem a, pItem b)
+void
+SwapItem(pList list, pItem a, pItem b)
 {
-	while (list->lock) ;
-	list->lock = true;
+    while (list->lock)
+        ;
+    list->lock = true;
 
-	dbg("%s %d: list:'%s' a:(prev=%p,p=%p,next=%p) <-> b:(prev=%p,p=%p,next=%p)\n", __FUNCTION__, __LINE__, list->name, a->prev, a, a->next, b->prev, b, b->next);
-	uint32_t index_a, index_b;
-	if (a == b) {
-		list->lock = false;
-		return;
-	}
+    dbg("%s %d: list:'%s' a:(prev=%p,p=%p,next=%p) <-> b:(prev=%p,p=%p,next=%p)\n",
+        __FUNCTION__,
+        __LINE__,
+        list->name,
+        a->prev,
+        a,
+        a->next,
+        b->prev,
+        b,
+        b->next);
+    uint32_t index_a, index_b;
+    if (a == b) {
+        list->lock = false;
+        return;
+    }
 
-	index_a = a->index;
-	index_b = b->index;
+    index_a = a->index;
+    index_b = b->index;
 
-	if (index_a < index_b) {
-		UnlinkItem(list, b, 0);
-		UnlinkItem(list, a, 0);
-		InsertItem(list, b, index_a);
-		InsertItem(list, a, index_b);
-	} else {
-		UnlinkItem(list, a, 0);
-		UnlinkItem(list, b, 0);
-		InsertItem(list, a, index_b);
-		InsertItem(list, b, index_a);
-	}
-	list->lock = false;
+    if (index_a < index_b) {
+        UnlinkItem(list, b, 0);
+        UnlinkItem(list, a, 0);
+        InsertItem(list, b, index_a);
+        InsertItem(list, a, index_b);
+    } else {
+        UnlinkItem(list, a, 0);
+        UnlinkItem(list, b, 0);
+        InsertItem(list, a, index_b);
+        InsertItem(list, b, index_a);
+    }
+    list->lock = false;
 }
 
 // sort the list. assign sort criteria function
 // 'compare' to list before first use.
 // warning: procedure is *slow* for large lists.
-void SortList(pList list, cmp_func compare)
+void
+SortList(pList list, cmp_func compare)
 {
-	dbg("%s %d: list:'%s'\n", __FUNCTION__, __LINE__, list->name);
-	pItem c, d;
-	if (compare == NULL) {
-		warning("sort function not assigned.\n");
-		return;
-	}
+    dbg("%s %d: list:'%s'\n", __FUNCTION__, __LINE__, list->name);
+    pItem c, d;
+    if (compare == NULL) {
+        warning("sort function not assigned.\n");
+        return;
+    }
 
 redo:
-	c = list->first;
-	while (c != NULL) {
-		d = c;
-		while (d != NULL) {
-			if (d->next == NULL) {
-				break;
-			}
-			if (compare(d, d->next) > 0) {
-				SwapItem(list, d, d->next);
-				goto redo;
-			}
-			d = d->next;
-		}
-		c = c->next;
-	}
+    c = list->first;
+    while (c != NULL) {
+        d = c;
+        while (d != NULL) {
+            if (d->next == NULL) {
+                break;
+            }
+            if (compare(d, d->next) > 0) {
+                SwapItem(list, d, d->next);
+                goto redo;
+            }
+            d = d->next;
+        }
+        c = c->next;
+    }
 }
 
-void *FindItem(pList list, void *prev, fnd_func criteria)
+void *
+FindItem(pList list, void *prev, fnd_func criteria)
 {
-	pItem p;
-	for (p = prev ? prev : list->first; p; p = p->next) {
-		if (criteria(p))
-			return p;
-	}
-	return NULL;
+    pItem p;
+    for (p = prev ? prev : list->first; p; p = p->next) {
+        if (criteria(p))
+            return p;
+    }
+    return NULL;
 }
 
 /*******************************************************************************
@@ -356,53 +374,56 @@ void *FindItem(pList list, void *prev, fnd_func criteria)
  ******************************************************************************/
 
 #ifdef CLOCK_MONOTONIC_COARSE
-#define CLK_SPEC CLOCK_MONOTONIC_COARSE	/* faster, but only linux since kernel 2.6.32 */
+#define CLK_SPEC CLOCK_MONOTONIC_COARSE /* faster, but only linux since kernel 2.6.32 */
 #else
 #define CLK_SPEC CLOCK_MONOTONIC
 #endif
 
-double elapsed(struct timespec *from, struct timespec *to)
+double
+elapsed(struct timespec *from, struct timespec *to)
 {
-	double Result;
-	int32_t nsec = to->tv_nsec - from->tv_nsec;
-	if (nsec < 0) {
-		Result = -1.0 + to->tv_sec - from->tv_sec;
-		nsec += 1000000000;
-	} else
-		Result = to->tv_sec - from->tv_sec;
-	Result += (nsec / 1e9);
-	return Result;
+    double Result;
+    int32_t nsec = to->tv_nsec - from->tv_nsec;
+    if (nsec < 0) {
+        Result = -1.0 + to->tv_sec - from->tv_sec;
+        nsec += 1000000000;
+    } else
+        Result = to->tv_sec - from->tv_sec;
+    Result += (nsec / 1e9);
+    return Result;
 }
 
-void get_time(struct timespec *dest)
+void
+get_time(struct timespec *dest)
 {
-	clock_gettime(CLK_SPEC, dest);
+    clock_gettime(CLK_SPEC, dest);
 }
 
-void set_timeout(uint16_t msec, struct timespec *dest)
+void
+set_timeout(uint16_t msec, struct timespec *dest)
 {
-	struct timespec t;
-	uint32_t nsec;
-	uint8_t sec;
+    struct timespec t;
+    uint32_t nsec;
+    uint8_t sec;
 
-	clock_gettime(CLK_SPEC, &t);
-	sec = (t.tv_nsec + msec * 1000000U) / 1000000000U;
-	nsec = (t.tv_nsec + msec * 1000000U) % 1000000000U;
-	dest->tv_sec = t.tv_sec + sec;
-	dest->tv_nsec = nsec;
-//dbg("now = %ld.%.9li timeout = %ld.%.9li\n", t.tv_sec, t.tv_nsec, dest->tv_sec, dest->tv_nsec);
+    clock_gettime(CLK_SPEC, &t);
+    sec = (t.tv_nsec + msec * 1000000U) / 1000000000U;
+    nsec = (t.tv_nsec + msec * 1000000U) % 1000000000U;
+    dest->tv_sec = t.tv_sec + sec;
+    dest->tv_nsec = nsec;
+    // dbg("now = %ld.%.9li timeout = %ld.%.9li\n", t.tv_sec, t.tv_nsec, dest->tv_sec, dest->tv_nsec);
 }
 
-int timeout_expired(struct timespec *src)
+int
+timeout_expired(struct timespec *src)
 {
-	struct timespec t;
-	int expired;
-	clock_gettime(CLK_SPEC, &t);
+    struct timespec t;
+    int expired;
+    clock_gettime(CLK_SPEC, &t);
 
-	expired = (t.tv_sec > src->tv_sec) ||
-		((t.tv_sec == src->tv_sec) && (t.tv_nsec > src->tv_nsec));
-//dbg("now = %ld.%.9li; expired=%d\n", t.tv_sec, t.tv_nsec, expired);
-	return expired;
+    expired = (t.tv_sec > src->tv_sec) || ((t.tv_sec == src->tv_sec) && (t.tv_nsec > src->tv_nsec));
+    // dbg("now = %ld.%.9li; expired=%d\n", t.tv_sec, t.tv_nsec, expired);
+    return expired;
 }
 
 /*******************************************************************************
@@ -410,537 +431,565 @@ int timeout_expired(struct timespec *src)
  ******************************************************************************/
 struct timespec starttime = { 0, 0 };
 
-void run_time_init()
+void
+run_time_init()
 {
-	get_time(&starttime);
+    get_time(&starttime);
 }
 
-const char *run_time()
+char const *
+run_time()
 {
-	static char rtbuf[12];
-	struct timespec now;
-	double t;
-	int sec, msec;
-	get_time(&now);
-	t = elapsed(&starttime, &now);
+    static char rtbuf[12];
+    struct timespec now;
+    double t;
+    int sec, msec;
+    get_time(&now);
+    t = elapsed(&starttime, &now);
 
-	sec = (int)t;
-	msec = 1000.0 * (t - sec);
-	sprintf(&rtbuf[0], "%.2d:%.2d.%.3d", sec / 60, sec % 60, msec);
-	return &rtbuf[0];
+    sec = (int)t;
+    msec = 1000.0 * (t - sec);
+    sprintf(&rtbuf[0], "%.2d:%.2d.%.3d", sec / 60, sec % 60, msec);
+    return &rtbuf[0];
 }
 
-void hexdump(const char *intro, const unsigned char *buf, int len)
+void
+hexdump(char const *intro, unsigned char const *buf, int len)
 {
-	int i, j;
-	char sbuf[17];
+    int i, j;
+    char sbuf[17];
 
-	if (verbosity < 4)
-		return;
+    if (verbosity < 4)
+        return;
 
-	memset(&sbuf, 0, 17);
+    memset(&sbuf, 0, 17);
 
-	info("\t===================== %s ", intro);
-	for (i = strlen(intro) + 1; i < 50; i++)
-		info("=");
-	info("\n");
-	info("\tlen = %d\n", len);
-	for (i = 0; i < len; i++) {
-		if ((i % 16) == 0) {
-			info("%s0x%.2X: ", i ? "\n\t" : "\t", (i / 16) * 16);
-		}
-		info("%.2X ", (uint8_t) * (buf + i));
-		sbuf[i % 16] = *(buf + i);
-		if (((i + 1) % 16) == 0) {
-			// remove non-printable chars
-			for (j = 0; j < 16; j++)
-				if (!((sbuf[j] > 31) && (sbuf[j] < 127)))
-					sbuf[j] = ' ';
+    info("\t===================== %s ", intro);
+    for (i = strlen(intro) + 1; i < 50; i++)
+        info("=");
+    info("\n");
+    info("\tlen = %d\n", len);
+    for (i = 0; i < len; i++) {
+        if ((i % 16) == 0) {
+            info("%s0x%.2X: ", i ? "\n\t" : "\t", (i / 16) * 16);
+        }
+        info("%.2X ", (uint8_t) * (buf + i));
+        sbuf[i % 16] = *(buf + i);
+        if (((i + 1) % 16) == 0) {
+            // remove non-printable chars
+            for (j = 0; j < 16; j++)
+                if (!((sbuf[j] > 31) && (sbuf[j] < 127)))
+                    sbuf[j] = ' ';
 
-			info(": %s", sbuf);
-			memset(&sbuf, 0, 17);
-		}
-	}
-	if (len % 16) {
-		for (i = 0; i < (len % 16); i++)
-			if (!((sbuf[i] > 31) && (sbuf[i] < 127)))
-				sbuf[i] = ' ';
-		for (i = (len % 16); i < 16; i++)
-			info("   ");
-		info(": %s", sbuf);
-	}
-	info("\n");
-	info("\t========================================================================\n");
+            info(": %s", sbuf);
+            memset(&sbuf, 0, 17);
+        }
+    }
+    if (len % 16) {
+        for (i = 0; i < (len % 16); i++)
+            if (!((sbuf[i] > 31) && (sbuf[i] < 127)))
+                sbuf[i] = ' ';
+        for (i = (len % 16); i < 16; i++)
+            info("   ");
+        info(": %s", sbuf);
+    }
+    info("\n");
+    info("\t========================================================================\n");
 }
 
-const char *inversion_name(int inversion)
+char const *
+inversion_name(int inversion)
 {
-	switch (inversion) {
-	case INVERSION_OFF:
-		return "INVERSION_OFF";
-	case INVERSION_ON:
-		return "INVERSION_ON";
-	default:
-		return "INVERSION_AUTO";
-	}
+    switch (inversion) {
+    case INVERSION_OFF:
+        return "INVERSION_OFF";
+    case INVERSION_ON:
+        return "INVERSION_ON";
+    default:
+        return "INVERSION_AUTO";
+    }
 }
 
-const char *coderate_name(int coderate)
+char const *
+coderate_name(int coderate)
 {
-	switch (coderate) {
-	case FEC_NONE:
-		return "FEC_NONE";
-	case FEC_2_5:
-		return "FEC_2_5";
-	case FEC_1_2:
-		return "FEC_1_2";
-	case FEC_3_5:
-		return "FEC_3_5";
-	case FEC_2_3:
-		return "FEC_2_3";
-	case FEC_3_4:
-		return "FEC_3_4";
-	case FEC_4_5:
-		return "FEC_4_5";
-	case FEC_5_6:
-		return "FEC_5_6";
-	case FEC_6_7:
-		return "FEC_6_7";
-	case FEC_7_8:
-		return "FEC_7_8";
-	case FEC_8_9:
-		return "FEC_8_9";
-	case FEC_9_10:
-		return "FEC_9_10";
-	default:
-		return "FEC_AUTO";
-	}
+    switch (coderate) {
+    case FEC_NONE:
+        return "FEC_NONE";
+    case FEC_2_5:
+        return "FEC_2_5";
+    case FEC_1_2:
+        return "FEC_1_2";
+    case FEC_3_5:
+        return "FEC_3_5";
+    case FEC_2_3:
+        return "FEC_2_3";
+    case FEC_3_4:
+        return "FEC_3_4";
+    case FEC_4_5:
+        return "FEC_4_5";
+    case FEC_5_6:
+        return "FEC_5_6";
+    case FEC_6_7:
+        return "FEC_6_7";
+    case FEC_7_8:
+        return "FEC_7_8";
+    case FEC_8_9:
+        return "FEC_8_9";
+    case FEC_9_10:
+        return "FEC_9_10";
+    default:
+        return "FEC_AUTO";
+    }
 }
 
-const char *modulation_name(int modulation)
+char const *
+modulation_name(int modulation)
 {
-	switch (modulation) {
-	case QPSK:
-		return "QPSK";
-	case QAM_16:
-		return "QAM_16";
-	case QAM_32:
-		return "QAM_32";
-	case QAM_64:
-		return "QAM_64";
-	case QAM_128:
-		return "QAM_128";
-	case QAM_256:
-		return "QAM_256";
-	case QAM_AUTO:
-		return "QAM_AUTO";
-	case VSB_8:
-		return "VSB_8";
-	case VSB_16:
-		return "VSB_16";
-	case PSK_8:
-		return "PSK_8";
-	case APSK_16:
-		return "APSK_16";
-	case APSK_32:
-		return "APSK_32";
-	case DQPSK:
-		return "DQPSK";
-	case QAM_4_NR:
-		return "QAM_4_NR";
-	default:
-		return "QAM_AUTO";
-	}
+    switch (modulation) {
+    case QPSK:
+        return "QPSK";
+    case QAM_16:
+        return "QAM_16";
+    case QAM_32:
+        return "QAM_32";
+    case QAM_64:
+        return "QAM_64";
+    case QAM_128:
+        return "QAM_128";
+    case QAM_256:
+        return "QAM_256";
+    case QAM_AUTO:
+        return "QAM_AUTO";
+    case VSB_8:
+        return "VSB_8";
+    case VSB_16:
+        return "VSB_16";
+    case PSK_8:
+        return "PSK_8";
+    case APSK_16:
+        return "APSK_16";
+    case APSK_32:
+        return "APSK_32";
+    case DQPSK:
+        return "DQPSK";
+    case QAM_4_NR:
+        return "QAM_4_NR";
+    default:
+        return "QAM_AUTO";
+    }
 }
 
-const char *transmission_mode_name(int transmission_mode)
+char const *
+transmission_mode_name(int transmission_mode)
 {
-	switch (transmission_mode) {
-	case TRANSMISSION_MODE_1K:
-		return "TRANSMISSION_MODE_1K";
-	case TRANSMISSION_MODE_2K:
-		return "TRANSMISSION_MODE_2K";
-	case TRANSMISSION_MODE_4K:
-		return "TRANSMISSION_MODE_4K";
-	case TRANSMISSION_MODE_8K:
-		return "TRANSMISSION_MODE_8K";
-	case TRANSMISSION_MODE_16K:
-		return "TRANSMISSION_MODE_16K";
-	case TRANSMISSION_MODE_32K:
-		return "TRANSMISSION_MODE_32K";
-	case TRANSMISSION_MODE_C1:
-		return "TRANSMISSION_MODE_C1";
-	case TRANSMISSION_MODE_C3780:
-		return "TRANSMISSION_MODE_C3780";
-	default:
-		return "TRANSMISSION_MODE_AUTO";
-	}
+    switch (transmission_mode) {
+    case TRANSMISSION_MODE_1K:
+        return "TRANSMISSION_MODE_1K";
+    case TRANSMISSION_MODE_2K:
+        return "TRANSMISSION_MODE_2K";
+    case TRANSMISSION_MODE_4K:
+        return "TRANSMISSION_MODE_4K";
+    case TRANSMISSION_MODE_8K:
+        return "TRANSMISSION_MODE_8K";
+    case TRANSMISSION_MODE_16K:
+        return "TRANSMISSION_MODE_16K";
+    case TRANSMISSION_MODE_32K:
+        return "TRANSMISSION_MODE_32K";
+    case TRANSMISSION_MODE_C1:
+        return "TRANSMISSION_MODE_C1";
+    case TRANSMISSION_MODE_C3780:
+        return "TRANSMISSION_MODE_C3780";
+    default:
+        return "TRANSMISSION_MODE_AUTO";
+    }
 }
 
-const char *guard_interval_name(int guard_interval)
+char const *
+guard_interval_name(int guard_interval)
 {
-	switch (guard_interval) {
-	case GUARD_INTERVAL_1_32:
-		return "GUARD_INTERVAL_1_32";
-	case GUARD_INTERVAL_1_16:
-		return "GUARD_INTERVAL_1_16";
-	case GUARD_INTERVAL_1_8:
-		return "GUARD_INTERVAL_1_8";
-	case GUARD_INTERVAL_1_4:
-		return "GUARD_INTERVAL_1_4";
-	case GUARD_INTERVAL_1_128:
-		return "GUARD_INTERVAL_1_128";
-	case GUARD_INTERVAL_19_128:
-		return "GUARD_INTERVAL_19_128";
-	case GUARD_INTERVAL_19_256:
-		return "GUARD_INTERVAL_19_256";
-	case GUARD_INTERVAL_PN420:
-		return "GUARD_INTERVAL_PN420";
-	case GUARD_INTERVAL_PN595:
-		return "GUARD_INTERVAL_PN595";
-	case GUARD_INTERVAL_PN945:
-		return "GUARD_INTERVAL_PN945";
-	default:
-		return "GUARD_INTERVAL_AUTO";
-	}
+    switch (guard_interval) {
+    case GUARD_INTERVAL_1_32:
+        return "GUARD_INTERVAL_1_32";
+    case GUARD_INTERVAL_1_16:
+        return "GUARD_INTERVAL_1_16";
+    case GUARD_INTERVAL_1_8:
+        return "GUARD_INTERVAL_1_8";
+    case GUARD_INTERVAL_1_4:
+        return "GUARD_INTERVAL_1_4";
+    case GUARD_INTERVAL_1_128:
+        return "GUARD_INTERVAL_1_128";
+    case GUARD_INTERVAL_19_128:
+        return "GUARD_INTERVAL_19_128";
+    case GUARD_INTERVAL_19_256:
+        return "GUARD_INTERVAL_19_256";
+    case GUARD_INTERVAL_PN420:
+        return "GUARD_INTERVAL_PN420";
+    case GUARD_INTERVAL_PN595:
+        return "GUARD_INTERVAL_PN595";
+    case GUARD_INTERVAL_PN945:
+        return "GUARD_INTERVAL_PN945";
+    default:
+        return "GUARD_INTERVAL_AUTO";
+    }
 }
 
-const char *hierarchy_name(int hierarchy)
+char const *
+hierarchy_name(int hierarchy)
 {
-	switch (hierarchy) {
-	case HIERARCHY_NONE:
-		return "HIERARCHY_NONE";
-	case HIERARCHY_1:
-		return "HIERARCHY_1";
-	case HIERARCHY_2:
-		return "HIERARCHY_2";
-	case HIERARCHY_4:
-		return "HIERARCHY_4";
-	default:
-		return "HIERARCHY_AUTO";
-	}
+    switch (hierarchy) {
+    case HIERARCHY_NONE:
+        return "HIERARCHY_NONE";
+    case HIERARCHY_1:
+        return "HIERARCHY_1";
+    case HIERARCHY_2:
+        return "HIERARCHY_2";
+    case HIERARCHY_4:
+        return "HIERARCHY_4";
+    default:
+        return "HIERARCHY_AUTO";
+    }
 }
 
-const char *interleaving_name(int interleaving)
+char const *
+interleaving_name(int interleaving)
 {
-	switch (interleaving) {
-	case INTERLEAVING_NONE:
-		return "INTERLEAVING_NONE";
-	case INTERLEAVING_240:
-		return "INTERLEAVING_240";
-	case INTERLEAVING_720:
-		return "INTERLEAVING_720";
-	default:
-		return "INTERLEAVING_AUTO";
-	}
+    switch (interleaving) {
+    case INTERLEAVING_NONE:
+        return "INTERLEAVING_NONE";
+    case INTERLEAVING_240:
+        return "INTERLEAVING_240";
+    case INTERLEAVING_720:
+        return "INTERLEAVING_720";
+    default:
+        return "INTERLEAVING_AUTO";
+    }
 }
 
-const char *delivery_system_name(int delsys)
+char const *
+delivery_system_name(int delsys)
 {
-	switch (delsys) {
-	case SYS_DVBC_ANNEX_A:
-		return "SYS_DVBC_ANNEX_A";
-	case SYS_DVBC_ANNEX_B:
-		return "SYS_DVBC_ANNEX_B";
-	case SYS_DVBT:
-		return "SYS_DVBT";
-	case SYS_DSS:
-		return "SYS_DSS";
-	case SYS_DVBS:
-		return "SYS_DVBS";
-	case SYS_DVBS2:
-		return "SYS_DVBS2";
-	case SYS_DVBH:
-		return "SYS_DVBH";
-	case SYS_ISDBT:
-		return "SYS_ISDBT";
-	case SYS_ISDBS:
-		return "SYS_ISDBS";
-	case SYS_ISDBC:
-		return "SYS_ISDBC";
-	case SYS_ATSC:
-		return "SYS_ATSC";
-	case SYS_ATSCMH:
-		return "SYS_ATSCMH";
-	case SYS_DTMB:
-		return "SYS_DTMB";
-	case SYS_CMMB:
-		return "SYS_CMMB";
-	case SYS_DAB:
-		return "SYS_DAB";
-	case SYS_DVBT2:
-		return "SYS_DVBT2";
-	case SYS_TURBO:
-		return "SYS_TURBO";
-	case SYS_DVBC_ANNEX_C:
-		return "SYS_DVBC_ANNEX_C";
-	default:
-		return "SYS_UNDEFINED";
-	}
+    switch (delsys) {
+    case SYS_DVBC_ANNEX_A:
+        return "SYS_DVBC_ANNEX_A";
+    case SYS_DVBC_ANNEX_B:
+        return "SYS_DVBC_ANNEX_B";
+    case SYS_DVBT:
+        return "SYS_DVBT";
+    case SYS_DSS:
+        return "SYS_DSS";
+    case SYS_DVBS:
+        return "SYS_DVBS";
+    case SYS_DVBS2:
+        return "SYS_DVBS2";
+    case SYS_DVBH:
+        return "SYS_DVBH";
+    case SYS_ISDBT:
+        return "SYS_ISDBT";
+    case SYS_ISDBS:
+        return "SYS_ISDBS";
+    case SYS_ISDBC:
+        return "SYS_ISDBC";
+    case SYS_ATSC:
+        return "SYS_ATSC";
+    case SYS_ATSCMH:
+        return "SYS_ATSCMH";
+    case SYS_DTMB:
+        return "SYS_DTMB";
+    case SYS_CMMB:
+        return "SYS_CMMB";
+    case SYS_DAB:
+        return "SYS_DAB";
+    case SYS_DVBT2:
+        return "SYS_DVBT2";
+    case SYS_TURBO:
+        return "SYS_TURBO";
+    case SYS_DVBC_ANNEX_C:
+        return "SYS_DVBC_ANNEX_C";
+    default:
+        return "SYS_UNDEFINED";
+    }
 }
 
-const char *property_name(int property)
+char const *
+property_name(int property)
 {
-	switch (property) {
-	case DTV_UNDEFINED:
-		return "DTV_UNDEFINED";
-	case DTV_TUNE:
-		return "DTV_TUNE";
-	case DTV_CLEAR:
-		return "DTV_CLEAR";
-	case DTV_FREQUENCY:
-		return "DTV_FREQUENCY";
-	case DTV_MODULATION:
-		return "DTV_MODULATION";
-	case DTV_BANDWIDTH_HZ:
-		return "DTV_BANDWIDTH_HZ";
-	case DTV_INVERSION:
-		return "DTV_INVERSION";
-	case DTV_DISEQC_MASTER:
-		return "DTV_DISEQC_MASTER";
-	case DTV_SYMBOL_RATE:
-		return "DTV_SYMBOL_RATE";
-	case DTV_INNER_FEC:
-		return "DTV_INNER_FEC";
-	case DTV_VOLTAGE:
-		return "DTV_VOLTAGE";
-	case DTV_TONE:
-		return "DTV_TONE";
-	case DTV_PILOT:
-		return "DTV_PILOT";
-	case DTV_ROLLOFF:
-		return "DTV_ROLLOFF";
-	case DTV_DISEQC_SLAVE_REPLY:
-		return "DTV_DISEQC_SLAVE_REPLY";
-	case DTV_FE_CAPABILITY_COUNT:
-		return "DTV_FE_CAPABILITY_COUNT";
-	case DTV_FE_CAPABILITY:
-		return "DTV_FE_CAPABILITY";
-	case DTV_DELIVERY_SYSTEM:
-		return "DTV_DELIVERY_SYSTEM";
-	case DTV_ISDBT_PARTIAL_RECEPTION:
-		return "DTV_ISDBT_PARTIAL_RECEPTION";
-	case DTV_ISDBT_SOUND_BROADCASTING:
-		return "DTV_ISDBT_SOUND_BROADCASTING";
-	case DTV_ISDBT_SB_SUBCHANNEL_ID:
-		return "DTV_ISDBT_SB_SUBCHANNEL_ID";
-	case DTV_ISDBT_SB_SEGMENT_IDX:
-		return "DTV_ISDBT_SB_SEGMENT_IDX";
-	case DTV_ISDBT_SB_SEGMENT_COUNT:
-		return "DTV_ISDBT_SB_SEGMENT_COUNT";
-	case DTV_ISDBT_LAYERA_FEC:
-		return "DTV_ISDBT_LAYERA_FEC";
-	case DTV_ISDBT_LAYERA_MODULATION:
-		return "DTV_ISDBT_LAYERA_MODULATION";
-	case DTV_ISDBT_LAYERA_SEGMENT_COUNT:
-		return "DTV_ISDBT_LAYERA_SEGMENT_COUNT";
-	case DTV_ISDBT_LAYERA_TIME_INTERLEAVING:
-		return "DTV_ISDBT_LAYERA_TIME_INTERLEAVING";
-	case DTV_ISDBT_LAYERB_FEC:
-		return "DTV_ISDBT_LAYERB_FEC";
-	case DTV_ISDBT_LAYERB_MODULATION:
-		return "DTV_ISDBT_LAYERB_MODULATION";
-	case DTV_ISDBT_LAYERB_SEGMENT_COUNT:
-		return "DTV_ISDBT_LAYERB_SEGMENT_COUNT";
-	case DTV_ISDBT_LAYERB_TIME_INTERLEAVING:
-		return "DTV_ISDBT_LAYERB_TIME_INTERLEAVING";
-	case DTV_ISDBT_LAYERC_FEC:
-		return "DTV_ISDBT_LAYERC_FEC";
-	case DTV_ISDBT_LAYERC_MODULATION:
-		return "DTV_ISDBT_LAYERC_MODULATION";
-	case DTV_ISDBT_LAYERC_SEGMENT_COUNT:
-		return "DTV_ISDBT_LAYERC_SEGMENT_COUNT";
-	case DTV_ISDBT_LAYERC_TIME_INTERLEAVING:
-		return "DTV_ISDBT_LAYERC_TIME_INTERLEAVING";
-	case DTV_API_VERSION:
-		return "DTV_API_VERSION";
-	case DTV_CODE_RATE_HP:
-		return "DTV_CODE_RATE_HP";
-	case DTV_CODE_RATE_LP:
-		return "DTV_CODE_RATE_LP";
-	case DTV_GUARD_INTERVAL:
-		return "DTV_GUARD_INTERVAL";
-	case DTV_TRANSMISSION_MODE:
-		return "DTV_TRANSMISSION_MODE";
-	case DTV_HIERARCHY:
-		return "DTV_HIERARCHY";
-	case DTV_ISDBT_LAYER_ENABLED:
-		return "DTV_ISDBT_LAYER_ENABLED";
-	case DTV_STREAM_ID:
-		return "DTV_STREAM_ID";
-	case DTV_DVBT2_PLP_ID_LEGACY:
-		return "DTV_DVBT2_PLP_ID_LEGACY";
-	case DTV_ENUM_DELSYS:
-		return "DTV_ENUM_DELSYS";
-	case DTV_ATSCMH_FIC_VER:
-		return "DTV_ATSCMH_FIC_VER";
-	case DTV_ATSCMH_PARADE_ID:
-		return "DTV_ATSCMH_PARADE_ID";
-	case DTV_ATSCMH_NOG:
-		return "DTV_ATSCMH_NOG";
-	case DTV_ATSCMH_TNOG:
-		return "DTV_ATSCMH_TNOG";
-	case DTV_ATSCMH_SGN:
-		return "DTV_ATSCMH_SGN";
-	case DTV_ATSCMH_PRC:
-		return "DTV_ATSCMH_PRC";
-	case DTV_ATSCMH_RS_FRAME_MODE:
-		return "DTV_ATSCMH_RS_FRAME_MODE";
-	case DTV_ATSCMH_RS_FRAME_ENSEMBLE:
-		return "DTV_ATSCMH_RS_FRAME_ENSEMBLE";
-	case DTV_ATSCMH_RS_CODE_MODE_PRI:
-		return "DTV_ATSCMH_RS_CODE_MODE_PRI";
-	case DTV_ATSCMH_RS_CODE_MODE_SEC:
-		return "DTV_ATSCMH_RS_CODE_MODE_SEC";
-	case DTV_ATSCMH_SCCC_BLOCK_MODE:
-		return "DTV_ATSCMH_SCCC_BLOCK_MODE";
-	case DTV_ATSCMH_SCCC_CODE_MODE_A:
-		return "DTV_ATSCMH_SCCC_CODE_MODE_A";
-	case DTV_ATSCMH_SCCC_CODE_MODE_B:
-		return "DTV_ATSCMH_SCCC_CODE_MODE_B";
-	case DTV_ATSCMH_SCCC_CODE_MODE_C:
-		return "DTV_ATSCMH_SCCC_CODE_MODE_C";
-	case DTV_ATSCMH_SCCC_CODE_MODE_D:
-		return "DTV_ATSCMH_SCCC_CODE_MODE_D";
-	case DTV_INTERLEAVING:
-		return "DTV_INTERLEAVING";
-	case DTV_LNA:
-		return "DTV_LNA";
-	case DTV_STAT_SIGNAL_STRENGTH:
-		return "DTV_STAT_SIGNAL_STRENGTH";
-	case DTV_STAT_CNR:
-		return "DTV_STAT_CNR";
-	case DTV_STAT_PRE_ERROR_BIT_COUNT:
-		return "DTV_STAT_PRE_ERROR_BIT_COUNT";
-	case DTV_STAT_PRE_TOTAL_BIT_COUNT:
-		return "DTV_STAT_PRE_TOTAL_BIT_COUNT";
-	case DTV_STAT_POST_ERROR_BIT_COUNT:
-		return "DTV_STAT_POST_ERROR_BIT_COUNT";
-	case DTV_STAT_POST_TOTAL_BIT_COUNT:
-		return "DTV_STAT_POST_TOTAL_BIT_COUNT";
-	case DTV_STAT_ERROR_BLOCK_COUNT:
-		return "DTV_STAT_ERROR_BLOCK_COUNT";
-	case DTV_STAT_TOTAL_BLOCK_COUNT:
-		return "DTV_STAT_TOTAL_BLOCK_COUNT";
-	default:
-		return "(unknown dtv property)";
-	}
+    switch (property) {
+    case DTV_UNDEFINED:
+        return "DTV_UNDEFINED";
+    case DTV_TUNE:
+        return "DTV_TUNE";
+    case DTV_CLEAR:
+        return "DTV_CLEAR";
+    case DTV_FREQUENCY:
+        return "DTV_FREQUENCY";
+    case DTV_MODULATION:
+        return "DTV_MODULATION";
+    case DTV_BANDWIDTH_HZ:
+        return "DTV_BANDWIDTH_HZ";
+    case DTV_INVERSION:
+        return "DTV_INVERSION";
+    case DTV_DISEQC_MASTER:
+        return "DTV_DISEQC_MASTER";
+    case DTV_SYMBOL_RATE:
+        return "DTV_SYMBOL_RATE";
+    case DTV_INNER_FEC:
+        return "DTV_INNER_FEC";
+    case DTV_VOLTAGE:
+        return "DTV_VOLTAGE";
+    case DTV_TONE:
+        return "DTV_TONE";
+    case DTV_PILOT:
+        return "DTV_PILOT";
+    case DTV_ROLLOFF:
+        return "DTV_ROLLOFF";
+    case DTV_DISEQC_SLAVE_REPLY:
+        return "DTV_DISEQC_SLAVE_REPLY";
+    case DTV_FE_CAPABILITY_COUNT:
+        return "DTV_FE_CAPABILITY_COUNT";
+    case DTV_FE_CAPABILITY:
+        return "DTV_FE_CAPABILITY";
+    case DTV_DELIVERY_SYSTEM:
+        return "DTV_DELIVERY_SYSTEM";
+    case DTV_ISDBT_PARTIAL_RECEPTION:
+        return "DTV_ISDBT_PARTIAL_RECEPTION";
+    case DTV_ISDBT_SOUND_BROADCASTING:
+        return "DTV_ISDBT_SOUND_BROADCASTING";
+    case DTV_ISDBT_SB_SUBCHANNEL_ID:
+        return "DTV_ISDBT_SB_SUBCHANNEL_ID";
+    case DTV_ISDBT_SB_SEGMENT_IDX:
+        return "DTV_ISDBT_SB_SEGMENT_IDX";
+    case DTV_ISDBT_SB_SEGMENT_COUNT:
+        return "DTV_ISDBT_SB_SEGMENT_COUNT";
+    case DTV_ISDBT_LAYERA_FEC:
+        return "DTV_ISDBT_LAYERA_FEC";
+    case DTV_ISDBT_LAYERA_MODULATION:
+        return "DTV_ISDBT_LAYERA_MODULATION";
+    case DTV_ISDBT_LAYERA_SEGMENT_COUNT:
+        return "DTV_ISDBT_LAYERA_SEGMENT_COUNT";
+    case DTV_ISDBT_LAYERA_TIME_INTERLEAVING:
+        return "DTV_ISDBT_LAYERA_TIME_INTERLEAVING";
+    case DTV_ISDBT_LAYERB_FEC:
+        return "DTV_ISDBT_LAYERB_FEC";
+    case DTV_ISDBT_LAYERB_MODULATION:
+        return "DTV_ISDBT_LAYERB_MODULATION";
+    case DTV_ISDBT_LAYERB_SEGMENT_COUNT:
+        return "DTV_ISDBT_LAYERB_SEGMENT_COUNT";
+    case DTV_ISDBT_LAYERB_TIME_INTERLEAVING:
+        return "DTV_ISDBT_LAYERB_TIME_INTERLEAVING";
+    case DTV_ISDBT_LAYERC_FEC:
+        return "DTV_ISDBT_LAYERC_FEC";
+    case DTV_ISDBT_LAYERC_MODULATION:
+        return "DTV_ISDBT_LAYERC_MODULATION";
+    case DTV_ISDBT_LAYERC_SEGMENT_COUNT:
+        return "DTV_ISDBT_LAYERC_SEGMENT_COUNT";
+    case DTV_ISDBT_LAYERC_TIME_INTERLEAVING:
+        return "DTV_ISDBT_LAYERC_TIME_INTERLEAVING";
+    case DTV_API_VERSION:
+        return "DTV_API_VERSION";
+    case DTV_CODE_RATE_HP:
+        return "DTV_CODE_RATE_HP";
+    case DTV_CODE_RATE_LP:
+        return "DTV_CODE_RATE_LP";
+    case DTV_GUARD_INTERVAL:
+        return "DTV_GUARD_INTERVAL";
+    case DTV_TRANSMISSION_MODE:
+        return "DTV_TRANSMISSION_MODE";
+    case DTV_HIERARCHY:
+        return "DTV_HIERARCHY";
+    case DTV_ISDBT_LAYER_ENABLED:
+        return "DTV_ISDBT_LAYER_ENABLED";
+    case DTV_STREAM_ID:
+        return "DTV_STREAM_ID";
+    case DTV_DVBT2_PLP_ID_LEGACY:
+        return "DTV_DVBT2_PLP_ID_LEGACY";
+    case DTV_ENUM_DELSYS:
+        return "DTV_ENUM_DELSYS";
+    case DTV_ATSCMH_FIC_VER:
+        return "DTV_ATSCMH_FIC_VER";
+    case DTV_ATSCMH_PARADE_ID:
+        return "DTV_ATSCMH_PARADE_ID";
+    case DTV_ATSCMH_NOG:
+        return "DTV_ATSCMH_NOG";
+    case DTV_ATSCMH_TNOG:
+        return "DTV_ATSCMH_TNOG";
+    case DTV_ATSCMH_SGN:
+        return "DTV_ATSCMH_SGN";
+    case DTV_ATSCMH_PRC:
+        return "DTV_ATSCMH_PRC";
+    case DTV_ATSCMH_RS_FRAME_MODE:
+        return "DTV_ATSCMH_RS_FRAME_MODE";
+    case DTV_ATSCMH_RS_FRAME_ENSEMBLE:
+        return "DTV_ATSCMH_RS_FRAME_ENSEMBLE";
+    case DTV_ATSCMH_RS_CODE_MODE_PRI:
+        return "DTV_ATSCMH_RS_CODE_MODE_PRI";
+    case DTV_ATSCMH_RS_CODE_MODE_SEC:
+        return "DTV_ATSCMH_RS_CODE_MODE_SEC";
+    case DTV_ATSCMH_SCCC_BLOCK_MODE:
+        return "DTV_ATSCMH_SCCC_BLOCK_MODE";
+    case DTV_ATSCMH_SCCC_CODE_MODE_A:
+        return "DTV_ATSCMH_SCCC_CODE_MODE_A";
+    case DTV_ATSCMH_SCCC_CODE_MODE_B:
+        return "DTV_ATSCMH_SCCC_CODE_MODE_B";
+    case DTV_ATSCMH_SCCC_CODE_MODE_C:
+        return "DTV_ATSCMH_SCCC_CODE_MODE_C";
+    case DTV_ATSCMH_SCCC_CODE_MODE_D:
+        return "DTV_ATSCMH_SCCC_CODE_MODE_D";
+    case DTV_INTERLEAVING:
+        return "DTV_INTERLEAVING";
+    case DTV_LNA:
+        return "DTV_LNA";
+    case DTV_STAT_SIGNAL_STRENGTH:
+        return "DTV_STAT_SIGNAL_STRENGTH";
+    case DTV_STAT_CNR:
+        return "DTV_STAT_CNR";
+    case DTV_STAT_PRE_ERROR_BIT_COUNT:
+        return "DTV_STAT_PRE_ERROR_BIT_COUNT";
+    case DTV_STAT_PRE_TOTAL_BIT_COUNT:
+        return "DTV_STAT_PRE_TOTAL_BIT_COUNT";
+    case DTV_STAT_POST_ERROR_BIT_COUNT:
+        return "DTV_STAT_POST_ERROR_BIT_COUNT";
+    case DTV_STAT_POST_TOTAL_BIT_COUNT:
+        return "DTV_STAT_POST_TOTAL_BIT_COUNT";
+    case DTV_STAT_ERROR_BLOCK_COUNT:
+        return "DTV_STAT_ERROR_BLOCK_COUNT";
+    case DTV_STAT_TOTAL_BLOCK_COUNT:
+        return "DTV_STAT_TOTAL_BLOCK_COUNT";
+    default:
+        return "(unknown dtv property)";
+    }
 }
 
-const char *ofdm_symbol_duration_name(fe_ofdm_symbol_duration_t ofdm_symbol_duration) {
-	switch (ofdm_symbol_duration) {
-	case FFT_4K_8MHZ:
-		return "FFT_4K_8MHZ";
-	case FFT_4K_6MHZ:
-		return "FFT_4K_6MHZ";
-	default:
-		return "(unknown ofdm symbol duration)";
-	}
-}
-
-const char *rolloff_name(fe_rolloff_t rolloff) {
-	switch (rolloff) {
-	case ROLLOFF_35:
-		return "ROLLOFF_35";
-	case ROLLOFF_25:
-		return "ROLLOFF_25";
-	case ROLLOFF_20:
-		return "ROLLOFF_20";
-	case ROLLOFF_AUTO:
-		return "ROLLOFF_AUTO";
-	default:
-		return "(unknown rolloff)";
-	}
-}
-
-const char *pilot_name(fe_pilot_t pilot) {
-	switch (pilot) {
-	case PILOT_ON:
-		return "PILOT_ON";
-	case PILOT_OFF:
-		return "PILOT_OFF";
-	case PILOT_AUTO:
-		return "PILOT_AUTO";
-	default:
-		return "(unknown pilot)";
-	}
-}
-
-const char *frequency_type_name(fe_frequency_type_t frequency_type) {
-	switch (frequency_type) {
-	case DATA_SLICE_TUNING_FREQUENCY:
-		return "DATA_SLICE_TUNING_FREQUENCY";
-	case C2_SYSTEM_CENTER_FREQUENCY:
-		return "C2_SYSTEM_CENTER_FREQUENCY";
-	case INITIAL_TUNING_FOR_STATIC_DATA_SLICE:
-		return "INITIAL_TUNING_FOR_STATIC_DATA_SLICE";
-	default:
-		return "(unknown frequency type)";
-	}
-}
-
-const char *west_east_flag_name(fe_west_east_flag_t west_east_flag) {
-	switch (west_east_flag) {
-	case EAST_FLAG:
-		return "E";
-	case WEST_FLAG:
-		return "W";
-	default:
-		return "(unknown west east flag)";
-	}
-}
-
-const char *polarization_name(fe_polarization_t polarization) {
-	switch (polarization) {
-	case POLARIZATION_HORIZONTAL:
-		return "HORIZONTAL";
-	case POLARIZATION_VERTICAL:
-		return "VERTICAL";
-	case POLARIZATION_CIRCULAR_LEFT:
-		return "CIRCULAR_LEFT";
-	case POLARIZATION_CIRCULAR_RIGHT:
-		return "CIRCULAR_RIGHT";
-	default:
-		return "(unknown polarization)";
-	}
-}
-
-const char *bool_name(bool t)
+char const *
+ofdm_symbol_duration_name(fe_ofdm_symbol_duration_t ofdm_symbol_duration)
 {
-	if (t == false)
-		return "false";
-	return "true";
+    switch (ofdm_symbol_duration) {
+    case FFT_4K_8MHZ:
+        return "FFT_4K_8MHZ";
+    case FFT_4K_6MHZ:
+        return "FFT_4K_6MHZ";
+    default:
+        return "(unknown ofdm symbol duration)";
+    }
 }
 
-uint32_t freq_scale(uint32_t freq, double scale)
+char const *
+rolloff_name(fe_rolloff_t rolloff)
 {
-	return (uint32_t) (0.5 + freq * scale);
+    switch (rolloff) {
+    case ROLLOFF_35:
+        return "ROLLOFF_35";
+    case ROLLOFF_25:
+        return "ROLLOFF_25";
+    case ROLLOFF_20:
+        return "ROLLOFF_20";
+    case ROLLOFF_AUTO:
+        return "ROLLOFF_AUTO";
+    default:
+        return "(unknown rolloff)";
+    }
 }
 
-const char *alpha_name(int alpha)
+char const *
+pilot_name(fe_pilot_t pilot)
 {
-	switch (alpha) {
-	case ALPHA_1:
-		return "ALPHA_1";
-	case ALPHA_2:
-		return "ALPHA_2";
-	case ALPHA_4:
-		return "ALPHA_4";
-	default:
-		return "ALPHA_AUTO";
-	}
+    switch (pilot) {
+    case PILOT_ON:
+        return "PILOT_ON";
+    case PILOT_OFF:
+        return "PILOT_OFF";
+    case PILOT_AUTO:
+        return "PILOT_AUTO";
+    default:
+        return "(unknown pilot)";
+    }
 }
 
-const char *interleaver_name(int i)
+char const *
+frequency_type_name(fe_frequency_type_t frequency_type)
 {
-	switch (i) {
-	case INTERLEAVE_NATIVE:
-		return "INTERLEAVE_NATIVE";
-	case INTERLEAVE_IN_DEPTH:
-		return "INTERLEAVE_IN_DEPTH";
-	default:
-		return "INTERLEAVE_AUTO";
-	}
+    switch (frequency_type) {
+    case DATA_SLICE_TUNING_FREQUENCY:
+        return "DATA_SLICE_TUNING_FREQUENCY";
+    case C2_SYSTEM_CENTER_FREQUENCY:
+        return "C2_SYSTEM_CENTER_FREQUENCY";
+    case INITIAL_TUNING_FOR_STATIC_DATA_SLICE:
+        return "INITIAL_TUNING_FOR_STATIC_DATA_SLICE";
+    default:
+        return "(unknown frequency type)";
+    }
+}
+
+char const *
+west_east_flag_name(fe_west_east_flag_t west_east_flag)
+{
+    switch (west_east_flag) {
+    case EAST_FLAG:
+        return "E";
+    case WEST_FLAG:
+        return "W";
+    default:
+        return "(unknown west east flag)";
+    }
+}
+
+char const *
+polarization_name(fe_polarization_t polarization)
+{
+    switch (polarization) {
+    case POLARIZATION_HORIZONTAL:
+        return "HORIZONTAL";
+    case POLARIZATION_VERTICAL:
+        return "VERTICAL";
+    case POLARIZATION_CIRCULAR_LEFT:
+        return "CIRCULAR_LEFT";
+    case POLARIZATION_CIRCULAR_RIGHT:
+        return "CIRCULAR_RIGHT";
+    default:
+        return "(unknown polarization)";
+    }
+}
+
+char const *
+bool_name(bool t)
+{
+    if (t == false)
+        return "false";
+    return "true";
+}
+
+uint32_t
+freq_scale(uint32_t freq, double scale)
+{
+    return (uint32_t)(0.5 + freq * scale);
+}
+
+char const *
+alpha_name(int alpha)
+{
+    switch (alpha) {
+    case ALPHA_1:
+        return "ALPHA_1";
+    case ALPHA_2:
+        return "ALPHA_2";
+    case ALPHA_4:
+        return "ALPHA_4";
+    default:
+        return "ALPHA_AUTO";
+    }
+}
+
+char const *
+interleaver_name(int i)
+{
+    switch (i) {
+    case INTERLEAVE_NATIVE:
+        return "INTERLEAVE_NATIVE";
+    case INTERLEAVE_IN_DEPTH:
+        return "INTERLEAVE_IN_DEPTH";
+    default:
+        return "INTERLEAVE_AUTO";
+    }
 }
 
 /*******************************************************************************
@@ -949,52 +998,54 @@ const char *interleaver_name(int i)
 #include "si_types.h"
 
 typedef struct {
-	void *prev;
-	void *next;
-	uint32_t index;
-	uint8_t value;
-	uint8_t count;
+    void *prev;
+    void *next;
+    uint32_t index;
+    uint8_t value;
+    uint8_t count;
 } byte_item;
 
-static int sort_by_count(void *a, void *b)
+static int
+sort_by_count(void *a, void *b)
 {
-	return ((byte_item *) a)->count > ((byte_item *) b)->count;
+    return ((byte_item *)a)->count > ((byte_item *)b)->count;
 }
 
-bool fuzzy_section(void *s)
+bool
+fuzzy_section(void *s)
 {
-	struct section_buf *section = (struct section_buf *)s;
-	cList current_byte;
-	unsigned char *buf;
-	unsigned i, j;
+    struct section_buf *section = (struct section_buf *)s;
+    cList current_byte;
+    unsigned char *buf;
+    unsigned i, j;
 
-	if (section->garbage == NULL)
-		return false;
+    if (section->garbage == NULL)
+        return false;
 
-	buf = (unsigned char *)calloc(1, SECTION_BUF_SIZE);
-	for (i = 0; i < SECTION_BUF_SIZE; i++) {
-		byte_item *bi;
-		NewList(&current_byte, "fuzzy_section: current_byte");
+    buf = (unsigned char *)calloc(1, SECTION_BUF_SIZE);
+    for (i = 0; i < SECTION_BUF_SIZE; i++) {
+        byte_item *bi;
+        NewList(&current_byte, "fuzzy_section: current_byte");
 
-		for (j = 0; j < (section->garbage)->count; j++) {
-			buf = GetItem(section->garbage, j) + sizeof(cList);
-			for (bi = current_byte.first; bi; bi = bi->next) {
-				if (bi->value == buf[i]) {
-					bi->count++;
-					break;
-				}
-			}
-			if (bi == NULL) {
-				bi = (byte_item *) calloc(1, sizeof(*bi));
-				bi->value = buf[i];
-				bi->count++;
-				AddItem(&current_byte, bi);
-			}
-		}
-		SortList(&current_byte, &sort_by_count);
-		buf[i] = ((byte_item *) current_byte.first)->value;
-	}
+        for (j = 0; j < (section->garbage)->count; j++) {
+            buf = GetItem(section->garbage, j) + sizeof(cList);
+            for (bi = current_byte.first; bi; bi = bi->next) {
+                if (bi->value == buf[i]) {
+                    bi->count++;
+                    break;
+                }
+            }
+            if (bi == NULL) {
+                bi = (byte_item *)calloc(1, sizeof(*bi));
+                bi->value = buf[i];
+                bi->count++;
+                AddItem(&current_byte, bi);
+            }
+        }
+        SortList(&current_byte, &sort_by_count);
+        buf[i] = ((byte_item *)current_byte.first)->value;
+    }
 
-	hexdump(__FUNCTION__, buf, 1024);
-	return false;		// fail.
+    hexdump(__FUNCTION__, buf, 1024);
+    return false; // fail.
 }

@@ -30,6 +30,6 @@
 
 #define PACKED __attribute((packed))
 
-u32 getBits(const u8 * buf, int startbit, int bitlen);
+u32 getBits(u8 const *buf, int startbit, int bitlen);
 
 #endif

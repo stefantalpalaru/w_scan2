@@ -4,11 +4,11 @@
 /* This file is taken from linuxtv-dvb-apps */
 
 struct lnb_types_st {
-	char *name;
-	char **desc;
-	unsigned long low_val;
-	unsigned long high_val;	/* zero indicates no hiband */
-	unsigned long switch_val;	/* zero indicates no hiband */
+    char *name;
+    char **desc;
+    unsigned long low_val;
+    unsigned long high_val; /* zero indicates no hiband */
+    unsigned long switch_val; /* zero indicates no hiband */
 };
 
 /* Enumerate through standard types of LNB's until NULL returned.

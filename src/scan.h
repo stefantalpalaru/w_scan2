@@ -37,35 +37,34 @@
  *****************************************************************************/
 
 struct w_scan_flags {
-	char *version;
-	scantype_t scantype;
-	uint8_t atsc_type;
-	uint8_t need_2g_fe;
-	uint32_t list_id;
-	uint8_t tuning_timeout;
-	uint8_t filter_timeout;
-	uint8_t get_other_nits;
-	uint8_t add_frequencies;
-	uint8_t dump_provider;
-	uint8_t vdr_version;
-	uint8_t qam_no_auto;
-	uint8_t ca_select;
-	int rotor_position;
-	uint16_t api_version;
-	uint16_t sw_pos;
-	uint16_t codepage;
-	uint8_t print_pmt;
-	uint8_t emulate;
-	uint8_t delete_duplicate_transponders;
-	uint16_t delsys;
-	const char *fallback_input_charset;
+    char *version;
+    scantype_t scantype;
+    uint8_t atsc_type;
+    uint8_t need_2g_fe;
+    uint32_t list_id;
+    uint8_t tuning_timeout;
+    uint8_t filter_timeout;
+    uint8_t get_other_nits;
+    uint8_t add_frequencies;
+    uint8_t dump_provider;
+    uint8_t vdr_version;
+    uint8_t qam_no_auto;
+    uint8_t ca_select;
+    int rotor_position;
+    uint16_t api_version;
+    uint16_t sw_pos;
+    uint16_t codepage;
+    uint8_t print_pmt;
+    uint8_t emulate;
+    uint8_t delete_duplicate_transponders;
+    uint16_t delsys;
+    char const *fallback_input_charset;
 };
 
 struct service *find_service(struct transponder *t, uint16_t service_id);
 struct service *alloc_service(struct transponder *t, uint16_t service_id);
 
-struct transponder *alloc_transponder(uint32_t frequency, unsigned delsys,
-				      uint8_t polarization);
+struct transponder *alloc_transponder(uint32_t frequency, unsigned delsys, uint8_t polarization);
 
 /* write transponder data to dest. no memory allocating,
  * so dest has to be big enough - think about before use!

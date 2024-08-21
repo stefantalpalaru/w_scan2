@@ -22,7 +22,7 @@
 #ifndef __ICONV_CODES_H__
 #define __ICONV_CODES_H__
 
-extern const char *iconv_codes[];
+extern char const *iconv_codes[];
 unsigned iconv_codes_count(void);
 
 #endif

@@ -23,7 +23,7 @@
 #define _TOOLS_H
 
 #include <stdint.h>
-#include <time.h>		// link with -lrt
+#include <time.h> // link with -lrt
 
 /*******************************************************************************
  * common typedefs && logging.
@@ -34,11 +34,11 @@ typedef int bool;
 #define true  !(false)
 #endif
 
-#define min(a,b)  (b<a?b:a)
-#define max(a,b)  (b>a?b:a)
-#define diff(a,b) (a>b?(a-b):(b-a))
+#define min(a, b)  (b<a?b:a)
+#define max(a, b)  (b>a?b:a)
+#define diff(a, b) (a>b?(a-b):(b-a))
 
-#define range(x,low,high) ((x>=low) && (x<=high))
+#define range(x, low, high) ((x>=low) && (x<=high))
 
 extern int verbosity;
 
@@ -74,53 +74,53 @@ int timeout_expired(struct timespec *src);
  * debug helpers.
  ******************************************************************************/
 void run_time_init();
-const char *run_time();
-void hexdump(const char *intro, const unsigned char *buf, int len);
+char const *run_time();
+void hexdump(char const *intro, unsigned char const *buf, int len);
 
-const char *inversion_name(int inversion);
-const char *coderate_name(int coderate);
-const char *modulation_name(int modulation);
-const char *transmission_mode_name(int transmission_mode);
-const char *guard_interval_name(int guard_interval);
-const char *hierarchy_name(int hierarchy);
-const char *interleaving_name(int interleaving);
-const char *delivery_system_name(int delsys);
-const char *property_name(int property);
-const char *ofdm_symbol_duration_name(fe_ofdm_symbol_duration_t ofdm_symbol_duration);
-const char *rolloff_name(fe_rolloff_t rolloff);
-const char *pilot_name(fe_pilot_t pilot);
-const char *frequency_type_name(fe_frequency_type_t frequency_type);
-const char *west_east_flag_name(fe_west_east_flag_t west_east_flag);
-const char *polarization_name(fe_polarization_t polarization);
-const char *bool_name(bool t);
+char const *inversion_name(int inversion);
+char const *coderate_name(int coderate);
+char const *modulation_name(int modulation);
+char const *transmission_mode_name(int transmission_mode);
+char const *guard_interval_name(int guard_interval);
+char const *hierarchy_name(int hierarchy);
+char const *interleaving_name(int interleaving);
+char const *delivery_system_name(int delsys);
+char const *property_name(int property);
+char const *ofdm_symbol_duration_name(fe_ofdm_symbol_duration_t ofdm_symbol_duration);
+char const *rolloff_name(fe_rolloff_t rolloff);
+char const *pilot_name(fe_pilot_t pilot);
+char const *frequency_type_name(fe_frequency_type_t frequency_type);
+char const *west_east_flag_name(fe_west_east_flag_t west_east_flag);
+char const *polarization_name(fe_polarization_t polarization);
+char const *bool_name(bool t);
 
 uint32_t freq_scale(uint32_t freq, double scale);
 
-const char *alpha_name(int alpha);	/* somehow missing. */
-const char *interleaver_name(int i);	/* somehow missing. */
+char const *alpha_name(int alpha); /* somehow missing. */
+char const *interleaver_name(int i); /* somehow missing. */
 
 /*******************************************************************************
  * double linked list.
  ******************************************************************************/
 
-typedef int (*cmp_func) (void *a, void *b);
-typedef bool(*fnd_func) (void *a);
+typedef int (*cmp_func)(void *a, void *b);
+typedef bool (*fnd_func)(void *a);
 
 typedef struct {
-	void *first;
-	void *last;
-	uint32_t count;
-	char *name;
-	bool lock;
+    void *first;
+    void *last;
+    uint32_t count;
+    char *name;
+    bool lock;
 } cList, *pList;
 
 typedef struct {
-	void *prev;
-	void *next;
-	uint32_t index;
+    void *prev;
+    void *next;
+    uint32_t index;
 } cItem, *pItem;
 
-void NewList(pList const list, const char *name);
+void NewList(pList const list, char const *name);
 void ClearList(pList list);
 void SortList(pList list, cmp_func compare);
 void AddItem(pList list, void *item);

@@ -28,16 +28,14 @@
 #include "dump-mplayer.h"
 #include "dump-xine.h"
 
-void mplayer_dump_service_parameter_set(FILE * f,
-					struct service *s,
-					struct transponder *t,
-					struct w_scan_flags *flags)
+void
+mplayer_dump_service_parameter_set(FILE *f, struct service *s, struct transponder *t, struct w_scan_flags *flags)
 {
-	int i;
+    int i;
 
-	fprintf(f, "%s:", s->service_name);
-	xine_dump_dvb_parameters(f, t, flags);
-	fprintf(f, ":%i", s->pmt_pid);
+    fprintf(f, "%s:", s->service_name);
+    xine_dump_dvb_parameters(f, t, flags);
+    fprintf(f, ":%i", s->pmt_pid);
     if (s->video_pid) {
         fprintf(f, "+%i", s->video_pid);
     }
@@ -46,30 +44,30 @@ void mplayer_dump_service_parameter_set(FILE * f,
     }
     fprintf(f, ":");
 
-	// build '+' separated list of mpeg audio and ac3 audio pids
-	if (s->audio_pid[0] || s->ac3_pid[0]) {
+    // build '+' separated list of mpeg audio and ac3 audio pids
+    if (s->audio_pid[0] || s->ac3_pid[0]) {
 
-		// prefer ac3 audio.
-		if (s->ac3_pid[0]) {
-			fprintf(f, "%i", s->ac3_pid[0]);
-			for (i = 1; i < s->ac3_num; i++) {
-				fprintf(f, "+%i", s->ac3_pid[i]);
-			}
-			if (s->audio_pid[0])
-				fprintf(f, "%s", "+");
-		}
-		// standard audio pids follow.
-		if (s->audio_pid[0]) {
-			fprintf(f, "%i", s->audio_pid[0]);
-			for (i = 1; i < s->audio_num; i++) {
-				fprintf(f, "+%i", s->audio_pid[i]);
-			}
-		}
-	}
+        // prefer ac3 audio.
+        if (s->ac3_pid[0]) {
+            fprintf(f, "%i", s->ac3_pid[0]);
+            for (i = 1; i < s->ac3_num; i++) {
+                fprintf(f, "+%i", s->ac3_pid[i]);
+            }
+            if (s->audio_pid[0])
+                fprintf(f, "%s", "+");
+        }
+        // standard audio pids follow.
+        if (s->audio_pid[0]) {
+            fprintf(f, "%i", s->audio_pid[0]);
+            for (i = 1; i < s->audio_num; i++) {
+                fprintf(f, "+%i", s->audio_pid[i]);
+            }
+        }
+    }
 
-	else
-		// no audio or ac3 audio pids found.
-		fprintf(f, "%i", 0);
+    else
+        // no audio or ac3 audio pids found.
+        fprintf(f, "%i", 0);
 
-	fprintf(f, ":%i\n", s->service_id);
+    fprintf(f, ":%i\n", s->service_id);
 }

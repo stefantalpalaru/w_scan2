@@ -9,13 +9,13 @@
 #include <linux/dvb/frontend.h>
 #include "si_types.h"
 
-void em_init(const char *log);
+void em_init(char const *log);
 void em_open(int *frontend_fd);
 void em_info(struct dvb_frontend_info *fe_info);
-void em_dvbapi(uint16_t * flags);
+void em_dvbapi(uint16_t *flags);
 int em_setproperty(struct dtv_properties *cmdseq);
 int em_getproperty(struct dtv_properties *cmdseq);
-int em_status(fe_status_t * status);
+int em_status(fe_status_t *status);
 void em_lnb(bool high_band, uint32_t high_val, uint32_t low_val);
 void em_polarization(uint8_t p);
 
