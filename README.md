@@ -40,8 +40,9 @@ make
 #### Gentoo
 
 ```sh
-eselect repository enable stefantalpalaru
-emaint sync --repo stefantalpalaru
+eselect repository enable guru
+eselect repository add stefantalpalaru git https://github.com/stefantalpalaru/gentoo-overlay
+emaint sync
 emerge w_scan2
 ```
 
