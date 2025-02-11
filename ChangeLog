@@ -1,7 +1,7 @@
 ChangeLog:
 --------------------
 
-[next]
+[1.0.16] 2025-02-11
 - increase default tuning timeout to "-t2"
 - update satellites.dat
 - VLC output: satellite DiSEqC switch number now starts from 1.
