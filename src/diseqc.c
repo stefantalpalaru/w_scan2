@@ -549,6 +549,7 @@ scr_prepare_tune_EN50607(
     struct dvb_diseqc_master_cmd *diseqc)
 {
     uint16_t TuningWord = 0;
+    uint8_t hiho = 0; // Hiband and horizontal polarization will be put here for OR with config->pos
 
     diseqc->msg[0] = 0x70;
     diseqc->msg_len = 4;
@@ -566,16 +567,29 @@ scr_prepare_tune_EN50607(
             TuningWord = 0x7FF;
     }
 
+    hiho |= (hiband << 0) | // committed sw band is D2 bit 0
+        (horizontal << 1); //  committed sw pol  is D2 bit 1
+
+    if (config->pos >= 0x40) {
+        hiho |= (hiband << 4) | // uncommitted sw band is D2 bit 5 (set only if pos bit 6 or higher is set)
+            (horizontal << 5); //  uncommitted sw pol  is D2 bit 6 (set only if pos bit 6 or higher is set)
+    }
+
     diseqc->msg[1] = (config->slot << 3) | // slot             is D0 bit 7..3
         ((TuningWord >> 8) & 0x7); // tuning word      is D0 bit 2..0
     diseqc->msg[2] = (TuningWord & 0xFF); //                 and D1 bit 7..0
-    diseqc->msg[3] = config->pos | // uncommitted/committed pos + option
-        (hiband << 0) | // committed sw band   is D2 bit 0
-        (horizontal << 1) | // committed sw pol    is D2 bit 1
-        (hiband << 4) | // uncommitted sw band is D2 bit 5
-        (horizontal << 5); // uncommitted sw pol  is D2 bit 6
+    diseqc->msg[3] = config->pos | hiho; // uncommitted/committed pos + option
 
     config->offset = 0; // no offset.
+    info("\nscr_prepare_tune_EN50607 : ");
+    // info ("Diseq_setupscr: %ju\n", (uintmax_t) diseqc.msg[0]);
+    info("length: %u     ", diseqc->msg_len);
+    info("Diseqc_setupscr: ");
+    for (int i = 0; i < diseqc->msg_len; i++) {
+        info("%02x ", diseqc->msg[i]);
+    }
+    info("\n");
+    info("#############################################################################\n");
 }
 
 static void
@@ -642,6 +656,16 @@ setup_scr(int frontend_fd, struct transponder *t, struct lnb_types_st *lnb, stru
     default:
         fatal("%s:%d: unknown SCR norm '%d'\n", __FUNCTION__, __LINE__, config->norm);
     }
+
+    info("\n");
+    // info ("Diseq_setupscr: %ju\n", (uintmax_t) diseqc.msg[0]);
+    info("Message length: %u     ", diseqc.msg_len);
+    info("Diseqc_setupscr : ");
+    for (int i = 0; i < diseqc.msg_len; i++) {
+        info("%02x ", diseqc.msg[i]);
+    }
+    info("\n");
+    info("#############################################################################\n");
 
     return scr_cmd(frontend_fd, &diseqc);
 }

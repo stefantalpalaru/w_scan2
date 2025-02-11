@@ -4165,6 +4165,9 @@ main(int argc, char **argv)
                     fatal("undefined SCR satellite pos: '%c'", c);
                 }
             }
+            info("\n************************************************\n\n\n");
+            info("INFO: scr_config.pos:  %02X     \n\n\n", scr_config.pos);
+            info("************************************************\n\n\n");
             break;
         case 'v': // verbose
             verbosity++;
