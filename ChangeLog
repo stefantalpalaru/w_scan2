@@ -9,6 +9,8 @@ ChangeLog:
   https://wiki.videolan.org/Documentation:Modules/dtv/Linux_options/.
   (Martin Wagner - https://github.com/martin-wagner)
 - change code formatting again, this time using "clang-format"
+- fix incorrect behaviour with SCR EN50607 (Unicable II - only Vertical Position
+  channels added to channels.conf) - patch by Christoph Tieben <tieben@tieben.de>
 
 [1.0.15] 2024-01-02
 - VLC output: include logical channel numbers (LCN) in titles, when available
