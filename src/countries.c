@@ -321,7 +321,7 @@ base_offset(int channel, int channellist)
             return 49000000;
         case 7 ... 13:
             return 135000000;
-        case 14 ... 69:
+        case 14 ... 36:
             return 389000000;
         default:
             return SKIP_CHANNEL;
