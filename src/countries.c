@@ -119,6 +119,7 @@ choose_country(char const *country, int *atsc, int *dvb, uint16_t *scan_type, in
     case SE: //      SWEDEN
     case SK: //      SLOVAKIA
     case TW: //      TAIWAN, DVB-T w. ATSC freq list (thanks for freqlist to mkrufky)
+    case PA: //      PANAMA, same as Taiwan
     case AU: //      AUSTRALIA, DVB-T w. 7MHz step
         switch (*dvb) {
         case SCAN_CABLE:
@@ -245,6 +246,7 @@ choose_country(char const *country, int *atsc, int *dvb, uint16_t *scan_type, in
     case US: //      UNITED STATES
     case CA: //      CANADA
     case TW: //      TAIWAN, DVB-T w. ATSC freq list
+    case PA: //      PANAMA, same as Taiwan
         if (atsc_is_vsb(*atsc)) {
             *channellist = ATSC_VSB;
             info("VSB US/CA, DVB-T TW\n");
