@@ -256,9 +256,14 @@ choose_country(char const *country, int *atsc, int *dvb, uint16_t *scan_type, in
     }
     break;
     case PA: //      PANAMA, similar to US but uses channels 38 to 51
-        if (atsc_is_vsb(*atsc)) {
+        switch (*dvb) {
+        case SCAN_CABLE:
+            info("cable panama not yet defined.\n");
+            break;
+        default:
             *channellist = DVBT_PA;
             info("DVB-T PA\n");
+            break;
         }
         break;
     case CO: //      COLOMBIA, 6MHz offs 389MHz
