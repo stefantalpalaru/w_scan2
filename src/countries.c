@@ -246,14 +246,19 @@ choose_country(char const *country, int *atsc, int *dvb, uint16_t *scan_type, in
     case US: //      UNITED STATES
     case CA: //      CANADA
     case TW: //      TAIWAN, DVB-T w. ATSC freq list
-    case PA: //      PANAMA, same as Taiwan
+    if (atsc_is_vsb(*atsc)) {
+        *channellist = ATSC_VSB;
+        info("VSB US/CA, DVB-T TW\n");
+    }
+    if (atsc_is_qam(*atsc)) {
+        *channellist = ATSC_QAM;
+        info("QAM US/CA\n");
+    }
+    break;
+    case PA: //      PANAMA, similar to US but uses channels 38 to 51
         if (atsc_is_vsb(*atsc)) {
-            *channellist = ATSC_VSB;
-            info("VSB US/CA, DVB-T TW\n");
-        }
-        if (atsc_is_qam(*atsc)) {
-            *channellist = ATSC_QAM;
-            info("QAM US/CA\n");
+            *channellist = DVBT_PA;
+            info("DVB-T PA\n");
         }
         break;
     case CO: //      COLOMBIA, 6MHz offs 389MHz
@@ -338,6 +343,14 @@ base_offset(int channel, int channellist)
         default:
             return SKIP_CHANNEL;
         }
+    case DVBT_PA: // DVB-T Panama, 6 MHz step
+        switch (channel) {
+            // scan up to ch 60
+        case 26 ... 60:
+            return 389142857; // for accurate channel finding, this number needs to be exact according to ISDB-T center here: https://en.wikipedia.org/wiki/Television_channel_frequencies#Americas_(most_countries),_South_Korea,_Taiwan,_Burma_(Myanmar)_and_the_Philippines
+        default:
+            return SKIP_CHANNEL;
+        }
     case ISDBT_6MHZ: // ISDB-T, 6 MHz central frequencies
         switch (channel) {
             // Channels 7-13 are reserved but aren't used yet
@@ -412,6 +425,7 @@ freq_step(int channel, int channellist)
     case ATSC_VSB:
     case DVBC_BR:
     case DVBT2_CO:
+    case DVBT_PA:
     case ISDBT_6MHZ:
         return 6000000; // atsc region, 6MHz step
     case DVBT_AU:
