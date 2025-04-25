@@ -273,7 +273,7 @@ em_getproperty(struct dtv_properties *cmdseq)
 }
 
 void
-em_lnb(int high_band, uint32_t high_val, uint32_t low_val)
+em_lnb(bool high_band, uint32_t high_val, uint32_t low_val)
 {
     em_device.highband = high_band;
     em_device.lnb_low = low_val;

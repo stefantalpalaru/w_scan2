@@ -24,16 +24,11 @@
 
 #include <stdint.h>
 #include <time.h> // link with -lrt
+#include <stdbool.h>
 
 /*******************************************************************************
  * common typedefs && logging.
  ******************************************************************************/
-#ifndef bool
-typedef int bool;
-#define false 0
-#define true  !(false)
-#endif
-
 #define min(a, b)  (b<a?b:a)
 #define max(a, b)  (b>a?b:a)
 #define diff(a, b) (a>b?(a-b):(b-a))

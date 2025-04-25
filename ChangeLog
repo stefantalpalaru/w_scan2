@@ -4,6 +4,7 @@ ChangeLog:
 [next]
 - ATSC_VSB: remove channels 37-69 (patch by https://github.com/majortom9)
 - support DVB-T for Panama (patch by https://github.com/ejrydhfs)
+- fix build with gcc-15
 
 [1.0.16] 2025-02-11
 - increase default tuning timeout to "-t2"
