@@ -1,6 +1,8 @@
 ChangeLog:
 --------------------
 
+[next]
+
 [1.0.17] 2025-04-26
 - ATSC_VSB: remove channels 37-69 (patch by https://github.com/majortom9)
 - support DVB-T for Panama (patch by https://github.com/ejrydhfs)
