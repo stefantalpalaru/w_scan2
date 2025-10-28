@@ -44,6 +44,8 @@ enum channellist_t {
     DAB_DE = 12,
     DVBT2_CO = 13,
     DVBT_PA = 14,
+    DVBC_CN = 15,
+    DTMB_CN = 16,
     USERLIST = 999
 };
 

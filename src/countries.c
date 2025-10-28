@@ -145,6 +145,19 @@ choose_country(char const *country, int *atsc, int *dvb, uint16_t *scan_type, in
             break;
         }
         break;
+    
+    case CN: //      CHINA, DVB-C + DTMB
+        switch (*dvb) {
+        case SCAN_CABLE:
+            *scan_type = SCAN_CABLE;
+            info("DVB cable\n");
+            break;
+        default:
+            *scan_type = SCAN_TERRESTRIAL;
+            info("DTMB\n");
+            break;
+        }
+        break;
 
     case US: //      UNITED STATES
     case CA: //      CANADA
@@ -239,6 +252,18 @@ choose_country(char const *country, int *atsc, int *dvb, uint16_t *scan_type, in
         default:
             *channellist = DVBT_AU;
             info("DVB-T AU\n");
+            break;
+        }
+        break;
+    case CN: //      CHINA
+        switch (*dvb) {
+        case SCAN_CABLE:
+            *channellist = DVBC_CN;
+            info("DVB-C CN\n");
+            break;
+        default:
+            *channellist = DTMB_CN;
+            info("DTMB CN\n");
             break;
         }
         break;
@@ -414,6 +439,53 @@ base_offset(int channel, int channellist)
         default:
             return SKIP_CHANNEL;
         }
+    case DVBC_CN: // CHINA
+        switch (channel) {
+            // https://zh.wikipedia.org/wiki/中华人民共和国电视频道频率划分列表
+            // "DS-" channels, for both terrestrial and cable
+        case 1 ... 3:
+            return 44500000;
+        case 4:
+            return 48000000;
+        case 6 ... 12:
+            return 123000000;
+        case 13 ... 24:
+            return 370000000;
+        case 25 ... 57:
+            return 410000000;
+            // "Z-" channels, cable only, here we start at 101
+        case 101 ... 107:
+            return -693000000;
+        case 108 ... 137:
+            return -637000000;
+        case 138 ... 142:
+            return -534000000;
+        default:
+            return SKIP_CHANNEL;
+        }
+    case DTMB_CN:
+        switch (channel) {
+            // https://zh.wikipedia.org/wiki/中华人民共和国电视频道频率划分列表
+            // "DS-" channels, for both terrestrial and cable
+        case 1 ... 3:
+            return 44500000;
+        case 4:
+            return 48000000;
+        case 6 ... 12:
+            return 123000000;
+        case 13 ... 24:
+            return 370000000;
+        case 25 ... 36:
+            // DS-37 to DS-57 removed for cellular
+            return 410000000;
+        case 138 ... 142:
+            // Z-38 to Z-42 are used for receiving HK/MO DTMB in Guangdong.
+            // also named DS-24+1 to DS-24+5
+            return -534000000;
+        default:
+            return SKIP_CHANNEL;
+        }
+
     default:
         fatal("%s: undefined channellist %d\n", __FUNCTION__, channellist);
         return SKIP_CHANNEL;
@@ -450,7 +522,10 @@ freq_step(int channel, int channellist)
     case DVBC_QAM:
     case DVBC_FI:
     case DVBC_FR:
+    case DVBC_CN:
         return 8000000; // dvb-c, 8MHz step
+    case DTMB_CN:
+        return 8000000; // DTMB, 8MHz step for VHF + UHF
     default:
         fatal("%s: undefined channellist %d\n", __FUNCTION__, channellist);
         return SKIP_CHANNEL;
@@ -667,6 +742,7 @@ delsysloop_max(int channel, int channellist, uint16_t delsys)
         case DVBC_FI:
         case DVBC_FR:
         case DVBC_BR:
+        case DVBC_CN:
         case ISDBT_6MHZ:
         case DAB_DE:
         case USERLIST:
@@ -695,6 +771,7 @@ dvbc_qam_max(int channel, int channellist)
         return 2; // QAM128
     case DVBC_BR:
     case DVBC_FR:
+    case DVBC_CN:
     case DVBC_QAM:
         return 1; // QAM256
     default:
@@ -709,6 +786,7 @@ dvbc_qam_min(int channel, int channellist)
     case DVBC_FI:
     case DVBC_BR:
     case DVBC_FR:
+    case DVBC_CN:
     case DVBC_QAM:
         return 0; // QAM64
     default:
