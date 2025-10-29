@@ -2,6 +2,7 @@ ChangeLog:
 --------------------
 
 [next]
+- cable and terrestrial frequency tables for China (patch by https://github.com/solderwire)
 
 [1.0.17] 2025-04-26
 - ATSC_VSB: remove channels 37-69 (patch by https://github.com/majortom9)
