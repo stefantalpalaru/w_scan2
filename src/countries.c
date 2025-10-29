@@ -145,7 +145,7 @@ choose_country(char const *country, int *atsc, int *dvb, uint16_t *scan_type, in
             break;
         }
         break;
-    
+
     case CN: //      CHINA, DVB-C + DTMB
         switch (*dvb) {
         case SCAN_CABLE:
