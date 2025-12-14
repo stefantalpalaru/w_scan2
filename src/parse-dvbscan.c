@@ -129,7 +129,7 @@ int
 dvbscan_parse_tuningdata(char const *tuningdata, struct w_scan_flags *flags)
 {
     FILE *initdata = NULL;
-    char *buf = (char *)calloc(sizeof(char), MAX_LINE_LENGTH);
+    char *buf = (char *)calloc(MAX_LINE_LENGTH, sizeof(char));
     enum __dvbscan_args arg;
     struct transponder *tn;
     int count = 0;
@@ -148,7 +148,7 @@ dvbscan_parse_tuningdata(char const *tuningdata, struct w_scan_flags *flags)
     }
 
     while (fgets(buf, MAX_LINE_LENGTH, initdata) != NULL) {
-        char *copy = (char *)calloc(sizeof(char), strlen(buf) + 1);
+        char *copy = (char *)calloc(strlen(buf) + 1, sizeof(char));
         char *token;
 
         if (copy == NULL) {
@@ -486,7 +486,7 @@ int
 dvbscan_parse_rotor_positions(char const *positiondata)
 {
     FILE *data = NULL;
-    char *buf = (char *)calloc(sizeof(char), MAX_LINE_LENGTH);
+    char *buf = (char *)calloc(MAX_LINE_LENGTH, sizeof(char));
     enum __rotor_args arg = end_of_line_rotor;
     // enum __rotor_file_formats fformat = rotor_fileformat_undef;
     struct pos_item item = { 0, NULL };
@@ -506,7 +506,7 @@ dvbscan_parse_rotor_positions(char const *positiondata)
     }
 
     while (fgets(buf, MAX_LINE_LENGTH, data) != NULL) {
-        char *copy = (char *)calloc(sizeof(char), strlen(buf) + 1);
+        char *copy = (char *)calloc(strlen(buf) + 1, sizeof(char));
         char *token;
 
         if (copy == NULL)
