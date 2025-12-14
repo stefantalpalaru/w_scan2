@@ -708,7 +708,7 @@ xml_dump(FILE *dest, pList transponders, struct w_scan_flags *flags)
                         fprintf(dest, " type=\"%u\"", s->audio_stream_type[i]);
                     fprintf(dest, " pid=\"%u\"", s->audio_pid[i]);
                     fprintf(dest, " description=\"%s\"", StreamName(s->audio_stream_type[i]));
-                    if (s->audio_lang && s->audio_lang[i][0])
+                    if (s->audio_lang[i][0])
                         fprintf(dest, " language_code=\"%s\"", safe_xml(s->audio_lang[i], (char *)&buffer));
                     fprintf(dest, "/>\n");
                 }
@@ -718,7 +718,7 @@ xml_dump(FILE *dest, pList transponders, struct w_scan_flags *flags)
                         fprintf(dest, " type=\"%u\"", s->ac3_stream_type[i]);
                         fprintf(dest, " pid=\"%u\"", s->ac3_pid[i]);
                         fprintf(dest, " description=\"AC3 audio\"");
-                        if (s->ac3_lang && s->ac3_lang[i][0])
+                        if (s->ac3_lang[i][0])
                             fprintf(dest, " language_code=\"%s\"", safe_xml(s->ac3_lang[i], (char *)&buffer));
                         fprintf(dest, "/>\n");
                     }
@@ -738,7 +738,7 @@ xml_dump(FILE *dest, pList transponders, struct w_scan_flags *flags)
                         fprintf(dest, " type=\"6\"");
                         fprintf(dest, " pid=\"%u\"", s->subtitling_pid[i]);
                         fprintf(dest, " description=\"subtitling\"");
-                        if (s->subtitling_lang && s->subtitling_lang[i][0])
+                        if (s->subtitling_lang[i][0])
                             fprintf(dest, " language_code=\"%s\"", safe_xml(s->subtitling_lang[i], (char *)&buffer));
                         fprintf(dest, "/>\n");
                     }

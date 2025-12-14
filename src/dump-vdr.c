@@ -572,13 +572,13 @@ vdr_dump_service_parameter_set(FILE *f, struct service *s, struct transponder *t
     fprintf(f, ":");
 
     fprintf(f, "%i", s->audio_pid[0]);
-    if (s->audio_lang && s->audio_lang[0][0])
+    if (s->audio_lang[0][0])
         fprintf(f, "=%.4s", s->audio_lang[0]);
     if (s->audio_stream_type[0])
         fprintf(f, "@%u", s->audio_stream_type[0]);
     for (i = 1; i < s->audio_num; i++) {
         fprintf(f, ",%i", s->audio_pid[i]);
-        if (s->audio_lang && s->audio_lang[i][0])
+        if (s->audio_lang[i][0])
             fprintf(f, "=%.4s", s->audio_lang[i]);
         if (flags->vdr_version > 7)
             if (s->audio_stream_type[i])
@@ -592,7 +592,7 @@ vdr_dump_service_parameter_set(FILE *f, struct service *s, struct transponder *t
                 fprintf(f, "%s", ",");
             fprintf(f, "%i", s->ac3_pid[i]);
             if (flags->vdr_version > 7)
-                if (s->ac3_lang && s->ac3_lang[i][0])
+                if (s->ac3_lang[i][0])
                     fprintf(f, "=%.4s", s->ac3_lang[i]);
         }
     }
@@ -606,7 +606,7 @@ vdr_dump_service_parameter_set(FILE *f, struct service *s, struct transponder *t
             if (i > 0)
                 fprintf(f, "%s", ",");
             fprintf(f, "%i", s->subtitling_pid[i]);
-            if (s->subtitling_lang && s->subtitling_lang[i][0])
+            if (s->subtitling_lang[i][0])
                 fprintf(f, "=%.4s", s->subtitling_lang[i]);
         }
     }
