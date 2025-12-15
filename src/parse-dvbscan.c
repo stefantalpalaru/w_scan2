@@ -252,8 +252,8 @@ dvbscan_parse_tuningdata(char const *tuningdata, struct w_scan_flags *flags)
             tn->modulation = VSB_8;
             break;
         default:
-            free(buf);
             error("could not parse '%s' - undefined fe_type\n", buf);
+            free(buf);
             return 0; // err
         }
 
