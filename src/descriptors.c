@@ -801,7 +801,6 @@ parse_cable_delivery_system_descriptor(unsigned char const *buf, struct transpon
 void
 parse_C2_delivery_system_descriptor(unsigned char const *buf, struct transponder *t, fe_spectral_inversion_t inversion)
 {
-    __u8 descriptor_length;
     //__u8 descriptor_tag_extension;
     unsigned char *bp;
 
@@ -814,20 +813,15 @@ parse_C2_delivery_system_descriptor(unsigned char const *buf, struct transponder
     t->delsys = SYS_DVBC2;
     t->inversion = inversion;
     // descriptor_tag               8 uimsbf
-    descriptor_length = buf[1]; // descriptor_length            8 uimsbf
     // descriptor_tag_extension = buf[2];                                                                 //
     // descriptor_tag_extension     8 uimsbf
     bp = (unsigned char *)&buf[3];
-    descriptor_length--;
     t->plp_id = *bp; // plp_id                       8 uimsbf; uniquely identifies a data PLP within the C2 System
     bp++;
-    descriptor_length--;
     t->data_slice_id = *bp; // data_slice_id                8 uimsbf; uniquely identifies a data slice within the C2 system
     bp++;
-    descriptor_length--;
     t->frequency = get_u32(bp); // C2_tuning_frequency          32 bslbf; see C2_tuning_frequency_type
     bp += 4;
-    descriptor_length -= 4;
     switch ((*bp & 0xC0) >> 6) { // C2_tuning_frequency_type     2 uimsbf
     case 0:
         t->C2_tuning_frequency_type = DATA_SLICE_TUNING_FREQUENCY;
@@ -866,7 +860,6 @@ parse_C2_delivery_system_descriptor(unsigned char const *buf, struct transponder
         t->guard = GUARD_INTERVAL_1_128; // defaulting to here to 1/128, as nothing better found so far.
     }
     bp++;
-    descriptor_length--;
 }
 
 /*
@@ -1187,7 +1180,6 @@ parse_T2_delivery_system_descriptor(unsigned char const *buf, struct transponder
 {
     unsigned char *bp;
     __u8 descriptor_length;
-    __u8 frequency_loop_length = 0;
     __u8 subcell_info_loop_length = 0;
     __u32 center_frequency = 0;
     struct cell *p;
@@ -1326,7 +1318,6 @@ parse_T2_delivery_system_descriptor(unsigned char const *buf, struct transponder
                 center_frequency = 10 * get_u32(bp);
                 bp += 4;
                 descriptor_length -= 4; //         centre_frequency 32 uimsbf
-                frequency_loop_length -= 4; //
                 if ((center_frequency < 50000000) || (center_frequency > 1000000000))
                     center_frequency = 0;
                 cell->center_frequencies[cell->num_center_frequencies++] = center_frequency; //
@@ -1387,8 +1378,7 @@ parse_T2_delivery_system_descriptor(unsigned char const *buf, struct transponder
             t->tfs_flag);
 
         verbose("          %u cells:\n", (t->cells)->count);
-        int i = 0;
-        for (p = (t->cells)->first; p; p = p->next, ++i) {
+        for (p = (t->cells)->first; p; p = p->next) {
             int n;
             for (n = 0; n < p->num_center_frequencies; n++)
                 verbose("             cell %u: center_frequency %7.3f\n", p->cell_id, p->center_frequencies[n] / 1000000.0);
