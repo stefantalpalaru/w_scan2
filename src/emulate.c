@@ -362,7 +362,7 @@ has_lock(fe_delivery_system_t em_delsys, struct transponder *t)
             EM_INFO("wrong pilot: %d != %d\n", t->pilot, em_device.pilot);
             return 0;
         }
-        /* fall trough. */
+        /* falls through */
     case SYS_DVBS:
         if (em_device.highband)
             tp_if = abs(t->frequency - em_device.lnb_high);
@@ -1359,6 +1359,7 @@ parse_logfile(char const *log)
                     break;
                 case SYS_ATSC:
                     sidata->t.type = SCAN_TERRCABLE_ATSC;
+                    /* falls through */
                 default:
                     fatal("unsupported del sys.\n");
                 }

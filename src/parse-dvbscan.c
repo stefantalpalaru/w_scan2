@@ -424,7 +424,8 @@ vdr_code_from_token(char const *token)
             dot++;
             break;
         case 'E':
-            neg++; // no break, fall through
+            neg++;
+            /* falls through */
         case 'W':
             if (!dot)
                 pos *= 10;
@@ -557,6 +558,7 @@ dvbscan_parse_rotor_positions(char const *positiondata)
                     error("could not parse %s\n", positiondata);
                     goto err;
                 }
+                /* falls through */
             case sat_id:
                 if (item.id)
                     free(item.id);
@@ -583,6 +585,7 @@ dvbscan_parse_rotor_positions(char const *positiondata)
                     error("could not parse %s\n", positiondata);
                     goto err;
                 }
+                /* falls through */
             case end_of_line_rotor:
             case READ_STOP:
             default:
