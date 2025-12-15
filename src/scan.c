@@ -274,7 +274,7 @@ is_auto_params(struct transponder *t)
     case SYS_DVBS2:
         if (t->rolloff == ROLLOFF_AUTO)
             return true;
-        /* fall trough. */
+        /* falls through */
     case SYS_DSS:
     case SYS_DVBS:
         if (t->coderate == FEC_AUTO)
@@ -2394,6 +2394,7 @@ set_frontend(int frontend_fd, struct transponder *t)
             info("\t skipped: (srate %u unsupported by driver)\n", t->symbolrate);
             return -2;
         }
+        /* falls through */
     case SCAN_TERRESTRIAL:
         if (t->delsys == SYS_DVBT2) {
             if (!(fe_info.caps & FE_CAN_2G_MODULATION)) {
@@ -2401,7 +2402,7 @@ set_frontend(int frontend_fd, struct transponder *t)
                 return -2;
             }
         }
-        // no break needed here.
+        /* falls through */
     case SCAN_TERRCABLE_ATSC:
         if ((t->frequency < fe_info.frequency_min) || (t->frequency > fe_info.frequency_max)) {
             info("\t skipped: (freq %u unsupported by driver)\n", t->frequency);
