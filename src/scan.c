@@ -502,6 +502,7 @@ find_transponder_by_freq(struct transponder *tn)
                     // c->center_frequencies[i]/1000000.0);
                     if (c->center_frequencies[i] == tn->frequency) {
                         verbose("             matches tn center\n");
+                        free(buffer);
                         return t;
                     }
 
@@ -513,6 +514,7 @@ find_transponder_by_freq(struct transponder *tn)
                             // cn->center_frequencies[j]/1000000.0);
                             if (c->center_frequencies[i] == cn->center_frequencies[j]) {
                                 verbose("             matches tn center_frequencies[%d]\n", j);
+                                free(buffer);
                                 return t;
                             }
                         }
@@ -543,6 +545,7 @@ find_transponder_by_freq(struct transponder *tn)
                     // c->center_frequencies[i]/1000000.0);
                     if (c->center_frequencies[i] == tn->frequency) {
                         verbose("             matches tn center\n");
+                        free(buffer);
                         return t;
                     }
 
@@ -554,6 +557,7 @@ find_transponder_by_freq(struct transponder *tn)
                             // cn->center_frequencies[j]/1000000.0);
                             if (c->center_frequencies[i] == cn->center_frequencies[j]) {
                                 verbose("             matches tn center_frequencies[%d]\n", j);
+                                free(buffer);
                                 return t;
                             }
                         }
@@ -1609,6 +1613,7 @@ parse_nit(unsigned char const *buf, uint16_t section_length, uint8_t table_id, u
             }
         }
         ClearList(tn.services);
+        ClearList(tn.cells);
 
         section_length -= descriptors_loop_len + 6;
         buf += descriptors_loop_len + 6;
@@ -2695,14 +2700,13 @@ tune_to_next_transponder(int frontend_fd)
                     continue; // GetItem may return NULL; dont want to segfault here.
 
                 t->frequency = next->center_frequencies[0];
-                j = 0;
                 test = find_transponder_by_freq(t);
                 if ((test != NULL) && !(IsMember(scanned_transponders, test))) {
                     info("retrying with center_frequency = %u\n", t->frequency);
                     if (tune_to_transponder(frontend_fd, t) == 0)
                         return 0;
                 }
-                while (j < next->num_transposers) {
+                for (j = 0; j < next->num_transposers; j++) {
                     t->frequency = next->transposers[j].transposer_frequency;
                     test = find_transponder_by_freq(t);
                     if ((test != NULL) && !(IsMember(scanned_transponders, test))) {
