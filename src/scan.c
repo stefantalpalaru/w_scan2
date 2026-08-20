@@ -3666,6 +3666,43 @@ fe_supports_scan(int fd, scantype_t type, struct dvb_frontend_info info)
     return false; // unsupported
 }
 
+/* dvb-core reports a frontend's tuning range in the units of the delivery
+ * system that is currently selected: kHz for satellite, Hz for everything
+ * else. A multi standard frontend starts out in whichever system its driver
+ * lists first, which need not be the one we are about to scan, so the limits
+ * returned by FE_GET_INFO can come back on the wrong scale. Tell the frontend
+ * which system we want before asking for its capabilities.
+ *
+ * Failing here is not fatal: a frontend that rejects the delivery system
+ * simply keeps the one it had, which is what we used to rely on anyway.
+ */
+static void
+preselect_delsys(int fd, scantype_t type)
+{
+    struct dtv_property p[] = { { .cmd = DTV_DELIVERY_SYSTEM } };
+    struct dtv_properties cmdseq = { .num = 1, .props = p };
+
+    switch (type) {
+    case SCAN_SATELLITE:
+        p[0].u.data = SYS_DVBS;
+        break;
+    case SCAN_CABLE:
+        p[0].u.data = SYS_DVBC_ANNEX_A;
+        break;
+    case SCAN_TERRESTRIAL:
+        p[0].u.data = SYS_DVBT;
+        break;
+    case SCAN_TERRCABLE_ATSC:
+        p[0].u.data = SYS_ATSC;
+        break;
+    default:
+        return;
+    }
+
+    if (ioctl(fd, FE_SET_PROPERTY, &cmdseq) < 0)
+        verbose("could not preselect delivery system: %d %s\n", errno, strerror(errno));
+}
+
 static char const *usage =
     "\n"
     "usage: %s [options...] \n"
@@ -4554,13 +4591,18 @@ main(int argc, char **argv)
         fatal("failed to open '%s': %d %s\n", frontend_devname, errno, strerror(errno));
     }
     info("-_-_-_-_ Getting frontend capabilities-_-_-_-_ \n");
+    flags.scantype = scantype;
+
+    /* Has to happen before FE_GET_INFO, see preselect_delsys(). */
+    if (!flags.emulate)
+        preselect_delsys(frontend_fd, scantype);
+
     /* determine FE type and caps */
     EMUL(em_info, &fe_info)
     if (ioctl(frontend_fd, FE_GET_INFO, &fe_info) == -1) {
         cleanup();
         fatal("FE_GET_INFO failed: %d %s\n", errno, strerror(errno));
     }
-    flags.scantype = scantype;
 
     EMUL(em_dvbapi, &flags.api_version)
     if (get_api_version(frontend_fd, &flags) < 0)
