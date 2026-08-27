@@ -558,7 +558,7 @@ vdr_dump_service_parameter_set(FILE *f, struct service *s, struct transponder *t
     fprintf(f, "%s", s->service_name);
 
     if (flags->dump_provider)
-        fprintf(f, ";%s", s->provider_name);
+        fprintf(f, ";%s;%d", s->provider_name, s->logical_channel_number);
 
     dump_param_vdr(f, t, flags);
 
