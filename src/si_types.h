@@ -68,6 +68,8 @@ struct section_buf {
 #define AC3_CHAN_MAX      (32)
 #define CA_SYSTEM_ID_MAX  (32)
 #define SUBTITLES_MAX     (32)
+// two ISO 639 codes joined by '+', as VDR stores them, plus the NUL
+#define VDR_LANG_MAX      (8)
 
 struct transponder;
 struct service {
@@ -89,13 +91,13 @@ struct service {
     uint8_t video_stream_type;
     uint16_t audio_pid[AUDIO_CHAN_MAX];
     uint8_t audio_stream_type[AUDIO_CHAN_MAX];
-    char audio_lang[AUDIO_CHAN_MAX][4];
+    char audio_lang[AUDIO_CHAN_MAX][VDR_LANG_MAX];
     int audio_num;
     uint16_t ca_id[CA_SYSTEM_ID_MAX];
     int ca_num;
     uint16_t teletext_pid;
     uint16_t subtitling_pid[SUBTITLES_MAX];
-    char subtitling_lang[SUBTITLES_MAX][4];
+    char subtitling_lang[SUBTITLES_MAX][VDR_LANG_MAX];
     uint8_t subtitling_type[SUBTITLES_MAX];
     uint16_t composition_page_id[SUBTITLES_MAX];
     uint16_t ancillary_page_id[SUBTITLES_MAX];
@@ -105,7 +107,7 @@ struct service {
     // AC-3 and E-AC-3 share stream type 0x06; only the descriptor tag
     // the stream was recognized by tells the two apart
     uint8_t ac3_descriptor_tag[AC3_CHAN_MAX];
-    char ac3_lang[AC3_CHAN_MAX][4];
+    char ac3_lang[AC3_CHAN_MAX][VDR_LANG_MAX];
     int ac3_num;
     unsigned int type : 8;
     bool scrambled;

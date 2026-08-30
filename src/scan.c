@@ -1198,7 +1198,7 @@ parse_pmt(unsigned char const *buf, uint16_t section_length, uint16_t service_id
 {
     int program_info_len;
     struct service *s;
-    char msg_buf[14 * AUDIO_CHAN_MAX + 1];
+    char msg_buf[(10 + VDR_LANG_MAX) * AUDIO_CHAN_MAX + 1];
     char *tmp;
     int i;
 
@@ -1403,7 +1403,7 @@ parse_pmt(unsigned char const *buf, uint16_t section_length, uint16_t service_id
     }
 
     tmp = msg_buf;
-    tmp += sprintf(tmp, "%d (%.4s)", s->audio_pid[0], s->audio_lang[0]);
+    tmp += sprintf(tmp, "%d (%.*s)", s->audio_pid[0], VDR_LANG_MAX - 1, s->audio_lang[0]);
 
     if (s->audio_num >= AUDIO_CHAN_MAX) {
         warning("more than %i audio channels: %i, truncating to %i\n", AUDIO_CHAN_MAX - 1, s->audio_num, AUDIO_CHAN_MAX);
@@ -1411,7 +1411,7 @@ parse_pmt(unsigned char const *buf, uint16_t section_length, uint16_t service_id
     }
 
     for (i = 1; i < s->audio_num; i++)
-        tmp += sprintf(tmp, ", %d (%.4s)", s->audio_pid[i], s->audio_lang[i]);
+        tmp += sprintf(tmp, ", %d (%.*s)", s->audio_pid[i], VDR_LANG_MAX - 1, s->audio_lang[i]);
 
     debug(
         "tsid=%d sid=%d: %s -- %s, pmt_pid 0x%04x, vpid 0x%04x, apid %s\n",
