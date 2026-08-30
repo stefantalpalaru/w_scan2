@@ -469,9 +469,8 @@ vdr_dump_service_parameter_set(FILE *f, struct service *s, struct transponder *t
         fprintf(f, ",%i", s->audio_pid[i]);
         if (s->audio_lang[i][0])
             fprintf(f, "=%.4s", s->audio_lang[i]);
-        if (flags->vdr_version > 7)
-            if (s->audio_stream_type[i])
-                fprintf(f, "@%u", s->audio_stream_type[i]);
+        if (s->audio_stream_type[i])
+            fprintf(f, "@%u", s->audio_stream_type[i]);
     }
 
     if (s->ac3_num) {
@@ -480,9 +479,8 @@ vdr_dump_service_parameter_set(FILE *f, struct service *s, struct transponder *t
             if (i > 0)
                 fprintf(f, "%s", ",");
             fprintf(f, "%i", s->ac3_pid[i]);
-            if (flags->vdr_version > 7)
-                if (s->ac3_lang[i][0])
-                    fprintf(f, "=%.4s", s->ac3_lang[i]);
+            if (s->ac3_lang[i][0])
+                fprintf(f, "=%.4s", s->ac3_lang[i]);
         }
     }
 
