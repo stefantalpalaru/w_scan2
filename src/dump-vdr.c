@@ -481,6 +481,9 @@ vdr_dump_service_parameter_set(FILE *f, struct service *s, struct transponder *t
             fprintf(f, "%i", s->ac3_pid[i]);
             if (s->ac3_lang[i][0])
                 fprintf(f, "=%.4s", s->ac3_lang[i]);
+            // an untyped Dpid means AC-3 to VDR, so E-AC-3 must say so
+            if (s->ac3_descriptor_tag[i])
+                fprintf(f, "@%u", s->ac3_descriptor_tag[i]);
         }
     }
 
