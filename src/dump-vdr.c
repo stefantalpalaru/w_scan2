@@ -439,7 +439,7 @@ dump_param_vdr(FILE *f, struct transponder *t, struct w_scan_flags *flags)
  * none.
  */
 static void
-vdr_dump_pid_list(FILE *f, int num, uint16_t const *pids, char const (*langs)[4], uint8_t const *types)
+vdr_dump_pid_list(FILE *f, int num, uint16_t const *pids, char const (*langs)[VDR_LANG_MAX], uint8_t const *types)
 {
     int i;
 
@@ -450,7 +450,7 @@ vdr_dump_pid_list(FILE *f, int num, uint16_t const *pids, char const (*langs)[4]
             fprintf(f, ",");
         fprintf(f, "%i", pids[i]);
         if (langs[i][0]) {
-            fprintf(f, "=%.4s", langs[i]);
+            fprintf(f, "=%.*s", VDR_LANG_MAX - 1, langs[i]);
             sep = "";
         }
         if ((types != NULL) && types[i])
