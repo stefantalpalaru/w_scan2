@@ -37,6 +37,7 @@
 #include "parse-dvbscan.h"
 #include "dvbscan.h"
 #include "satellites.h"
+#include "countries.h"
 #include "dump-vdr.h"
 
 #define MAX_LINE_LENGTH 1024 // paranoia, but still possible
@@ -78,32 +79,32 @@ enum __extflags { ignore, wscan_version, tuning_timeout, filter_timeout, fe_type
 void
 parse_w_scan_flags(char const *input_buffer, struct w_scan_flags *flags)
 {
-    char *copy = (char *)malloc(strlen(input_buffer) + 1);
-    char *token = strtok(copy, DELIMITERS);
+    char *copy = strdup(input_buffer);
+    char *token;
     enum __extflags arg = ignore;
 
-    strcpy(copy, input_buffer);
+    if (copy == NULL) {
+        error("strdup() returned NULL\n");
+        exit(1);
+    }
+    // strtok() must not run before the input is in place
+    token = strtok(copy, DELIMITERS);
     if (NULL == token) {
         free(copy);
         return;
     }
     while (NULL != (token = strtok(0, DELIMITERS))) {
-        if (0 == strcasecmp(token, "<w_scan>")) {
+        if ((0 == strcasecmp(token, "<w_scan2>")) || (0 == strcasecmp(token, "<w_scan>"))) {
             arg = wscan_version;
             continue;
         }
-        if (0 == strcasecmp(token, "</w_scan>")) {
+        if ((0 == strcasecmp(token, "</w_scan2>")) || (0 == strcasecmp(token, "</w_scan>"))) {
             arg = ignore;
             continue;
         }
         switch (arg++) {
         case wscan_version:
-            flags->version = (char *)malloc(strlen(token) + 1);
-            if (flags->version == NULL) {
-                error("malloc() returned NULL\n");
-                exit(1);
-            }
-            strncpy(flags->version, token, strlen(token));
+            snprintf(flags->version, sizeof(flags->version), "%s", token);
             break;
         case tuning_timeout:
             flags->tuning_timeout = strtoul(token, NULL, 10);
@@ -115,8 +116,29 @@ parse_w_scan_flags(char const *input_buffer, struct w_scan_flags *flags)
             flags->scantype = txt_to_scantype(token);
             break;
         case list_idx:
-            flags->list_id = strtoul(token, NULL, 10);
-            break;
+            {
+                // the writer puts the country or satellite short name
+                // here, not an index into the table
+                int id;
+
+                if (flags->scantype == SCAN_SATELLITE) {
+                    id = txt_to_satellite(token); // -1 when unknown
+                } else {
+                    // txt_to_country() answers DE for anything it does
+                    // not know, so ask it to name the id back
+                    id = txt_to_country(token);
+                    if (strcasecmp(country_to_short_name(id), token) != 0)
+                        id = -1;
+                }
+                if (id >= 0)
+                    flags->list_id = id;
+                else
+                    info(
+                        "ignoring unknown %s \"%s\" in the initial tuning data\n",
+                        (flags->scantype == SCAN_SATELLITE) ? "satellite" : "country",
+                        token);
+                break;
+            }
         case ignore:
         default:
             continue;
@@ -162,8 +184,10 @@ dvbscan_parse_tuningdata(char const *tuningdata, struct w_scan_flags *flags)
          */
         strcpy(copy, buf);
         token = strtok(copy, DELIMITERS);
-        if (NULL == token)
+        if (NULL == token) {
+            free(copy);
             continue;
+        }
         switch (toupper(token[0])) {
         case 'A':
             tn = alloc_transponder(0, SYS_ATSC, 0);
@@ -182,15 +206,14 @@ dvbscan_parse_tuningdata(char const *tuningdata, struct w_scan_flags *flags)
             tn->type = SCAN_TERRESTRIAL;
             break;
         case '#':
-            if (strlen(token) > 2)
-                switch (token[1]) {
-                case '!':
-                    parse_w_scan_flags(buf, flags);
-                    continue;
-                default:;
-                }
+            // the token is exactly "#!"; the rest of the line follows
+            // it as separate tokens
+            if (token[1] == '!')
+                parse_w_scan_flags(buf, flags);
+            free(copy);
             continue;
         default:
+            free(copy);
             free(buf);
             error("could not parse %s\n", tuningdata);
             return 0; // err
