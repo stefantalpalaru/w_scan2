@@ -102,12 +102,7 @@ static int parse_logfile(char const *log);
 // Declare parse_xyz in scan.h? Hmm..
 extern void parse_pat(unsigned char const *buf, uint16_t section_length, uint16_t transport_stream_id, uint32_t flags);
 extern void parse_pmt(unsigned char const *buf, uint16_t section_length, uint16_t service_id);
-extern void parse_nit(
-    unsigned char const *buf,
-    uint16_t section_length,
-    uint8_t table_id,
-    uint16_t network_id,
-    uint32_t section_flags);
+extern void parse_nit(unsigned char const *buf, uint16_t section_length, uint8_t table_id, uint16_t network_id);
 extern void parse_sdt(unsigned char const *buf, uint16_t section_length, uint16_t transport_stream_id);
 extern void parse_psip_vct(unsigned char const *buf, uint16_t section_length, uint8_t table_id, uint16_t transport_stream_id);
 
@@ -515,7 +510,7 @@ em_readfilters(int *result)
                 break;
             case TABLE_NIT_ACT:
             case TABLE_NIT_OTH:
-                parse_nit(sidata->buf, sidata->len, filter->table_id, sidata->network_id, filter->flags);
+                parse_nit(sidata->buf, sidata->len, filter->table_id, sidata->network_id);
                 break;
             case TABLE_PMT:
                 verbose(
