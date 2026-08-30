@@ -102,6 +102,9 @@ struct service {
     int subtitling_num;
     uint16_t ac3_pid[AC3_CHAN_MAX];
     uint8_t ac3_stream_type[AC3_CHAN_MAX];
+    // AC-3 and E-AC-3 share stream type 0x06; only the descriptor tag
+    // the stream was recognized by tells the two apart
+    uint8_t ac3_descriptor_tag[AC3_CHAN_MAX];
     char ac3_lang[AC3_CHAN_MAX][4];
     int ac3_num;
     unsigned int type : 8;
@@ -109,6 +112,8 @@ struct service {
     bool visible_service;
     uint32_t logical_channel_number;
     uint8_t running;
+    // language slot of the elementary stream being parsed, else NULL
+    char *current_lang;
     void *priv;
 };
 
