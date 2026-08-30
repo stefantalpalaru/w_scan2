@@ -987,8 +987,11 @@ parse_descriptors(enum table_id t, unsigned char const *buf, int descriptors_loo
         case teletext_descriptor:
         case telephone_descriptor:
         case local_time_offset_descriptor:
+            break;
         case subtitling_descriptor:
-            parse_subtitling_descriptor(buf, data);
+            // only a PMT's descriptor loop names an elementary stream
+            if (t == TABLE_PMT)
+                parse_subtitling_descriptor(buf, data);
             break;
         case terrestrial_delivery_system_descriptor:
             if ((scantype == SCAN_TERRESTRIAL) && ((t == TABLE_NIT_ACT) || (t == TABLE_NIT_OTH)))
