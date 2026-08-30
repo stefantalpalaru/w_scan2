@@ -56,16 +56,20 @@ NOTE:  only one type of frontend should be used per file, see above.
 
 1.1 DVB-T/T2
 -----------------------------------------
-# T[2] [plp_id] [T2_system_id] <freq> <bw> <fec_hi> <fec_lo> <mod> <tm> <guard> <hi> [# comment]
+# T[2] <freq> <bw> <fec_hi> <fec_lo> <mod> <tm> <guard> <hi> [plp_id [T2_system_id]] [# comment]
 
 T	identifier DVB-T, frontend type FE_OFDM
 
 2	use second generation modulation, "DVB-T2"
 
-plp_id  plp_id, DVB-T2 only, omitted in case of DVB-T
+plp_id  plp_id, DVB-T2 only; optional, after <hi>
 
 T2_system_id
-        T2_system_id, DVB-T2 only, omitted in case of DVB-T
+        T2_system_id, DVB-T2 only; optional, after plp_id
+
+        The reader also accepts the older order, in which a T2 line
+        began with the plp_id and the T2_system_id:
+        T2 <plp_id> <T2_system_id> <freq> ...
 
 freq	center frequency in Hz
 

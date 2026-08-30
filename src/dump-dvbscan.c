@@ -77,7 +77,7 @@ dvbscan_dump_tuningdata(FILE *f, struct transponder *t, uint16_t index, struct w
             break;
         case SCAN_TERRESTRIAL:
             fprintf(f, "# T[2] <freq> <bw> <fec_hi> <fec_lo> <mod>");
-            fprintf(f, " <tm> <guard> <hi> [plp_id] [# comment]\n"); //  [system_id]
+            fprintf(f, " <tm> <guard> <hi> [plp_id [system_id]] [# comment]\n");
             break;
         case SCAN_SATELLITE:
             fprintf(f, "# S[2] <freq> <pol> <sr> <fec> [ro] [mod] [isi] [pls_code] [pls_mode] [# comment]\n");
@@ -112,8 +112,12 @@ dvbscan_dump_tuningdata(FILE *f, struct transponder *t, uint16_t index, struct w
         fprintf(f, "%4s ", terr_transmission_to_txt(t->transmission));
         fprintf(f, "%4s ", terr_guard_to_txt(t->guard));
         fprintf(f, "%4s", terr_hierarchy_to_txt(t->hierarchy));
-        if (t->plp_id)
+        // system_id is the second optional column, so a bare system_id
+        // still has to be preceded by its plp_id
+        if (t->plp_id || t->system_id)
             fprintf(f, " %u", t->plp_id);
+        if (t->system_id)
+            fprintf(f, " %u", t->system_id);
         break;
     case SCAN_SATELLITE:
         fprintf(f, "%-2s ", sat_delivery_system_to_txt(t->delsys));

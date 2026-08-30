@@ -32,6 +32,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <stdint.h>
 #include "extended_frontend.h"
 #include "scan.h"
 #include "parse-dvbscan.h"
@@ -55,8 +56,8 @@ enum __dvbscan_args {
     cable_fec_inner,
     cable_modulation,
     cable_END_READING,
-    terr_plp_id,
-    terr_system_id,
+    terr_first, // the frequency, or a legacy leading plp_id
+    terr_system_id_first,
     terr_frequency,
     terr_bandwidth,
     terr_fec_high_priority,
@@ -65,6 +66,8 @@ enum __dvbscan_args {
     terr_transmission_mode,
     terr_guard_interval,
     terr_hierarchy,
+    terr_plp_id, // optional trailing columns
+    terr_system_id,
     terr_END_READING,
     atsc_frequency,
     atsc_modulation,
@@ -230,7 +233,7 @@ dvbscan_parse_tuningdata(char const *tuningdata, struct w_scan_flags *flags)
                 if (token[1] == '2') {
                     flags->need_2g_fe = 1;
                     tn->delsys = SYS_DVBT2;
-                    arg = terr_plp_id;
+                    arg = terr_first;
                 }
             tn->inversion = INVERSION_AUTO;
             tn->bandwidth = 8000000;
@@ -258,6 +261,12 @@ dvbscan_parse_tuningdata(char const *tuningdata, struct w_scan_flags *flags)
         }
 
         while (NULL != (token = strtok(0, DELIMITERS))) {
+            // the trailing "# comment" holds no values; without this its
+            // first word would be read into whichever optional column
+            // comes next - plp_id and system_id on a terrestrial line,
+            // rolloff and modulation on a satellite one
+            if (token[0] == '#')
+                break;
             switch (arg++) {
             case sat_frequency:
             case cable_frequency:
@@ -291,11 +300,27 @@ dvbscan_parse_tuningdata(char const *tuningdata, struct w_scan_flags *flags)
                 tn->modulation = txt_to_cable_mod(token);
                 count++;
                 break;
-            case terr_plp_id:
-                tn->plp_id = strtoul(token, NULL, 10);
-                break;
-            case terr_system_id:
+            case terr_first:
+                {
+                    // a T2 line starts either with the frequency, as
+                    // the writer emits it, or with the plp_id, as
+                    // README.file_formats has always documented.  A
+                    // plp_id is 8 bits and a frequency is in Hz, so the
+                    // first column says which one it is.
+                    unsigned long value = strtoul(token, NULL, 10);
+
+                    if (value <= UINT8_MAX) {
+                        tn->plp_id = value;
+                        arg = terr_system_id_first;
+                    } else {
+                        tn->frequency = value;
+                        arg = terr_bandwidth;
+                    }
+                    break;
+                }
+            case terr_system_id_first:
                 tn->system_id = strtoul(token, NULL, 10);
+                arg = terr_frequency;
                 break;
             case terr_bandwidth:
                 tn->bandwidth = txt_to_terr_bw(token);
@@ -318,6 +343,12 @@ dvbscan_parse_tuningdata(char const *tuningdata, struct w_scan_flags *flags)
             case terr_hierarchy:
                 tn->hierarchy = txt_to_terr_hierarchy(token);
                 count++;
+                break;
+            case terr_plp_id:
+                tn->plp_id = strtoul(token, NULL, 10);
+                break;
+            case terr_system_id:
+                tn->system_id = strtoul(token, NULL, 10);
                 break;
             case atsc_modulation:
                 tn->modulation = txt_to_atsc_mod(token);
