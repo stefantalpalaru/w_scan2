@@ -483,23 +483,18 @@ parse_iso639_language_descriptor(unsigned char const *buf, struct service *s)
 void
 parse_subtitling_descriptor(unsigned char const *buf, struct service *s)
 {
-    unsigned int N = buf[1] / 8; // descriptor_length divided by 8_bytes per subtitle
-    unsigned int i;
+    // fills the slot of the subtitling PID parse_pmt() just added, not
+    // slot 0: a service may carry several subtitling streams
+    int i = s->subtitling_num - 1;
+    unsigned int count = buf[1] / 8; // descriptor_length over 8 bytes per subtitle
+
+    if ((i < 0) || (count == 0))
+        return;
     buf += 2;
-
-    if (N > SUBTITLES_MAX)
-        N = SUBTITLES_MAX;
-
-    for (i = 0; i < N; i++) {
-        memcpy(s->subtitling_lang[i], buf, 3);
-        buf += 3;
-        s->subtitling_type[i] = buf[0];
-        buf++;
-        s->composition_page_id[i] = buf[0] << 8 | buf[1];
-        buf += 2;
-        s->ancillary_page_id[i] = buf[0] << 8 | buf[1];
-        buf += 2;
-    }
+    memcpy(s->subtitling_lang[i], buf, 3);
+    s->subtitling_type[i] = buf[3];
+    s->composition_page_id[i] = (buf[4] << 8) | buf[5];
+    s->ancillary_page_id[i] = (buf[6] << 8) | buf[7];
 }
 
 void
