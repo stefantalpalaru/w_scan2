@@ -432,6 +432,32 @@ dump_param_vdr(FILE *f, struct transponder *t, struct w_scan_flags *flags)
     };
 }
 
+/* Print a comma-separated "<pid>[=<lang>][@<type>]" list.  VDR looks for
+ * the type only behind the language separator (cChannel::Parse()), so a
+ * typed PID without a language keeps the '=', the way VDR's own writer
+ * emits it (IntArrayToString()).  types is NULL for lists that carry
+ * none.
+ */
+static void
+vdr_dump_pid_list(FILE *f, int num, uint16_t const *pids, char const (*langs)[4], uint8_t const *types)
+{
+    int i;
+
+    for (i = 0; i < num; i++) {
+        char const *sep = "=";
+
+        if (i > 0)
+            fprintf(f, ",");
+        fprintf(f, "%i", pids[i]);
+        if (langs[i][0]) {
+            fprintf(f, "=%.4s", langs[i]);
+            sep = "";
+        }
+        if ((types != NULL) && types[i])
+            fprintf(f, "%s@%u", sep, types[i]);
+    }
+}
+
 /******************************************************************************
  * print complete vdr channels.conf line from service params.
  *
@@ -460,45 +486,21 @@ vdr_dump_service_parameter_set(FILE *f, struct service *s, struct transponder *t
 
     fprintf(f, ":");
 
-    fprintf(f, "%i", s->audio_pid[0]);
-    if (s->audio_lang[0][0])
-        fprintf(f, "=%.4s", s->audio_lang[0]);
-    if (s->audio_stream_type[0])
-        fprintf(f, "@%u", s->audio_stream_type[0]);
-    for (i = 1; i < s->audio_num; i++) {
-        fprintf(f, ",%i", s->audio_pid[i]);
-        if (s->audio_lang[i][0])
-            fprintf(f, "=%.4s", s->audio_lang[i]);
-        if (s->audio_stream_type[i])
-            fprintf(f, "@%u", s->audio_stream_type[i]);
-    }
+    // the Apid field is mandatory, so a service without audio still gets its "0"
+    vdr_dump_pid_list(f, s->audio_num > 0 ? s->audio_num : 1, s->audio_pid, s->audio_lang, s->audio_stream_type);
 
     if (s->ac3_num) {
-        fprintf(f, "%s", ";");
-        for (i = 0; i < s->ac3_num; i++) {
-            if (i > 0)
-                fprintf(f, "%s", ",");
-            fprintf(f, "%i", s->ac3_pid[i]);
-            if (s->ac3_lang[i][0])
-                fprintf(f, "=%.4s", s->ac3_lang[i]);
-            // an untyped Dpid means AC-3 to VDR, so E-AC-3 must say so
-            if (s->ac3_descriptor_tag[i])
-                fprintf(f, "@%u", s->ac3_descriptor_tag[i]);
-        }
+        fprintf(f, ";");
+        // an untyped Dpid means AC-3 to VDR, so E-AC-3 must say so
+        vdr_dump_pid_list(f, s->ac3_num, s->ac3_pid, s->ac3_lang, s->ac3_descriptor_tag);
     }
 
     fprintf(f, ":%d", s->teletext_pid);
 
     // add subtitling here
     if (s->subtitling_num) {
-        fprintf(f, "%s", ";");
-        for (i = 0; i < s->subtitling_num; i++) {
-            if (i > 0)
-                fprintf(f, "%s", ",");
-            fprintf(f, "%i", s->subtitling_pid[i]);
-            if (s->subtitling_lang[i][0])
-                fprintf(f, "=%.4s", s->subtitling_lang[i]);
-        }
+        fprintf(f, ";");
+        vdr_dump_pid_list(f, s->subtitling_num, s->subtitling_pid, s->subtitling_lang, NULL);
     }
 
     fprintf(f, ":%X", s->ca_id[0]);
