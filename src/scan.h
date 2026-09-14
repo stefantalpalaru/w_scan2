@@ -47,7 +47,6 @@ struct w_scan_flags {
     uint8_t get_other_nits;
     uint8_t add_frequencies;
     uint8_t dump_provider;
-    uint8_t vdr_version;
     uint8_t qam_no_auto;
     uint8_t ca_select;
     int rotor_position;

@@ -97,7 +97,6 @@ struct w_scan_flags flags = {
     1, // get_other_nits, atm always
     1, // add_frequencies, atm always
     1, // dump_provider, dump also provider name
-    2, // VDR version number, VDR-2.0.0
     0, // 0 = qam auto, 1 = search qams
     1, // scan encrypted channels = yes
     -1, // rotor position, unused
@@ -1297,8 +1296,6 @@ parse_pmt(unsigned char const *buf, uint16_t section_length, uint16_t service_id
             break;
         case iso_iec_13818_7_audio_w_ADTS_transp:
             moreverbose("  ADTS Audio Stream (usually AAC) : PID %d (stream type 0x%x)\n", elementary_pid, buf[0]);
-            if ((output_format == OUTPUT_VDR) && (flags.vdr_version != 2)) // CHECK!
-                break; /* not supported by VDR-1.2..1.7.?? */
             if (s->audio_num < AUDIO_CHAN_MAX) {
                 s->audio_pid[s->audio_num] = elementary_pid;
                 s->audio_stream_type[s->audio_num] = buf[0];
@@ -1315,8 +1312,6 @@ parse_pmt(unsigned char const *buf, uint16_t section_length, uint16_t service_id
                 "  ISO/IEC 14496-3 Audio with LATM transport syntax as def. in ISO/IEC 14496-3/AMD1 : PID %d (stream type 0x%x)\n",
                 elementary_pid,
                 buf[0]);
-            if ((output_format == OUTPUT_VDR) && (flags.vdr_version != 2)) // CHECK!
-                break; /* not supported by VDR-1.2..1.7.?? */
             if (s->audio_num < AUDIO_CHAN_MAX) {
                 s->audio_pid[s->audio_num] = elementary_pid;
                 s->audio_stream_type[s->audio_num] = buf[0];
@@ -3777,9 +3772,7 @@ static char const *ext_opts =
     "               N=0 gets only Free TV channels\n"
     "               N=1 search also encrypted channels [default]\n"
     "       -o N, --output-vdr N\n"
-    "               specify VDR version / channels.conf format\n"
-    "               2  = VDR-2.0.x (default)\n"
-    "               21 = VDR-2.1.x\n"
+    "               deprecated, ignored\n"
     "       -d, --delete-duplicate-transponders\n"
     "               with this option, only the first transponder copy is kept,\n"
     "               regardless of the signal strength, so if you are in an area\n"
@@ -4095,8 +4088,8 @@ main(int argc, char **argv)
             this_lnb.high_val *= 1000;
             this_lnb.switch_val *= 1000;
             break;
-        case 'o': // vdr Version
-            flags.vdr_version = strtoul(optarg, NULL, 0);
+        case 'o': // vdr version, deprecated
+            info("-o/--output-vdr is deprecated and ignored: the output fits any current VDR\n");
             break;
         case 'p': // satellite *p*osition file
             positionfile = strdup(optarg);
@@ -4457,21 +4450,11 @@ main(int argc, char **argv)
     }
     switch (output_format) {
     case OUTPUT_VDR:
-        switch (flags.vdr_version) {
-        case 2:
-            info("output format vdr-2.0\n");
-            break;
-        case 21:
-            info("output format vdr-2.1\n");
-            break;
-        default:
-            fatal("UNKNOWN VDR VERSION.");
-        }
+        info("output format vdr channels.conf\n");
         break;
     case OUTPUT_GSTREAMER:
         // Gstreamer output: As vdr-1.7+, but pmt_pid added at end of line.
         flags.print_pmt = 1;
-        flags.vdr_version = 2;
         output_format = OUTPUT_VDR;
         info("output format gstreamer\n");
         break;
