@@ -461,11 +461,11 @@ parse_iso639_language_descriptor(unsigned char const *buf, struct service *s)
     unsigned int lang_count = buf[1] / 4;
     unsigned int i;
     buf += 2;
-    if (s->audio_num < 1)
+    if (s->current_lang == NULL)
         return;
     for (i = 0; i < lang_count; i++) {
         // ISO_639_language_code 24 bslbf
-        memcpy(s->audio_lang[s->audio_num - 1], buf, 3);
+        memcpy(s->current_lang, buf, 3);
         /*   switch(buf[3]) { // audio_type 8 bslbf, seems to be wrong all over the place
                 case 1: // clean effects, program element has no language
                         break;

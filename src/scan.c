@@ -1154,6 +1154,48 @@ parse_pat(unsigned char const *buf, uint16_t section_length, uint16_t transport_
     }
 }
 
+/* Record an elementary stream and read its descriptor loop with
+ * current_lang aimed at that stream's own slot, so its language does
+ * not land on whichever track was parsed last.
+ */
+static void
+add_audio_stream(struct service *s, int pid, uint8_t stream_type, unsigned char const *es_info, int es_info_len)
+{
+    if (s->audio_num >= AUDIO_CHAN_MAX) {
+        warning("more than %i audio channels, truncating\n", AUDIO_CHAN_MAX);
+        return;
+    }
+    s->audio_pid[s->audio_num] = pid;
+    s->audio_stream_type[s->audio_num] = stream_type;
+    s->current_lang = s->audio_lang[s->audio_num++];
+    parse_descriptors(TABLE_PMT, es_info, es_info_len, s, flags.scantype);
+    s->current_lang = NULL;
+}
+
+/* descriptor_tag is what VDR reads the Dolby codec from; the stream
+ * type cannot express it.
+ */
+static void
+add_dolby_stream(
+    struct service *s,
+    int pid,
+    uint8_t stream_type,
+    uint8_t descriptor_tag,
+    unsigned char const *es_info,
+    int es_info_len)
+{
+    if (s->ac3_num >= AC3_CHAN_MAX) {
+        warning("more than %i Dolby audio channels, truncating\n", AC3_CHAN_MAX);
+        return;
+    }
+    s->ac3_pid[s->ac3_num] = pid;
+    s->ac3_stream_type[s->ac3_num] = stream_type;
+    s->ac3_descriptor_tag[s->ac3_num] = descriptor_tag;
+    s->current_lang = s->ac3_lang[s->ac3_num++];
+    parse_descriptors(TABLE_PMT, es_info, es_info_len, s, flags.scantype);
+    s->current_lang = NULL;
+}
+
 em_static void
 parse_pmt(unsigned char const *buf, uint16_t section_length, uint16_t service_id)
 {
@@ -1201,13 +1243,7 @@ parse_pmt(unsigned char const *buf, uint16_t section_length, uint16_t service_id
         case iso_iec_11172_audio_stream:
         case iso_iec_13818_3_audio_stream:
             moreverbose("  AUDIO     : PID %d (stream type 0x%x)\n", elementary_pid, buf[0]);
-            if (s->audio_num < AUDIO_CHAN_MAX) {
-                s->audio_pid[s->audio_num] = elementary_pid;
-                s->audio_stream_type[s->audio_num] = buf[0];
-                s->audio_num++;
-                parse_descriptors(TABLE_PMT, buf + 5, ES_info_len, s, flags.scantype);
-            } else
-                warning("more than %i audio channels, truncating\n", AUDIO_CHAN_MAX);
+            add_audio_stream(s, elementary_pid, buf[0], buf + 5, ES_info_len);
             break;
         case iso_iec_13818_1_private_sections:
         case iso_iec_13818_1_private_data:
@@ -1227,23 +1263,11 @@ parse_pmt(unsigned char const *buf, uint16_t section_length, uint16_t service_id
                 break;
             } else if (find_descriptor(ac3_descriptor, buf + 5, ES_info_len, NULL, NULL)) {
                 moreverbose("  AC3       : PID %d (stream type 0x%x)\n", elementary_pid, buf[0]);
-                if (s->ac3_num < AC3_CHAN_MAX) {
-                    s->ac3_pid[s->ac3_num] = elementary_pid;
-                    s->ac3_stream_type[s->ac3_num] = buf[0];
-                    s->ac3_num++;
-                    parse_descriptors(TABLE_PMT, buf + 5, ES_info_len, s, flags.scantype);
-                } else
-                    warning("more than %i ac3 audio channels, truncating\n", AC3_CHAN_MAX);
+                add_dolby_stream(s, elementary_pid, buf[0], ac3_descriptor, buf + 5, ES_info_len);
                 break;
             } else if (find_descriptor(enhanced_ac3_descriptor, buf + 5, ES_info_len, NULL, NULL)) {
                 moreverbose("  EAC3      : PID %d (stream type 0x%x)\n", elementary_pid, buf[0]);
-                if (s->ac3_num < AC3_CHAN_MAX) {
-                    s->ac3_pid[s->ac3_num] = elementary_pid;
-                    s->ac3_stream_type[s->ac3_num] = buf[0];
-                    s->ac3_num++;
-                    parse_descriptors(TABLE_PMT, buf + 5, ES_info_len, s, flags.scantype);
-                } else
-                    warning("more than %i eac3 audio channels, truncating\n", AC3_CHAN_MAX);
+                add_dolby_stream(s, elementary_pid, buf[0], enhanced_ac3_descriptor, buf + 5, ES_info_len);
                 break;
             }
             // we shouldn't reach this one, usually it should be Teletext, Subtitling or AC3 ..
@@ -1296,13 +1320,7 @@ parse_pmt(unsigned char const *buf, uint16_t section_length, uint16_t service_id
             break;
         case iso_iec_13818_7_audio_w_ADTS_transp:
             moreverbose("  ADTS Audio Stream (usually AAC) : PID %d (stream type 0x%x)\n", elementary_pid, buf[0]);
-            if (s->audio_num < AUDIO_CHAN_MAX) {
-                s->audio_pid[s->audio_num] = elementary_pid;
-                s->audio_stream_type[s->audio_num] = buf[0];
-                s->audio_num++;
-                parse_descriptors(TABLE_PMT, buf + 5, ES_info_len, s, flags.scantype);
-            } else
-                warning("more than %i audio channels, truncating\n", AUDIO_CHAN_MAX);
+            add_audio_stream(s, elementary_pid, buf[0], buf + 5, ES_info_len);
             break;
         case iso_iec_14496_2_visual:
             moreverbose("  ISO/IEC 14496-2 Visual : PID %d\n", elementary_pid);
@@ -1312,13 +1330,7 @@ parse_pmt(unsigned char const *buf, uint16_t section_length, uint16_t service_id
                 "  ISO/IEC 14496-3 Audio with LATM transport syntax as def. in ISO/IEC 14496-3/AMD1 : PID %d (stream type 0x%x)\n",
                 elementary_pid,
                 buf[0]);
-            if (s->audio_num < AUDIO_CHAN_MAX) {
-                s->audio_pid[s->audio_num] = elementary_pid;
-                s->audio_stream_type[s->audio_num] = buf[0];
-                s->audio_num++;
-                parse_descriptors(TABLE_PMT, buf + 5, ES_info_len, s, flags.scantype);
-            } else
-                warning("more than %i audio channels, truncating\n", AUDIO_CHAN_MAX);
+            add_audio_stream(s, elementary_pid, buf[0], buf + 5, ES_info_len);
             break;
         case iso_iec_14496_1_packet_stream_in_PES:
             moreverbose(
@@ -1377,13 +1389,8 @@ parse_pmt(unsigned char const *buf, uint16_t section_length, uint16_t service_id
             break;
         case atsc_a_52b_ac3:
             moreverbose("  AC-3 Audio per ATSC A/52B : PID %d (stream type 0x%x)\n", elementary_pid, buf[0]);
-            if (s->ac3_num < AC3_CHAN_MAX) {
-                s->ac3_pid[s->ac3_num] = elementary_pid;
-                s->ac3_stream_type[s->ac3_num] = buf[0];
-                s->ac3_num++;
-                parse_descriptors(TABLE_PMT, buf + 5, ES_info_len, s, flags.scantype);
-            } else
-                warning("more than %i ac3 audio channels, truncating\n", AC3_CHAN_MAX);
+            // ATSC A/52B is AC-3, as in VDR's own pat.c
+            add_dolby_stream(s, elementary_pid, buf[0], ac3_descriptor, buf + 5, ES_info_len);
             break;
         default:
             moreverbose("  OTHER     : PID %d TYPE 0x%02x\n", elementary_pid, buf[0]);
