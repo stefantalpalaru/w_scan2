@@ -5,6 +5,7 @@ ChangeLog:
 - cable and terrestrial frequency tables for China (patch by https://github.com/solderwire)
 - fix endless loop and memory leaks in a terrestrial scan corner case (https://github.com/stefantalpalaru/w_scan2/pull/71)
 - select the delivery system before reading the frontend limits (patch by https://github.com/dnehring7)
+- ignore "--output-vdr", since we no longer care about very old VDR versions (https://github.com/stefantalpalaru/w_scan2/pull/76)
 
 [1.0.17] 2025-04-26
 - ATSC_VSB: remove channels 37-69 (patch by https://github.com/majortom9)
