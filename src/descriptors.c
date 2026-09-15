@@ -455,29 +455,32 @@ parse_ca_descriptor(unsigned char const *buf, struct service *s)
     }
 }
 
+/* Store the stream's languages the way VDR does: up to two ISO 639
+ * codes joined by '+' (cChannel::Parse()).  Looping over the codes
+ * while writing the same three bytes, as this used to, keeps only the
+ * last one.
+ */
+static void
+copy_language_codes(char *dest, unsigned char const *buf, unsigned int count, unsigned int stride)
+{
+    unsigned int i;
+
+    memset(dest, 0, VDR_LANG_MAX);
+    for (i = 0; (i < count) && (i < 2); i++, buf += stride) {
+        if (i > 0)
+            *dest++ = '+';
+        memcpy(dest, buf, 3);
+        dest += 3;
+    }
+}
+
 void
 parse_iso639_language_descriptor(unsigned char const *buf, struct service *s)
 {
-    unsigned int lang_count = buf[1] / 4;
-    unsigned int i;
-    buf += 2;
-    if (s->current_lang == NULL)
-        return;
-    for (i = 0; i < lang_count; i++) {
-        // ISO_639_language_code 24 bslbf
-        memcpy(s->current_lang, buf, 3);
-        /*   switch(buf[3]) { // audio_type 8 bslbf, seems to be wrong all over the place
-                case 1: // clean effects, program element has no language
-                        break;
-                case 2: // hearing impaired, program element is prepared for the hearing impaired
-                        break;
-                case 3: // visual_impaired_commentary, program element is prepared for the visually impaired viewer
-                        break;
-                default:
-                        info("unhandled audio_type.\n");
-                }*/
-        buf += 4;
-    }
+    // ISO_639_language_code 24 bslbf, then audio_type 8 bslbf - which
+    // seems to be wrong all over the place, so it is not read
+    if (s->current_lang != NULL)
+        copy_language_codes(s->current_lang, buf + 2, buf[1] / 4, 4);
 }
 
 void
@@ -491,7 +494,7 @@ parse_subtitling_descriptor(unsigned char const *buf, struct service *s)
     if ((i < 0) || (count == 0))
         return;
     buf += 2;
-    memcpy(s->subtitling_lang[i], buf, 3);
+    copy_language_codes(s->subtitling_lang[i], buf, count, 8);
     s->subtitling_type[i] = buf[3];
     s->composition_page_id[i] = (buf[4] << 8) | buf[5];
     s->ancillary_page_id[i] = (buf[6] << 8) | buf[7];
