@@ -1259,7 +1259,13 @@ parse_pmt(unsigned char const *buf, uint16_t section_length, uint16_t service_id
                 // that we catch DVB subtitling streams only here, w/o
                 // parsing the descriptor.
                 moreverbose("  SUBTITLING: PID %d\n", elementary_pid);
-                s->subtitling_pid[s->subtitling_num++] = elementary_pid;
+                if (s->subtitling_num < SUBTITLES_MAX) {
+                    s->subtitling_pid[s->subtitling_num++] = elementary_pid;
+                    // the descriptor loop carries the language; the
+                    // parser files it under the PID just added
+                    parse_descriptors(TABLE_PMT, buf + 5, ES_info_len, s, flags.scantype);
+                } else
+                    warning("more than %i subtitling streams, truncating\n", SUBTITLES_MAX);
                 break;
             } else if (find_descriptor(ac3_descriptor, buf + 5, ES_info_len, NULL, NULL)) {
                 moreverbose("  AC3       : PID %d (stream type 0x%x)\n", elementary_pid, buf[0]);
