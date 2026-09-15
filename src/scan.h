@@ -37,7 +37,7 @@
  *****************************************************************************/
 
 struct w_scan_flags {
-    char *version;
+    char version[32];
     scantype_t scantype;
     uint8_t atsc_type;
     uint8_t need_2g_fe;

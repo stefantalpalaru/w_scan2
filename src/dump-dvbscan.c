@@ -51,7 +51,7 @@ dvbscan_dump_tuningdata(FILE *f, struct transponder *t, uint16_t index, struct w
         fprintf(f, "# (https://github.com/stefantalpalaru/w_scan2)\n");
         fprintf(
             f,
-            "#! <w_scan> %s %u %u %s %s </w_scan>\n",
+            "#! <w_scan2> %s %u %u %s %s </w_scan2>\n",
             flags->version,
             flags->tuning_timeout,
             flags->filter_timeout,
