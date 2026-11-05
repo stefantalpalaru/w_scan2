@@ -473,7 +473,7 @@ hexdump(char const *intro, unsigned char const *buf, int len)
         if ((i % 16) == 0) {
             info("%s0x%.2X: ", i ? "\n\t" : "\t", (i / 16) * 16);
         }
-        info("%.2X ", (uint8_t) * (buf + i));
+        info("%.2X ", (uint8_t)*(buf + i));
         sbuf[i % 16] = *(buf + i);
         if (((i + 1) % 16) == 0) {
             // remove non-printable chars
