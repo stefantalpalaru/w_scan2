@@ -740,18 +740,18 @@ parse_tp(char const *str)
             sprintf(mbuf, "P%d", em_device.stream_id);
         else
             mbuf[0] = 0;
-        //EM_INFO("%s: '%-55s' -> %-8s f = %6d kHz I%sB%sC%sD%sT%sG%sY%s%s\n", \
-		//    __FUNCTION__, str,                                               \
-		//    xine_modulation_name(em_device.modulation),                      \
-		//    freq_scale(em_device.frequency, 1e-3),                           \
-		//    vdr_inversion_name(em_device.inversion),                         \
-		//    vdr_bandwidth_name(em_device.bandwidth_hz),                      \
-		//    vdr_fec_name(em_device.fec),                                     \
-		//    vdr_fec_name(FEC_NONE),                                          \
-		//    vdr_transmission_mode_name(em_device.transmission),              \
-		//    vdr_guard_name(em_device.guard),                                 \
-		//    vdr_hierarchy_name(em_device.hierarchy),                         \
-		//    mbuf);
+        // EM_INFO("%s: '%-55s' -> %-8s f = %6d kHz I%sB%sC%sD%sT%sG%sY%s%s\n", \
+        //     __FUNCTION__, str,                                               \
+        //     xine_modulation_name(em_device.modulation),                      \
+        //     freq_scale(em_device.frequency, 1e-3),                           \
+        //     vdr_inversion_name(em_device.inversion),                         \
+        //     vdr_bandwidth_name(em_device.bandwidth_hz),                      \
+        //     vdr_fec_name(em_device.fec),                                     \
+        //     vdr_fec_name(FEC_NONE),                                          \
+        //     vdr_transmission_mode_name(em_device.transmission),              \
+        //     vdr_guard_name(em_device.guard),                                 \
+        //     vdr_hierarchy_name(em_device.hierarchy),                         \
+        //     mbuf);
         break;
     case SCAN_TERRCABLE_ATSC:
         sscanf(str, "%8s f=%u kHz ", mbuf, &args[0]);
@@ -766,10 +766,10 @@ parse_tp(char const *str)
         else
             em_device.modulation = QAM_AUTO;
         em_device.frequency = 1000 * args[0];
-        //EM_INFO("%s: '%-55s' -> %-8s f=%d kHz\n",  \
-		//    __FUNCTION__, str,                     \
-		//    atsc_mod_to_txt(em_device.modulation), \
-		//    freq_scale(em_device.frequency, 1e-3));
+        // EM_INFO("%s: '%-55s' -> %-8s f=%d kHz\n",  \
+        //     __FUNCTION__, str,                     \
+        //     atsc_mod_to_txt(em_device.modulation), \
+        //     freq_scale(em_device.frequency, 1e-3));
         break;
     case SCAN_CABLE:
         sscanf(str, "%8s f = %u kHz S%uC%u  ", mbuf, &args[0], &args[1], &args[2]);
@@ -788,12 +788,12 @@ parse_tp(char const *str)
         em_device.frequency = 1000 * args[0];
         em_device.symbolrate = 1000 * args[1];
         em_device.fec = FEC_NONE;
-        //EM_INFO("%s: '%-55s' -> %-8s f = %d kHz S%dC%s\n", \
-		//    __FUNCTION__, str,                             \
-		//    xine_modulation_name(em_device.modulation),    \
-		//    freq_scale(em_device.frequency, 1e-3),         \
-		//    freq_scale(em_device.symbol_rate, 1e-3),         \
-		//    vdr_fec_name(FEC_NONE));
+        // EM_INFO("%s: '%-55s' -> %-8s f = %d kHz S%dC%s\n", \
+        //     __FUNCTION__, str,                             \
+        //     xine_modulation_name(em_device.modulation),    \
+        //     freq_scale(em_device.frequency, 1e-3),         \
+        //     freq_scale(em_device.symbol_rate, 1e-3),         \
+        //     vdr_fec_name(FEC_NONE));
         break;
     case SCAN_SATELLITE:
         em_device.delsys = SYS_DVBS;
@@ -1383,16 +1383,16 @@ parse_logfile(char const *log)
                 default:
                     info("%s: no table id.\n", __FUNCTION__);
                 }
-                //EM_INFO("line %-5d: new sidata: table_id = %-8s, table_id_ext = %u, pid = %u (%u:%u:%u)\n", \
-				//     line_no,                                                                               \
-				//     sidata->table_id == TABLE_PAT    ?"PAT":                                               \
-				//     sidata->table_id == TABLE_NIT_ACT?"NIT(act)":                                          \
-				//     sidata->table_id == TABLE_NIT_OTH?"NIT(oth)":                                          \
-				//     sidata->table_id == TABLE_SDT_ACT?"SDT(act)":                                          \
-				//     sidata->table_id == TABLE_SDT_OTH?"SDT(oth)":                                          \
-				//     sidata->table_id == TABLE_PMT    ?"PMT":"---ERROR---" ,                                \
-				//     sidata->table_id_ext, sidata->pid,                                                     \
-				//     sidata->original_network_id, sidata->network_id, sidata->transport_stream_id);
+                // EM_INFO("line %-5d: new sidata: table_id = %-8s, table_id_ext = %u, pid = %u (%u:%u:%u)\n", \
+                //      line_no,                                                                               \
+                //      sidata->table_id == TABLE_PAT    ?"PAT":                                               \
+                //      sidata->table_id == TABLE_NIT_ACT?"NIT(act)":                                          \
+                //      sidata->table_id == TABLE_NIT_OTH?"NIT(oth)":                                          \
+                //      sidata->table_id == TABLE_SDT_ACT?"SDT(act)":                                          \
+                //      sidata->table_id == TABLE_SDT_OTH?"SDT(oth)":                                          \
+                //      sidata->table_id == TABLE_PMT    ?"PMT":"---ERROR---" ,                                \
+                //      sidata->table_id_ext, sidata->pid,                                                     \
+                //      sidata->original_network_id, sidata->network_id, sidata->transport_stream_id);
             }
             continue;
         }

@@ -334,7 +334,7 @@ char_coding(
         int to_utf = user_charset_id < iconv_codes_count() && !strncmp(iconv_codes[user_charset_id], "UTF", sizeof "UTF" - 1);
 #endif
         for (i = 0; i < nsrc; i++) {
-            switch ((uint8_t) * (psrc + i)) {
+            switch ((uint8_t)*(psrc + i)) {
                 // case 0x20 ... 0x7E:
                 // case 0xA0 ... 0xFF:
                 //  printable chars ISO-6937-2

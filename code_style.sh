@@ -43,8 +43,8 @@ find_cfiles() {
 # We're targeting clang-format version 18 and other versions give slightly
 # different results, so prefer `clang-format-18` if it's installed.
 clang_format_exe_names=(
-  'clang-format-18'
-  '/usr/lib/llvm/18/bin/clang-format'
+  'clang-format-21'
+  '/usr/lib/llvm/21/bin/clang-format'
   'clang-format'
 )
 for name in ${clang_format_exe_names[@]}; do
